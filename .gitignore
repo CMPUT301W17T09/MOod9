@@ -18,6 +18,9 @@ out/
 .gradle/
 build/
 
+# Java Class files
+*.class
+
 # Local configuration file (sdk path, etc)
 local.properties
 
