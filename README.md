@@ -7,3 +7,4 @@ Teammembers:
 * cdkushni - Colin Kushniruk
 * ddao - Dai Dao
 * shlakhte - Anton Shlakhter
+* fmachaal - Fady Machalani
