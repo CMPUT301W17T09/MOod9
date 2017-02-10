@@ -1,4 +1,5 @@
-# ProjectMOod9
+# ProjectMO*od*9
+## Mood Organizer god #9
 Team 9 CMPUT301W17T09's public MOod9 repository.
 
 Teammembers:
