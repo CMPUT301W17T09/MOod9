@@ -1,5 +1,5 @@
-# ProjectMobilegeddon
-Team 9 CMPUT301W17T09's public Mobilegeddon repository.
+# ProjectMOod9
+Team 9 CMPUT301W17T09's public MOod9 repository.
 
 Teammembers:
 * vinnakot - Rohit Vinnakota
