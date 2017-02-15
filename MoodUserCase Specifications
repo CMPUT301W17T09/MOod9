@@ -1,0 +1,48 @@
+Post Moods
+Track Moods
+Share Moods
+
+USER CASE: 
+NAME:Moods
+GOAL:Add new Mood event with current date/time, 
+emotional state, optional trigger, optional social situation.
+-Emotional States: anger, confusion, disgust, fear, happiness, sadness, shame, surprise.
+-Emoticons and colors to represent emotional states.
+-View all details of mood events meaning by default mood events should be compact and concise.
+-Editable details of user's own mood events.
+-Delete user's own mood events.
+
+
+USER CASE:
+NAME:Other Details
+GOAL:Specify Mood event status text/photo and social situation
+
+USER CASE:
+NAME:Profile
+GOAL:Change Profile Username
+
+USER CASE:
+NAME:Mood History
+GOAL:View Mood History, sorted most recent first, 
+filterable by how recent/mood emotion/mood status contains word
+
+USER CASE:
+NAME:Mood Following and Sharing
+GOAL:-Follow another user's mood event/Grant 
+another user permission to follow my mood event
+-View list of recent mood events of all users I am following, 
+sortable by date/time; recent first. Filterable by: 
+How recent/mood emotion/mood status contains word
+
+USER CASE:
+NAME:Geolocation and Maps
+GOAL:Attach location to mood event, 
+see map of mood events with emotions based on filtered mood history list.
+Followers can see their followed user's mood event maps.
+Users can see a map of all user's mood events 
+within range of them if the event has a location.
+
+USER CASE:
+NAME:Offline Behavior
+GOAL:Be able to add, edit or delete a mood event while offline, 
+go online and it will synchronize with the database.
