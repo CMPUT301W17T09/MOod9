@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<SocialSituations xmlns:android="http://schemas.android.com/apk/res/android">
+    <SocialSituation>
+        <id>0</id>
+        <name>Alone</name>
+        <description>There's no one here besides me.</description>
+    </SocialSituation>
+</SocialSituations>
