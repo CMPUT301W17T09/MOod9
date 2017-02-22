@@ -24,6 +24,8 @@ public class FeedActivity extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
-    }
 
+        toolbar.setTitle(R.string.universal_feed);
+
+    }
 }

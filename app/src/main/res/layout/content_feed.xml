@@ -13,4 +13,9 @@
     tools:context="ca.ualberta.cmput301w17t09.mood9.mood9.FeedActivity"
     tools:showIn="@layout/activity_feed">
 
+    <android.support.v7.widget.RecyclerView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true" />
 </RelativeLayout>
