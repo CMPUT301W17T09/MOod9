@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- http://stackoverflow.com/questions/5223554/custom-xml-with-references-to-drawable-resources -->
+<Emotions xmlns:android="http://schemas.android.com/apk/res/android">
+    <Emotion>
+        <id>0</id>
+        <name>Happiness</name>
+        <description>I'm so happy</description>
+        <color>#ffffff</color>
+        <image>happiness.png</image>
+    </Emotion>
+</Emotions>
