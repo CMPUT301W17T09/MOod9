@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context="ca.ualberta.cmput301w17t09.mood9.mood9.MainActivity">
+    tools:context="ca.ualberta.cmput301w17t09.mood9.mood9.FeedActivity">
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
@@ -21,30 +21,15 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <ImageView
-        android:layout_marginTop="75dp"
+    <include layout="@layout/content_feed" />
+
+    <android.support.design.widget.FloatingActionButton
+        app:backgroundTint="@color/colorPrimary"
+        android:id="@+id/fab"
         android:layout_width="wrap_content"
-        android:layout_height="240dp"
-        app:srcCompat="@drawable/logo"
-        android:id="@+id/logo_imageview" />
-
-    <EditText
-        android:layout_marginTop="350dp"
-        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:inputType="textPersonName"
-        android:hint="@string/username"
-        android:ems="10"
-        android:id="@+id/username_field" />
-
-    <Button
-        android:textColor="@color/colorWhite"
-        android:background="@color/colorPrimary"
-        android:layout_marginTop="400dp"
-        android:text="Go"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/go" />
-
+        android:layout_gravity="bottom|end"
+        android:layout_margin="@dimen/fab_margin"
+        app:srcCompat="@android:drawable/ic_input_add" />
 
 </android.support.design.widget.CoordinatorLayout>
