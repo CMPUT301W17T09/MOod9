@@ -36,6 +36,10 @@ public class Mood {
         this.date = date;
     }
 
+    public Mood(){
+
+    }
+
     public String getId() {
         return id;
     }
