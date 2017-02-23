@@ -4,4 +4,11 @@
     <string name="username">Username</string>
     <string name="title_activity_feed">FeedActivity</string>
     <string name="universal_feed">Universal Feed</string>
+    <string name="emotion">Emotion</string>
+    <string name="social">Social</string>
+    <string name="add_location">Add Location</string>
+    <string name="save">Save</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
 </resources>
