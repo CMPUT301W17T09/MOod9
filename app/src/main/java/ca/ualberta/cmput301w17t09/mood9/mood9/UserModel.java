@@ -10,15 +10,15 @@ import java.util.Map;
  */
 
 public class UserModel {
-    protected static HashMap<String, UserRecord> users;
+    protected static HashMap<String, User> users;
     protected Date last_updated;
 
     public static User getUser(String id){
-        return users.get(id).getUser();
+        return users.get(id);
     }
 
     public static void loadUsers() {
-        UserModel.users = new HashMap<String, UserRecord>();
+        UserModel.users = new HashMap<String, User>();
     }
 
     public static void loadUser(String id) {
@@ -26,13 +26,6 @@ public class UserModel {
     }
 
     public static HashMap<String, User> getUsers(){
-        HashMap<String, User> users_map = new HashMap<String, User>();
-        Iterator<Map.Entry<String, UserRecord>> it = users.entrySet().iterator();
-        while (it.hasNext()) {
-            Map.Entry pair = (Map.Entry)it.next();
-            UserRecord ur = (UserRecord)pair.getValue();
-            users_map.put((String) pair.getKey(), ur.getUser());
-        }
-        return users_map;
+        return users;
     }
 }
