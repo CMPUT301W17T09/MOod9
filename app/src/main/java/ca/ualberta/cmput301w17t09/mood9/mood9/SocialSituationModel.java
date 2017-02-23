@@ -47,6 +47,6 @@ public class SocialSituationModel {
     }
 
     public static void initialLoad(){
-        
+
     }
 }
