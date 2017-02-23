@@ -42,10 +42,6 @@ public class UserModel {
                 });
     }
 
-    public static void loadUser(String id) {
-
-    }
-
     public static ConcurrentMap<String, User> getUsers(){
         return users.asMap();
     }
