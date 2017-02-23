@@ -18,10 +18,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".FeedActivitytemp"
-            android:label="@string/title_activity_feed"
-            android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".AddMoodActivity" />
         <activity
             android:name=".FeedActivity"
