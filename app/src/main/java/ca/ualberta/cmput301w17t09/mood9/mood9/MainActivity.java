@@ -24,7 +24,7 @@ public class MainActivity extends AppCompatActivity {
         goButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent feedIntent = new Intent(MainActivity.this, FeedActivitytemp.class);
+                Intent feedIntent = new Intent(MainActivity.this, FeedActivity.class);
                 startActivity(feedIntent);
                 finish();
             }

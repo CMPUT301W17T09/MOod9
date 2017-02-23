@@ -3,34 +3,36 @@
 
     <group android:checkableBehavior="single">
         <item
-            android:id="@+id/nav_camera"
-            android:icon="@drawable/ic_menu_camera"
-            android:title="Import" />
+            android:id="@+id/personal"
+            android:icon="@drawable/ic_personal"
+            android:title="@string/personal_feed" />
         <item
-            android:id="@+id/nav_gallery"
-            android:icon="@drawable/ic_menu_gallery"
-            android:title="Gallery" />
+            android:id="@+id/followed"
+            android:icon="@drawable/ic_followed"
+            android:title="@string/followed_feed" />
         <item
-            android:id="@+id/nav_slideshow"
-            android:icon="@drawable/ic_menu_slideshow"
-            android:title="Slideshow" />
+            android:id="@+id/universal"
+            android:icon="@drawable/ic_globe"
+            android:title="@string/universal_feed" />
         <item
-            android:id="@+id/nav_manage"
-            android:icon="@drawable/ic_menu_manage"
-            android:title="Tools" />
+            android:id="@+id/near_me"
+            android:icon="@drawable/ic_location"
+            android:title="@string/near_me" />
     </group>
 
-    <item android:title="Communicate">
+    <item android:title="Communcation">
         <menu>
             <item
-                android:id="@+id/nav_share"
-                android:icon="@drawable/ic_menu_share"
-                android:title="Share" />
+                android:id="@+id/profile"
+                android:icon="@drawable/ic_face"
+                android:title="@string/profile" />
             <item
-                android:id="@+id/nav_send"
-                android:icon="@drawable/ic_menu_send"
-                android:title="Send" />
+                android:id="@+id/about"
+                android:icon="@drawable/ic_lightbulb"
+                android:title="@string/about" />
         </menu>
     </item>
-
+<!--TODO change the buttons and icons to do as we wish-->
 </menu>
+
+

@@ -13,6 +13,7 @@
         android:theme="@style/AppTheme.AppBarOverlay">
 
         <android.support.v7.widget.Toolbar
+            app:title="title"
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
@@ -24,11 +25,12 @@
     <include layout="@layout/content_feed" />
 
     <android.support.design.widget.FloatingActionButton
+        app:backgroundTint="@color/colorPrimary"
         android:id="@+id/fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/fab_margin"
-        app:srcCompat="@android:drawable/ic_dialog_email" />
+        app:srcCompat="@drawable/ic_add_mood" />
 
 </android.support.design.widget.CoordinatorLayout>

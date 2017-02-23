@@ -1,5 +1,6 @@
 package ca.ualberta.cmput301w17t09.mood9.mood9;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -27,8 +28,7 @@ public class FeedActivity extends AppCompatActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                addMood();
             }
         });
 
@@ -40,6 +40,10 @@ public class FeedActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+
+        //This changes the title of the toolbar - need to change according to feed shown
+        toolbar.setTitle(R.string.universal_feed);
     }
 
     @Override
@@ -81,22 +85,27 @@ public class FeedActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camera) {
+        if (id == R.id.personal) {
             // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
+        } else if (id == R.id.followed) {
 
-        } else if (id == R.id.nav_slideshow) {
+        } else if (id == R.id.universal) {
 
-        } else if (id == R.id.nav_manage) {
+        } else if (id == R.id.near_me) {
 
-        } else if (id == R.id.nav_share) {
+        } else if (id == R.id.profile) {
 
-        } else if (id == R.id.nav_send) {
+        } else if (id == R.id.about) {
 
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    private void addMood() {
+        Intent addMoodIntent = new Intent(this, AddMoodActivity.class);
+        startActivity(addMoodIntent);
     }
 }
