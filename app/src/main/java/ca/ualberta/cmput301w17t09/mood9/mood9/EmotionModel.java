@@ -25,7 +25,7 @@ public class EmotionModel {
         return emo;
     }
 
-    public static void loadEmotions() {
+    public static void initEmotions() {
         EmotionModel.emotions = CacheBuilder.newBuilder()
                 .maximumSize(100) // maximum 100 records can be cached
                 .build(new CacheLoader<String, Emotion>(){ // build the cacheloader
@@ -45,5 +45,9 @@ public class EmotionModel {
     public static Emotion getFromXMLRessource(String id){
         // TODO
         return new Emotion("", "", "", "", "");
+    }
+
+    public static void initialLoad(){
+
     }
 }

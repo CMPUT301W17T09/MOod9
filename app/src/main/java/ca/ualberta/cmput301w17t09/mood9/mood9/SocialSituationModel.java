@@ -24,7 +24,7 @@ public class SocialSituationModel {
         return ss;
     }
 
-    public static void loadSocialSituations() {
+    public static void initSocialSituations() {
         SocialSituationModel.socialSituations = CacheBuilder.newBuilder()
                 .maximumSize(100) // maximum 100 records can be cached
                 .build(new CacheLoader<String, SocialSituation>(){ // build the cacheloader
@@ -44,5 +44,9 @@ public class SocialSituationModel {
     public static SocialSituation getFromXMLRessource(String id){
         // TODO
         return new SocialSituation("", "", "");
+    }
+
+    public static void initialLoad(){
+        
     }
 }
