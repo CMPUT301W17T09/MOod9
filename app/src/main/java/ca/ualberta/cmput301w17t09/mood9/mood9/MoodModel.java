@@ -49,7 +49,7 @@ public class MoodModel {
         return m;
     }
 
-    public static void loadUsers() {
+    public static void loadMood() {
         MoodModel.moods = CacheBuilder.newBuilder()
                 .maximumSize(100) // maximum 100 records can be cached
                 .expireAfterAccess(30, TimeUnit.MINUTES) // cache will expire after 30 minutes of access
@@ -70,6 +70,10 @@ public class MoodModel {
     public static Mood getFromElasticSearch(String id){
         // TODO
         return new Mood();
+    }
+
+    public static void setOnElasticSearch(Mood mood){
+        //Send mood to elastic search
     }
 
     public static ConcurrentMap<String, Mood> getMyMoods(){

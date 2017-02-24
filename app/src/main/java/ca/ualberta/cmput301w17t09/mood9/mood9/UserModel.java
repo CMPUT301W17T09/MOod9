@@ -18,6 +18,12 @@ import java.util.concurrent.TimeUnit;
 public class UserModel {
     protected static LoadingCache<String, User> users;
 
+
+    public void setOnElasticSearch(User user){
+        //Add the user to elastic search
+    }
+
+
     public static User getUser(String id){
         User u = null;
         try {

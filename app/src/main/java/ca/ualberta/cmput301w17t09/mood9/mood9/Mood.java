@@ -36,6 +36,7 @@ public class Mood {
         this.date = date;
     }
 
+
     public Mood(){
 
     }
