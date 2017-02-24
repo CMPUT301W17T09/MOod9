@@ -107,10 +107,13 @@ public class MoodModelTest {
     public void testGetFollowedMoods(){
         MoodModel test = new MoodModel();
         UserModel sample = new UserModel();
-        User user1 = sample.getUser("1");
         Mood m1 = new Mood("1",12.22,13.22,"Trigger","1","Alone","22",new Date(12-12-2016),"1");
         Mood m2 = new Mood("2",12.22,13.22,"Trigger","2","With 2 others","14",new Date(12-11-2016),"1");
         Mood m3 = new Mood("3",9999.0,9999.0,"Trigger","2","With 2 others","15",new Date(12-11-2016),"2");
+        User u1 = new User("1","Test");
+        sample.setOnElasticSearch(u1);
+        sample.loadUsers();
+        User user1 = sample.getUser("1");
         ConcurrentMap<String, Mood> testing = new ConcurrentHashMap();
         testing.put("1",m1);
         testing.put("2",m2);
