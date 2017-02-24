@@ -47,6 +47,10 @@ public class EmotionModel {
         return new Emotion("", "", "", "", "");
     }
 
+    public static void setOnXMLResource(Emotion emotion){
+        //Sets an emotion
+    }
+
     public static void initialLoad(){
 
     }

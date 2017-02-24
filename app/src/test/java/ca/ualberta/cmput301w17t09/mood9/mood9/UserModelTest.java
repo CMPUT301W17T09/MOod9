@@ -20,9 +20,8 @@ public class UserModelTest {
         test.setOnElasticSearch(user1);
         test.setOnElasticSearch(user2);
         test.loadUsers();
-        assertEquals(test.getUser("1"),"Test");
-        assertEquals(test.getUser("2"),"Test1");
-
+        assertEquals(test.getUser("1"),user1);
+        assertEquals(test.getUser("2"),user2);
     }
 
     //Tests both the uplink and downlink for our elasticsearch
@@ -45,8 +44,9 @@ public class UserModelTest {
         test.loadUsers();
         ConcurrentMap<String, User> map1 = test.getUsers();
         assertEquals(map1.size(),2);
-        assertEquals(map1.get("1"),"Test");
-        assertEquals(map1.get("2"),"Test1");
+        assertEquals(map1.get("1"),user1);
+        assertEquals(map1.get("2"),user2);
     }
+
 
 }
