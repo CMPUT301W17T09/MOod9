@@ -12,7 +12,7 @@ import java.util.concurrent.ConcurrentMap;
  */
 
 public class MoodModelTest {
-    
+
     @Test
     public void testLoadMood(){
     MoodModel test = new MoodModel();
@@ -27,7 +27,32 @@ public class MoodModelTest {
     }
 
     public void testElasticSearch(){
-        assertTrue(true);
+
     }
+
+    public void testDeleteMood(){
+
+    }
+
+    public void testUpdateMood(){
+
+    }
+
+    public void testGetMoodsNear(){
+
+    }
+
+    public void testMyMoods(){
+
+    }
+
+    public void testGetUniversalMoods(){
+
+    }
+
+    public void testGetFollowedMoods(){
+
+    }
+
 
 }
