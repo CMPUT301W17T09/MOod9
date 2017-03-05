@@ -3,9 +3,58 @@
 <Emotions xmlns:android="http://schemas.android.com/apk/res/android">
     <Emotion>
         <id>0</id>
-        <name>Happiness</name>
-        <description>I'm so happy</description>
+        <name>Anger</name>
+        <description>You did not just quick a puppy!</description>
+        <color>#ff0000</color>
+        <image>anger.png</image>
+    </Emotion>
+    <Emotion>
+        <id>1</id>
+        <name>Confusion</name>
+        <description>What way is up?</description>
+        <color>#31696c</color>
+        <image>confusion.png</image>
+    </Emotion>
+    <Emotion>
+        <id>2</id>
+        <name>Disgust</name>
+        <description>Puke puddles everywhere...</description>
+        <color>#ffff00</color>
+        <image>disgust.png</image>
+    </Emotion>
+    <Emotion>
+        <id>3</id>
+        <name>Fear</name>
+        <description>Is there a monster in the closest?</description>
         <color>#ffffff</color>
+        <image>happiness.png</image>
+    </Emotion>
+    <Emotion>
+        <id>4</id>
+        <name>Happiness</name>
+        <description>Squirrel!</description>
+        <color>#ffffff</color>
+        <image>happiness.png</image>
+    </Emotion>
+    <Emotion>
+        <id>5</id>
+        <name>Sadness</name>
+        <description>My puppy got run over by a car.</description>
+        <color>#000eb4</color>
+        <image>happiness.png</image>
+    </Emotion>
+    <Emotion>
+        <id>6</id>
+        <name>Shame</name>
+        <description>Oh no not again.</description>
+        <color>#c8b7b7</color>
+        <image>happiness.png</image>
+    </Emotion>
+    <Emotion>
+        <id>7</id>
+        <name>Surprise</name>
+        <description>A present for me?</description>
+        <color>#53e4e6</color>
         <image>happiness.png</image>
     </Emotion>
 </Emotions>
