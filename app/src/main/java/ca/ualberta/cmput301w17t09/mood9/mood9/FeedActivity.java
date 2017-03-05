@@ -16,15 +16,17 @@ import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 public class FeedActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    private ListView moodListView;
-    private HashMap<String, List<String>> moodHash;
-    private ArrayAdapter<String> listAdapter;
+    //private ListView moodListView;
+    //private ArrayList<String> moodHeaders;
+    //private HashMap<String, List<String>> moodHash;
+    //private ArrayAdapter<String> listAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,9 +57,12 @@ public class FeedActivity extends AppCompatActivity
         toolbar.setTitle(R.string.universal_feed);
 
         // set up list view adapter
-        listAdapter = new ArrayAdapter<String>(FeedActivity.this, )
 
-        moodListView.setAdapter(listAdapter);
+        //moodHeaders.add("Test Mood!");
+
+        //listAdapter = new ArrayAdapter<String>(FeedActivity.this, android.R.layout.simple_list_item_1, moodHeaders);
+        //moodListView = (ListView) findViewById(R.id.moodList);
+        //moodListView.setAdapter(listAdapter);
     }
 
     @Override
@@ -119,7 +124,7 @@ public class FeedActivity extends AppCompatActivity
     }
 
     private void addMood() {
-        moodListView = (ListView)findViewById(R.id.moodList);
+
         Intent addMoodIntent = new Intent(this, AddMoodActivity.class);
         startActivity(addMoodIntent);
     }
