@@ -16,6 +16,7 @@ public class Mood {
     private String socialSituationId;
     private String imageTriggerId;
     private Date date;
+    private String user_id;
 
     // The following fields should not be serialized
     private User user;
@@ -25,7 +26,7 @@ public class Mood {
 
     public Mood(String id, Double latitude, Double longitutde,
                 String trigger, String emotionId, String socialSituationId,
-                String imageTriggerId, Date date) {
+                String imageTriggerId, Date date,String user_id) {
         this.id = id;
         this.latitude = latitude;
         this.longitutde = longitutde;
@@ -34,7 +35,9 @@ public class Mood {
         this.socialSituationId = socialSituationId;
         this.imageTriggerId = imageTriggerId;
         this.date = date;
+        this.user_id = user_id;
     }
+
 
     public Mood(){
 
@@ -104,6 +107,14 @@ public class Mood {
 
     public void setDate(Date date) {
         this.date = date;
+    }
+
+    public String getUser_id() {
+        return user_id;
+    }
+
+    public void setUser_id(String user_id) {
+        this.user_id = user_id;
     }
 
     public User getUser() {
