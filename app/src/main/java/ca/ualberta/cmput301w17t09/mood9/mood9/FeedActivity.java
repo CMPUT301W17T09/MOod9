@@ -13,9 +13,18 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+
+import java.util.HashMap;
+import java.util.List;
 
 public class FeedActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
+
+    private ListView moodListView;
+    private HashMap<String, List<String>> moodHash;
+    private ArrayAdapter<String> listAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +53,11 @@ public class FeedActivity extends AppCompatActivity
 
         //This changes the title of the toolbar - need to change according to feed shown
         toolbar.setTitle(R.string.universal_feed);
+
+        // set up list view adapter
+        listAdapter = new ArrayAdapter<String>(FeedActivity.this, )
+
+        moodListView.setAdapter(listAdapter);
     }
 
     @Override
@@ -105,6 +119,7 @@ public class FeedActivity extends AppCompatActivity
     }
 
     private void addMood() {
+        moodListView = (ListView)findViewById(R.id.moodList);
         Intent addMoodIntent = new Intent(this, AddMoodActivity.class);
         startActivity(addMoodIntent);
     }

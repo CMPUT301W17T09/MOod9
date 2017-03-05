@@ -26,7 +26,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent feedIntent = new Intent(MainActivity.this, FeedActivity.class);
                 startActivity(feedIntent);
-                finish();
+                //finish();
             }
         });
 
