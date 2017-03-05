@@ -1,9 +1,12 @@
 package ca.ualberta.cmput301w17t09.mood9.mood9;
 
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -15,6 +18,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -23,10 +27,11 @@ import java.util.List;
 public class FeedActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    //private ListView moodListView;
-    //private ArrayList<String> moodHeaders;
+    private ListView moodListView;
+    private ArrayList<String> moodHeaders;
     //private HashMap<String, List<String>> moodHash;
-    //private ArrayAdapter<String> listAdapter;
+    private ArrayAdapter<String> listAdapter;
+    static final int REQUEST_CODE = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,11 +63,13 @@ public class FeedActivity extends AppCompatActivity
 
         // set up list view adapter
 
+        moodHeaders = new ArrayList<String>();
         //moodHeaders.add("Test Mood!");
 
-        //listAdapter = new ArrayAdapter<String>(FeedActivity.this, android.R.layout.simple_list_item_1, moodHeaders);
-        //moodListView = (ListView) findViewById(R.id.moodList);
-        //moodListView.setAdapter(listAdapter);
+        listAdapter = new ArrayAdapter<String>(FeedActivity.this, android.R.layout.simple_list_item_1, moodHeaders);
+
+        moodListView = (ListView) findViewById(R.id.moodList);
+        moodListView.setAdapter(listAdapter);
     }
 
     @Override
@@ -124,8 +131,24 @@ public class FeedActivity extends AppCompatActivity
     }
 
     private void addMood() {
-
         Intent addMoodIntent = new Intent(this, AddMoodActivity.class);
-        startActivity(addMoodIntent);
+        startActivityForResult(addMoodIntent, 0);
+    }
+
+    // Code Documentation found here: https://developer.android.com/reference/android/app/Activity.html
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_CODE) {
+            String receiptData = data.getStringExtra("Emoticons");
+            LayoutInflater inflater = (LayoutInflater)this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            View view = inflater.inflate(R.layout.fragment_mood,null);
+
+            TextView username = (TextView)view.findViewById(R.id.username);
+            username.setTypeface(null, Typeface.BOLD);
+
+            username.setText(receiptData);
+
+            moodHeaders.add(receiptData);
+            listAdapter.notifyDataSetChanged();
+        }
     }
 }

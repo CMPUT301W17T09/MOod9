@@ -1,5 +1,6 @@
 package ca.ualberta.cmput301w17t09.mood9.mood9;
 
+import android.content.Intent;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -50,6 +51,9 @@ public class AddMoodActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 //TODO Need to actually save the information that is entered
+                Intent feedIntent = new Intent();
+                feedIntent.putExtra("Emoticons", "Angry!!!!!");
+                setResult(0, feedIntent);
                 finish();
             }
         });
