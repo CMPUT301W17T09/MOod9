@@ -30,7 +30,11 @@ public class FeedActivity extends AppCompatActivity
     private ListView moodListView;
     private ArrayList<String> moodHeaders;
     //private HashMap<String, List<String>> moodHash;
-    private ArrayAdapter<String> listAdapter;
+    //private ArrayAdapter<String> listAdapter;
+    private MoodListAdapter moodListAdapter;
+    public int [] emoteImages={R.drawable.anger, R.drawable.confusion, R.drawable.happiness, R.drawable.sadness, R.drawable.shame, R.drawable.surpise};
+    public String [] userNameList={"Anger","Confusion","Happiness","Sadness","Shame","Surprise"};
+    Context context;
     static final int REQUEST_CODE = 0;
 
     @Override
@@ -62,14 +66,15 @@ public class FeedActivity extends AppCompatActivity
         toolbar.setTitle(R.string.universal_feed);
 
         // set up list view adapter
+        context = this;
 
         moodHeaders = new ArrayList<String>();
-        //moodHeaders.add("Test Mood!");
 
-        listAdapter = new ArrayAdapter<String>(FeedActivity.this, android.R.layout.simple_list_item_1, moodHeaders);
+        //listAdapter = new ArrayAdapter<String>(FeedActivity.this, android.R.layout.simple_list_item_1, moodHeaders);
 
         moodListView = (ListView) findViewById(R.id.moodList);
-        moodListView.setAdapter(listAdapter);
+        moodListAdapter = new MoodListAdapter(this, userNameList, emoteImages);
+        moodListView.setAdapter(moodListAdapter);
     }
 
     @Override
@@ -148,7 +153,8 @@ public class FeedActivity extends AppCompatActivity
             username.setText(receiptData);
 
             moodHeaders.add(receiptData);
-            listAdapter.notifyDataSetChanged();
+            //userNameList.add(receiptData);
+            moodListAdapter.notifyDataSetChanged();
         }
     }
 }
