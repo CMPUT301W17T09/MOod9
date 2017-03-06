@@ -8,6 +8,7 @@ import java.util.Date;
 
 public class Mood {
     // The following fields are to be serialized
+    @JestId
     private String id;
     private Double latitude;
     private Double longitutde;
