@@ -123,7 +123,8 @@ public class FeedActivity extends AppCompatActivity
         } else if (id == R.id.profile) {
 
         } else if (id == R.id.about) {
-
+            Intent aboutIntent = new Intent(this, AboutActivity.class);
+            startActivity(aboutIntent);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
