@@ -1,12 +1,16 @@
 package ca.ualberta.cmput301w17t09.mood9.mood9;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -21,17 +25,29 @@ public class MainActivity extends AppCompatActivity {
         EditText usernameField = (EditText) findViewById(R.id.username_field);
 
 
+        SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences(getString(R.string.stored_name), MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        String name = sharedPreferences.getString("username", null);
+
+        //If the name is not null, then the user has already choosen a name, the app will go straight to the FeedActivity
+        if(name != null){
+            Intent feedIntent = new Intent(MainActivity.this, FeedActivity.class);
+            startActivity(feedIntent);
+            finish();
+        }
+
+
         goButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                editor.putString("username", usernameField.getText().toString());
+                editor.apply();
                 Intent feedIntent = new Intent(MainActivity.this, FeedActivity.class);
                 startActivity(feedIntent);
                 finish();
             }
         });
-
     }
-
 
 
 
