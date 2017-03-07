@@ -32,6 +32,8 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.location.LocationServices;
 
+import java.util.ArrayList;
+
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
@@ -42,6 +44,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private FusedLocationProviderApi locationProvider = LocationServices.FusedLocationApi;
     private Double myLat;
     private Double myLong;
+    private ArrayList<Marker> markers = new ArrayList<>();
+
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,7 +79,25 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(timmiesCord, 10));
 
 
-        //Check for permissions to use location
+        LatLng test_cord = new LatLng(53.52611, -113.524596);
+        Marker new_test = mMap.addMarker(new MarkerOptions().title("Test Marker").position(test_cord).icon(BitmapDescriptorFactory.fromBitmap(makeSmallerIcon(R.drawable.happiness))));
+
+        markers.add(timmies);
+        markers.add(new_test);
+
+
+        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker) {
+                //TODO Instead of a toast, show the MOod that was created in this location.
+                Toast.makeText(MapsActivity.this, marker.getTitle(), Toast.LENGTH_SHORT).show();
+                return false;
+            }
+        });
+
+
+
+        //Check for permissions to use phone's location
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             mMap.setMyLocationEnabled(true);
         } else {
