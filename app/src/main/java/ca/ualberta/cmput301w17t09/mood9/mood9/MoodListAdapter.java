@@ -1,6 +1,8 @@
 package ca.ualberta.cmput301w17t09.mood9.mood9;
 
 import android.content.Context;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,11 +17,12 @@ import java.util.ArrayList;
 /**
  * Created by cdkushni on 3/5/17.
  * code reference from https://www.caveofprogramming.com/guest-posts/custom-listview-with-imageview-and-textview-in-android.html
+ * Changed by cdkushni on 3/8/17 to use ArrayLists instead of primitive arrays for compatibility reasons.
  */
 
-public class MoodListAdapter extends BaseAdapter {
-    ArrayList<String> result;
+public class MoodListAdapter extends BaseAdapter{
     Context context;
+    ArrayList<String> result;
     ArrayList<Integer> imageId;
     private static LayoutInflater inflater=null;
     public MoodListAdapter(FeedActivity feedActivity, ArrayList<String> usrNameList, ArrayList<Integer> emoteImages) {

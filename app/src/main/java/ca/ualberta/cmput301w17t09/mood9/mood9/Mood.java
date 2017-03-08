@@ -1,17 +1,22 @@
 package ca.ualberta.cmput301w17t09.mood9.mood9;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import java.util.Date;
 
 /**
  * Created by dannick on 2/22/17.
+ * Converted to parcelable class by cdkushni on 3/8/17
  */
 
-public class Mood {
+public class Mood implements Parcelable {
     // The following fields are to be serialized
     private String id;
     private Double latitude;
     private Double longitutde;
     private String trigger;
+    private int emoticon;
     private String emotionId;
     private String socialSituationId;
     private String imageTriggerId;
@@ -25,13 +30,14 @@ public class Mood {
 
 
     public Mood(String id, Double latitude, Double longitutde,
-                String trigger, String emotionId, String socialSituationId,
+                String trigger, String emotionId, int emoticon, String socialSituationId,
                 String imageTriggerId, Date date,String user_id) {
         this.id = id;
         this.latitude = latitude;
         this.longitutde = longitutde;
         this.trigger = trigger;
         this.emotionId = emotionId;
+        this.emoticon = emoticon;
         this.socialSituationId = socialSituationId;
         this.imageTriggerId = imageTriggerId;
         this.date = date;
@@ -83,6 +89,13 @@ public class Mood {
         this.emotionId = emotionId;
         this.emotion = EmotionModel.getEmotion(emotionId);
     }
+    public int getEmoticon() {
+        return emoticon;
+    }
+
+    public void setEmoticon(int emoticon) {
+        this.emoticon = emoticon;
+    }
 
     public String getSocialSituationId() {
         return socialSituationId;
@@ -128,4 +141,67 @@ public class Mood {
     public SocialSituation getSocialSituation() {
         return socialSituation;
     }
+
+
+    protected Mood(Parcel in) {
+        id = in.readString();
+        latitude = in.readByte() == 0x00 ? null : in.readDouble();
+        longitutde = in.readByte() == 0x00 ? null : in.readDouble();
+        trigger = in.readString();
+        emotionId = in.readString();
+        emoticon = in.readInt();
+        socialSituationId = in.readString();
+        imageTriggerId = in.readString();
+        long tmpDate = in.readLong();
+        date = tmpDate != -1 ? new Date(tmpDate) : null;
+        user_id = in.readString();
+        user = (User) in.readValue(User.class.getClassLoader());
+        emotion = (Emotion) in.readValue(Emotion.class.getClassLoader());
+        socialSituation = (SocialSituation) in.readValue(SocialSituation.class.getClassLoader());
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(id);
+        if (latitude == null) {
+            dest.writeByte((byte) (0x00));
+        } else {
+            dest.writeByte((byte) (0x01));
+            dest.writeDouble(latitude);
+        }
+        if (longitutde == null) {
+            dest.writeByte((byte) (0x00));
+        } else {
+            dest.writeByte((byte) (0x01));
+            dest.writeDouble(longitutde);
+        }
+        dest.writeString(trigger);
+        dest.writeString(emotionId);
+        dest.writeInt(emoticon);
+        dest.writeString(socialSituationId);
+        dest.writeString(imageTriggerId);
+        dest.writeLong(date != null ? date.getTime() : -1L);
+        dest.writeString(user_id);
+        dest.writeValue(user);
+        dest.writeValue(emotion);
+        dest.writeValue(socialSituation);
+    }
+
+    @SuppressWarnings("unused")
+    public static final Parcelable.Creator<Mood> CREATOR = new Parcelable.Creator<Mood>() {
+        @Override
+        public Mood createFromParcel(Parcel in) {
+            return new Mood(in);
+        }
+
+        @Override
+        public Mood[] newArray(int size) {
+            return new Mood[size];
+        }
+    };
 }

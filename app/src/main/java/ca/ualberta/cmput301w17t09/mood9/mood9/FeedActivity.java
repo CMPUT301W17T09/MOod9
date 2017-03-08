@@ -24,6 +24,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+/**
+ * Originally created by :
+ * Modified by cdkushni on 3/5/17 and 3/8/17 to implement MoodListAdapter and data bundle receipt from addMood. Also made to inflate layout to a listview in the feed.
+ *
+ */
 public class FeedActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -67,6 +72,8 @@ public class FeedActivity extends AppCompatActivity
 
         // set up list view adapter
         context = this;
+        emoteImages = new ArrayList<Integer>();
+        userNameList = new ArrayList<String>();
 
         moodListView = (ListView) findViewById(R.id.moodList);
         moodListAdapter = new MoodListAdapter(this, userNameList, emoteImages);
@@ -139,17 +146,18 @@ public class FeedActivity extends AppCompatActivity
     // Code Documentation found here: https://developer.android.com/reference/android/app/Activity.html
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_CODE) {
-            String receiptData = data.getStringExtra("Emoticons");
+            Bundle returnData = data.getExtras();
+            Mood returnMood = (Mood) returnData.getParcelable("mood");
             LayoutInflater inflater = (LayoutInflater)this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             View view = inflater.inflate(R.layout.fragment_mood,null);
 
             TextView username = (TextView)view.findViewById(R.id.username);
             username.setTypeface(null, Typeface.BOLD);
 
-            username.setText(receiptData);
+            //username.setText(receiptData);
 
-            userNameList.add("Anger");
-            emoteImages.add(R.drawable.anger);
+            userNameList.add(returnMood.getEmotionId());
+            emoteImages.add(returnMood.getEmoticon());
             moodListAdapter.notifyDataSetChanged();
         }
     }
