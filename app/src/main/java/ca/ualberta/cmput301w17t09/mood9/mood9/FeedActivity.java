@@ -28,12 +28,12 @@ public class FeedActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     private ListView moodListView;
-    private ArrayList<String> moodHeaders;
+    //private ArrayList<String> moodHeaders;
     //private HashMap<String, List<String>> moodHash;
     //private ArrayAdapter<String> listAdapter;
     private MoodListAdapter moodListAdapter;
-    public int [] emoteImages={R.drawable.anger, R.drawable.confusion, R.drawable.happiness, R.drawable.sadness, R.drawable.shame, R.drawable.surpise};
-    public String [] userNameList={"Anger","Confusion","Happiness","Sadness","Shame","Surprise"};
+    private ArrayList<Integer> emoteImages; // {R.drawable.anger, R.drawable.confusion, R.drawable.happiness, R.drawable.sadness, R.drawable.shame, R.drawable.surpise}
+    private ArrayList<String> userNameList; //{"Anger","Confusion","Happiness","Sadness","Shame","Surprise"}
     Context context;
     static final int REQUEST_CODE = 0;
 
@@ -67,10 +67,6 @@ public class FeedActivity extends AppCompatActivity
 
         // set up list view adapter
         context = this;
-
-        moodHeaders = new ArrayList<String>();
-
-        //listAdapter = new ArrayAdapter<String>(FeedActivity.this, android.R.layout.simple_list_item_1, moodHeaders);
 
         moodListView = (ListView) findViewById(R.id.moodList);
         moodListAdapter = new MoodListAdapter(this, userNameList, emoteImages);
@@ -152,8 +148,8 @@ public class FeedActivity extends AppCompatActivity
 
             username.setText(receiptData);
 
-            moodHeaders.add(receiptData);
-            //userNameList.add(receiptData);
+            userNameList.add("Anger");
+            emoteImages.add(R.drawable.anger);
             moodListAdapter.notifyDataSetChanged();
         }
     }

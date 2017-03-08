@@ -9,17 +9,20 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+
 /**
  * Created by cdkushni on 3/5/17.
  * code reference from https://www.caveofprogramming.com/guest-posts/custom-listview-with-imageview-and-textview-in-android.html
  */
 
 public class MoodListAdapter extends BaseAdapter {
-    String [] result;
+    ArrayList<String> result;
     Context context;
-    int [] imageId;
+    ArrayList<Integer> imageId;
     private static LayoutInflater inflater=null;
-    public MoodListAdapter(FeedActivity feedActivity, String[] usrNameList, int[] emoteImages) {
+    public MoodListAdapter(FeedActivity feedActivity, ArrayList<String> usrNameList, ArrayList<Integer> emoteImages) {
         result = usrNameList;
         context = feedActivity;
         imageId = emoteImages;
@@ -29,7 +32,7 @@ public class MoodListAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
-        return result.length;
+        return result.size();
     }
     @Override
     public Object getItem(int position) {
@@ -57,13 +60,13 @@ public class MoodListAdapter extends BaseAdapter {
         rowView = inflater.inflate(R.layout.fragment_mood, null);
         holder.tv=(TextView) rowView.findViewById(R.id.username);
         holder.img=(ImageView) rowView.findViewById(R.id.imageView);
-        holder.tv.setText(result[position]);
-        holder.img.setImageResource(imageId[position]);
+        holder.tv.setText(result.get(position));
+        holder.img.setImageResource(imageId.get(position));
         rowView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // TODO Auto-generated method stub
-                Toast.makeText(context, "You Clicked "+result[position], Toast.LENGTH_LONG).show();
+                Toast.makeText(context, "You Clicked "+ result.get(position), Toast.LENGTH_LONG).show();
             }
         });
         return rowView;
