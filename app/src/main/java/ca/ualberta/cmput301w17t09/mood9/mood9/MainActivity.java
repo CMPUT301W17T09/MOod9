@@ -33,36 +33,6 @@ public class MainActivity extends AppCompatActivity {
                 finish();
             }
         });
-
-        Mood m1 = new Mood("0",12.22,13.22,"Trigger","1","Alone","22",new Date(12-12-2016),"1");
-        /*
-        ElasticSearchMOodController.AddMoodsTask addMoodsTask = new ElasticSearchMOodController.AddMoodsTask();
-        addMoodsTask.execute(m1);
-        */
-        ElasticSearchMOodController.GetMoodsTask getMoodsTask = new ElasticSearchMOodController.GetMoodsTask();
-        getMoodsTask.execute("");
-
-        ArrayList<Mood> moods = new ArrayList<Mood>();
-
-        try {
-            moods = getMoodsTask.get();
-        } catch (Exception e) {
-            Log.i("Error", "Can't get moods from ElasticSearch");
-        }
-
-
-        ElasticSearchMOodController.DeleteMoodTask deleteMoodTask = new ElasticSearchMOodController.DeleteMoodTask();
-        deleteMoodTask.execute(m1);
-
-        ElasticSearchMOodController.GetMoodsTask getMoodsTask2 = new ElasticSearchMOodController.GetMoodsTask();
-        getMoodsTask2.execute("");
-        try {
-            moods = getMoodsTask2.get();
-        } catch (Exception e) {
-            Log.i("Error", "Can't get moods from ElasticSearch");
-        }
-
-        int xx= 1;
     }
 }
 

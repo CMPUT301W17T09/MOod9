@@ -18,14 +18,14 @@ public class ElasticSearchControllerTest {
     @Test
     public void testAdd() {
 
-        Mood m1 = new Mood("0",12.22,13.22,"Trigger","1","Alone","22",new Date(12-12-2016),"1");
-        /*
+        Mood m1 = new Mood(12.22,13.22,"Trigger","1","Fun","22",new Date(12-12-2016),"1");
+
         ElasticSearchMOodController.AddMoodsTask addMoodsTask = new ElasticSearchMOodController.AddMoodsTask();
         addMoodsTask.execute(m1);
-        */
+
         ElasticSearchMOodController.GetMoodsTask getMoodsTask = new ElasticSearchMOodController.GetMoodsTask();
         getMoodsTask.execute("");
-
+        /*
         ArrayList<Mood> moods = new ArrayList<Mood>();
 
         try {
@@ -34,9 +34,15 @@ public class ElasticSearchControllerTest {
             Log.i("Error", "Can't get moods from ElasticSearch");
         }
 
+        Mood update_mood = moods.get(2);
+        update_mood.setImageTriggerId("10");
 
-        ElasticSearchMOodController.DeleteMoodTask deleteMoodTask = new ElasticSearchMOodController.DeleteMoodTask();
-        deleteMoodTask.execute(m1);
+        // UPDATE Procedure
+        ElasticSearchMOodController.UpdateMoodsTask updateMoodsTask = new ElasticSearchMOodController.UpdateMoodsTask();
+        updateMoodsTask.execute(update_mood);
+
+        // ElasticSearchMOodController.DeleteMoodTask deleteMoodTask = new ElasticSearchMOodController.DeleteMoodTask();
+        // deleteMoodTask.execute(m1);
 
         ElasticSearchMOodController.GetMoodsTask getMoodsTask2 = new ElasticSearchMOodController.GetMoodsTask();
         getMoodsTask2.execute("");
@@ -45,6 +51,7 @@ public class ElasticSearchControllerTest {
         } catch (Exception e) {
             Log.i("Error", "Can't get moods from ElasticSearch");
         }
+        */
     }
 
     @Test

@@ -34,6 +34,33 @@ public class ElasticSearchMOodController {
     private static String mood_type = "mood9";
     private static String user_type = "user9";
 
+
+    public static class UpdateMoodsTask {
+
+        public UpdateMoodsTask() {}
+
+        public void execute(Mood... moods) {
+            verifySettings();
+
+            for (Mood mood : moods) {
+                try {
+
+                    // Delete the MOod with this specific id
+                    DeleteMoodTask deleteMoodTask = new DeleteMoodTask();
+                    deleteMoodTask.execute(mood);
+
+                    // Add the updated mood to ElasticSearch
+                    AddMoodsTask addMoodsTask = new AddMoodsTask();
+                    addMoodsTask.execute(mood);
+
+                } catch (Exception e) {
+                    Log.i("Error", "Update to ElasticSearch failed failed");
+                }
+            }
+        }
+
+    }
+
     public static class AddMoodsTask extends AsyncTask<Mood, Void, Void> {
 
         @Override
@@ -58,24 +85,6 @@ public class ElasticSearchMOodController {
         }
     }
 
-    public static class UpdateMoodTask extends AsyncTask<Mood, Void, Void> {
-        @Override
-        protected Void doInBackground(Mood...updatedMoods) {
-            verifySettings();
-
-            for (Mood mood : updatedMoods) {
-                try {
-                    JestResult result = client.execute(new Update.Builder(mood).index(index_name).type(mood_type).id(mood.getId()).build());
-                }
-                catch (Exception e) {
-                    Log.i("Error", "Elastic Search failed to update");
-                }
-            }
-
-            return null;
-        }
-    }
-
     public static class DeleteMoodTask extends AsyncTask<Mood, Void, Void> {
         @Override
         protected Void doInBackground(Mood...deletedMoods) {
@@ -85,7 +94,6 @@ public class ElasticSearchMOodController {
                 try {
                     String id = mood.getId();
                     JestResult result = client.execute(new Delete.Builder(id).index(index_name).type(mood_type).build());
-                    int x = 1;
                 } catch (Exception e) {
                     Log.i("Error", "Elastic Search failed to delete");
                 }
