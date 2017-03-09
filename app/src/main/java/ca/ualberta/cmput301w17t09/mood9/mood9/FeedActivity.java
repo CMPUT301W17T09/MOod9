@@ -16,6 +16,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -30,7 +31,7 @@ import java.util.List;
  *
  */
 public class FeedActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener,ListView.OnItemClickListener {
 
     private ListView moodListView;
     //private ArrayList<String> moodHeaders;
@@ -39,8 +40,8 @@ public class FeedActivity extends AppCompatActivity
     private MoodListAdapter moodListAdapter;
     private ArrayList<Integer> emoteImages; // {R.drawable.anger, R.drawable.confusion, R.drawable.happiness, R.drawable.sadness, R.drawable.shame, R.drawable.surpise}
     private ArrayList<String> userNameList; //{"Anger","Confusion","Happiness","Sadness","Shame","Surprise"}
+    private ArrayList<String> dateList;
     Context context;
-    static final int REQUEST_CODE = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,9 +75,10 @@ public class FeedActivity extends AppCompatActivity
         context = this;
         emoteImages = new ArrayList<Integer>();
         userNameList = new ArrayList<String>();
+        dateList = new ArrayList<String>();
 
         moodListView = (ListView) findViewById(R.id.moodList);
-        moodListAdapter = new MoodListAdapter(this, userNameList, emoteImages);
+        moodListAdapter = new MoodListAdapter(this, userNameList, dateList, emoteImages);
         moodListView.setAdapter(moodListAdapter);
     }
 
@@ -113,6 +115,7 @@ public class FeedActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
+
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
@@ -138,6 +141,13 @@ public class FeedActivity extends AppCompatActivity
         return true;
     }
 
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        //for list item clicked
+        Intent editMoodIntent = new Intent(this, AddMoodActivity.class); // TODO: Either create a Edit activity or change addmood to be able to know whether to edit or add new.
+        startActivityForResult(editMoodIntent, 0);
+    }
+
     private void addMood() {
         Intent addMoodIntent = new Intent(this, AddMoodActivity.class);
         startActivityForResult(addMoodIntent, 0);
@@ -145,7 +155,7 @@ public class FeedActivity extends AppCompatActivity
 
     // Code Documentation found here: https://developer.android.com/reference/android/app/Activity.html
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_CODE) {
+        if (requestCode == 0) {
             Bundle returnData = data.getExtras();
             Mood returnMood = (Mood) returnData.getParcelable("mood");
             LayoutInflater inflater = (LayoutInflater)this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -155,8 +165,10 @@ public class FeedActivity extends AppCompatActivity
             username.setTypeface(null, Typeface.BOLD);
 
             //username.setText(receiptData);
+            //TODO: Get rid of text view and move all display functionality over to linearlayout
 
             userNameList.add(returnMood.getEmotionId());
+            dateList.add(returnMood.getDate().toString()); // TODO: needs testing
             emoteImages.add(returnMood.getEmoticon());
             moodListAdapter.notifyDataSetChanged();
         }

@@ -1,6 +1,7 @@
 package ca.ualberta.cmput301w17t09.mood9.mood9;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.view.LayoutInflater;
@@ -24,9 +25,11 @@ public class MoodListAdapter extends BaseAdapter{
     Context context;
     ArrayList<String> result;
     ArrayList<Integer> imageId;
+    ArrayList<String> timeResult;
     private static LayoutInflater inflater=null;
-    public MoodListAdapter(FeedActivity feedActivity, ArrayList<String> usrNameList, ArrayList<Integer> emoteImages) {
+    public MoodListAdapter(FeedActivity feedActivity, ArrayList<String> usrNameList, ArrayList<String> dateList, ArrayList<Integer> emoteImages) {
         result = usrNameList;
+        timeResult = dateList;
         context = feedActivity;
         imageId = emoteImages;
         inflater = ( LayoutInflater )context.
@@ -51,7 +54,8 @@ public class MoodListAdapter extends BaseAdapter{
 
     public class Holder
     {
-        TextView tv;
+        TextView idtv;
+        TextView timetv;
         ImageView img;
     }
     @Override
@@ -61,9 +65,11 @@ public class MoodListAdapter extends BaseAdapter{
         View rowView;
 
         rowView = inflater.inflate(R.layout.fragment_mood, null);
-        holder.tv=(TextView) rowView.findViewById(R.id.username);
+        holder.idtv=(TextView) rowView.findViewById(R.id.username);
+        holder.timetv=(TextView) rowView.findViewById(R.id.time);
         holder.img=(ImageView) rowView.findViewById(R.id.imageView);
-        holder.tv.setText(result.get(position));
+        holder.idtv.setText(result.get(position));
+        holder.timetv.setText(timeResult.get(position));
         holder.img.setImageResource(imageId.get(position));
         rowView.setOnClickListener(new View.OnClickListener() {
             @Override
