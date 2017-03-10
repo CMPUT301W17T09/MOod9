@@ -15,17 +15,13 @@ import static org.junit.Assert.*;
 
 public class ElasticSearchControllerTest {
 
-    @Test
-    public void testAdd() {
-
-        Mood m1 = new Mood(12.22,13.22,"Trigger","1","Fun","22",new Date(12-12-2016),"1");
-
-        ElasticSearchMOodController.AddMoodsTask addMoodsTask = new ElasticSearchMOodController.AddMoodsTask();
-        addMoodsTask.execute(m1);
-
+    // Probably need a new index just for testing
+    // DO NOT RUN THESE TESTS YET, need to make a new index for testing.
+    
+    private ArrayList<Mood> getMoods(String user_id) {
         ElasticSearchMOodController.GetMoodsTask getMoodsTask = new ElasticSearchMOodController.GetMoodsTask();
-        getMoodsTask.execute("");
-        /*
+        getMoodsTask.execute(user_id);
+        
         ArrayList<Mood> moods = new ArrayList<Mood>();
 
         try {
@@ -33,35 +29,49 @@ public class ElasticSearchControllerTest {
         } catch (Exception e) {
             Log.i("Error", "Can't get moods from ElasticSearch");
         }
+        
+        return moods;
+    }
+    
+    @Test
+    public void testAdd() {
+        Mood m1 = new Mood(12.22,13.22,"Trigger","1","Fun","22",new Date(12-12-2016),"1");
+        Mood m2 = new Mood(12.22,13.22,"Trigger","2","Alone","10",new Date(10-01-2017),"1");
 
-        Mood update_mood = moods.get(2);
-        update_mood.setImageTriggerId("10");
+        ElasticSearchMOodController.AddMoodsTask addMoodsTask = new ElasticSearchMOodController.AddMoodsTask();
+        addMoodsTask.execute(new ArrayList<Mood>() {m1, m2} );
+        
+        ArrayList<Mood> moods = getMoods("");
+       
+        assertTrue(moods.size() == 2);
+    }
+
+    @Test
+    public void testUpdate() {
+        ArrayList<Mood> moods = getMoods("2");
+        Mood update_mood = moods.get(0);
+        update_mood.setImageTriggerId("30");
 
         // UPDATE Procedure
         ElasticSearchMOodController.UpdateMoodsTask updateMoodsTask = new ElasticSearchMOodController.UpdateMoodsTask();
         updateMoodsTask.execute(update_mood);
-
-        // ElasticSearchMOodController.DeleteMoodTask deleteMoodTask = new ElasticSearchMOodController.DeleteMoodTask();
-        // deleteMoodTask.execute(m1);
-
-        ElasticSearchMOodController.GetMoodsTask getMoodsTask2 = new ElasticSearchMOodController.GetMoodsTask();
-        getMoodsTask2.execute("");
-        try {
-            moods = getMoodsTask2.get();
-        } catch (Exception e) {
-            Log.i("Error", "Can't get moods from ElasticSearch");
-        }
-        */
-    }
-
-    @Test
-    public void testEdit() {
-
+        
+        // GET and check
+        moods = getMoods("2");
+        update_mood = moods.get(0);
+        assertTrue(update_mood.getTriggerId() == "30");
     }
 
     @Test
     public void testDelete() {
-
+        ArrayList<Mood> moods = getMoods(""); 
+        assertTrue(moods.size() == 2);
+        
+        ElasticSearchMOodController.DeleteMoodTask deleteMoodTask = new ElasticSearchMOodController.DeleteMoodTask();
+        deleteMoodTask.execute(moods);
+        
+        moods = getMoods(""); 
+        assertTrue(moods.size() == 0);
     }
 
 }
