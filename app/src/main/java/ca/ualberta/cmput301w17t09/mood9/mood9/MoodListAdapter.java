@@ -14,6 +14,7 @@ import android.widget.Toast;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 /**
  * Created by cdkushni on 3/5/17.
@@ -26,19 +27,21 @@ public class MoodListAdapter extends BaseAdapter{
     ArrayList<String> result;
     ArrayList<Integer> imageId;
     ArrayList<String> timeResult;
+    LinkedList<Mood> moodList;
     private static LayoutInflater inflater=null;
-    public MoodListAdapter(FeedActivity feedActivity, ArrayList<String> usrNameList, ArrayList<String> dateList, ArrayList<Integer> emoteImages) {
-        result = usrNameList;
-        timeResult = dateList;
+    public MoodListAdapter(FeedActivity feedActivity, LinkedList<Mood> moodLinkedList) {
+        //result = usrNameList;
+        //timeResult = dateList;
+        moodList = moodLinkedList;
         context = feedActivity;
-        imageId = emoteImages;
+        //imageId = emoteImages;
         inflater = ( LayoutInflater )context.
                 getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
     @Override
     public int getCount() {
-        return result.size();
+        return moodList.size();
     }
     @Override
     public Object getItem(int position) {
@@ -68,16 +71,16 @@ public class MoodListAdapter extends BaseAdapter{
         holder.idtv=(TextView) rowView.findViewById(R.id.username);
         holder.timetv=(TextView) rowView.findViewById(R.id.time);
         holder.img=(ImageView) rowView.findViewById(R.id.imageView);
-        holder.idtv.setText(result.get(position));
-        holder.timetv.setText(timeResult.get(position));
-        holder.img.setImageResource(imageId.get(position));
+        holder.idtv.setText(moodList.get(position).getEmotionId());
+        holder.timetv.setText(moodList.get(position).getDate().toString());
+        holder.img.setImageResource(moodList.get(position).getEmoticon());/*
         rowView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // TODO Auto-generated method stub
                 Toast.makeText(context, "You Clicked "+ result.get(position), Toast.LENGTH_LONG).show();
             }
-        });
+        });*/
         return rowView;
     }
 

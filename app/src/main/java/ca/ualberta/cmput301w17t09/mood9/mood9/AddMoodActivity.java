@@ -29,14 +29,22 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
     int[] emoticons = {R.drawable.anger, R.drawable.confusion, R.drawable.happiness, R.drawable.sadness, R.drawable.shame, R.drawable.surpise};
     String selectedEmotion = "Anger";
     int selectedEmote = R.drawable.anger;
+    Bundle editCheckB;
     // map<Emotion> emotions = EmotionModel.getEmotions();
     String[] socials = {"TEMP", "DO NOT USE", "With my enemies", "All Alone"};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Intent thisIntent = getIntent();
+        editCheckB = thisIntent.getExtras();
+        int editCheck = editCheckB.getInt("editCheck", 0);
 
-        setContentView(R.layout.activity_add_mood);
+        if (editCheck == 1) {
+            setContentView(R.layout.activity_edit_mood);
+        } else {
+            setContentView(R.layout.activity_add_mood);
+        }
 
         Spinner emotionsSpinner = (Spinner) findViewById(R.id.emotions_spinner);
         Spinner socialSpinner = (Spinner) findViewById(R.id.social_spinner);
@@ -65,13 +73,30 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
             public void onClick(View v) {
                 //TODO Need to actually save the information that is entered
 
-                // added emoticon parameter to Mood class to store the r.drawable of the selected emotion
-                Mood returnMood = new Mood("0", 100.0, 100.0, "Triggered", selectedEmotion, selectedEmote, "With my enemies", "N/A", new Date(), "myName");
-                // Parcelable http://www.parcelabler.com/
-                Intent feedIntent = new Intent();
-                feedIntent.putExtra("mood", returnMood);
-                setResult(0, feedIntent);
-                finish();
+                if (editCheckB.getInt("editCheck", -1) == 0) {
+                    // added emoticon parameter to Mood class to store the r.drawable of the selected emotion
+                    Mood returnMood = new Mood(100.0, 100.0, "Triggered", selectedEmotion, selectedEmote, "With my enemies", "N/A", new Date(), "myName");
+                    int newMoodId = editCheckB.getInt("moodId", 0);
+                    returnMood.setId(String.valueOf(newMoodId));
+                    // Parcelable http://www.parcelabler.com/
+                    Intent feedIntent = new Intent();
+                    feedIntent.putExtra("mood", returnMood);
+                    setResult(0, feedIntent);
+                    finish();
+                } else if (editCheckB.getInt("editCheck", -1) == 1) {
+                    Mood returnMood = editCheckB.getParcelable("oldMood");
+                    returnMood.setEmoticon(selectedEmote);
+                    //returnMood.setEmotionId("Pizza"); TODO: Doesn't work because we call from resource file, need to get concurrent hash map collection and populate from there.
+                    returnMood.setDate(new Date());
+                    Intent feedIntent = new Intent();
+                    feedIntent.putExtra("mood", returnMood);
+                    setResult(1, feedIntent);
+                    finish();
+                }
+                else
+                {
+                    // TODO: implement failed to find edit check data so needs to error on return type and just make a new mood.
+                }
             }
         });
 
@@ -80,7 +105,7 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
     //Performing action onItemSelected and onNothing selected
     @Override
     public void onItemSelected(AdapterView<?> arg0, View arg1, int position, long id) {
-        Toast.makeText(getApplicationContext(), emotions[position], Toast.LENGTH_LONG).show();
+        Toast.makeText(getApplicationContext(), emotions[position], Toast.LENGTH_SHORT).show();
         selectedEmotion = emotions[position];
         selectedEmote = emoticons[position];
     }

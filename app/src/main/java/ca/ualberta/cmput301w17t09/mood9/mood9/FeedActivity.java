@@ -20,10 +20,13 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
 
 /**
  * Originally created by :
@@ -31,17 +34,16 @@ import java.util.List;
  *
  */
 public class FeedActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener,ListView.OnItemClickListener {
+        implements NavigationView.OnNavigationItemSelectedListener {
 
     private ListView moodListView;
-    //private ArrayList<String> moodHeaders;
-    //private HashMap<String, List<String>> moodHash;
-    //private ArrayAdapter<String> listAdapter;
     private MoodListAdapter moodListAdapter;
+    private LinkedList<Mood> moodLinkedList;
     private ArrayList<Integer> emoteImages; // {R.drawable.anger, R.drawable.confusion, R.drawable.happiness, R.drawable.sadness, R.drawable.shame, R.drawable.surpise}
     private ArrayList<String> userNameList; //{"Anger","Confusion","Happiness","Sadness","Shame","Surprise"}
     private ArrayList<String> dateList;
     Context context;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,10 +78,24 @@ public class FeedActivity extends AppCompatActivity
         emoteImages = new ArrayList<Integer>();
         userNameList = new ArrayList<String>();
         dateList = new ArrayList<String>();
+        moodLinkedList = new LinkedList<Mood>();
 
         moodListView = (ListView) findViewById(R.id.moodList);
-        moodListAdapter = new MoodListAdapter(this, userNameList, dateList, emoteImages);
+        moodListAdapter = new MoodListAdapter(this, moodLinkedList);
         moodListView.setAdapter(moodListAdapter);
+
+        moodListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                //for list item clicked
+                Toast.makeText(context, "0", Toast.LENGTH_SHORT).show();
+                Intent editMoodIntent = new Intent(FeedActivity.this, AddMoodActivity.class);
+                editMoodIntent.putExtra("editCheck", 1);
+                editMoodIntent.putExtra("oldMood", moodLinkedList.get(position));
+                startActivityForResult(editMoodIntent, 1);
+            }
+        });
+
     }
 
     @Override
@@ -141,23 +157,34 @@ public class FeedActivity extends AppCompatActivity
         return true;
     }
 
-    @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        //for list item clicked
-        Intent editMoodIntent = new Intent(this, AddMoodActivity.class); // TODO: Either create a Edit activity or change addmood to be able to know whether to edit or add new.
-        startActivityForResult(editMoodIntent, 0);
-    }
-
     private void addMood() {
         Intent addMoodIntent = new Intent(this, AddMoodActivity.class);
+        Random rand = new Random();
+        int newId = rand.nextInt(1000000);
+        addMoodIntent.putExtra("editCheck", 0);
+        addMoodIntent.putExtra("moodId", newId);
         startActivityForResult(addMoodIntent, 0);
+    }
+
+    private int getIndexOfMoodID(String moodId) {
+        int targetId = Integer.parseInt(moodId);
+        for (int i = 0; i < moodLinkedList.size(); i++) {
+            int currentId = Integer.parseInt(moodLinkedList.get(i).getId());
+            if (currentId == targetId) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     // Code Documentation found here: https://developer.android.com/reference/android/app/Activity.html
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        // requestcode 0 is from adding a new mood
         if (requestCode == 0) {
             Bundle returnData = data.getExtras();
             Mood returnMood = (Mood) returnData.getParcelable("mood");
+            moodLinkedList.add(returnMood);
+
             LayoutInflater inflater = (LayoutInflater)this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             View view = inflater.inflate(R.layout.fragment_mood,null);
 
@@ -168,9 +195,18 @@ public class FeedActivity extends AppCompatActivity
             //TODO: Get rid of text view and move all display functionality over to linearlayout
 
             userNameList.add(returnMood.getEmotionId());
-            dateList.add(returnMood.getDate().toString()); // TODO: needs testing
+            dateList.add(returnMood.getDate().toString());
             emoteImages.add(returnMood.getEmoticon());
             moodListAdapter.notifyDataSetChanged();
+        } else {
+            if (requestCode == 1) {
+                Bundle returnData = data.getExtras();
+                Mood returnMood = (Mood) returnData.getParcelable("mood");
+                int oldMoodIndex = getIndexOfMoodID(returnMood.getId());
+                //moodLinkedList.set(getIndexOfMoodID(returnMood.getId()), returnMood);
+                moodLinkedList.set(oldMoodIndex, returnMood);
+                moodListAdapter.notifyDataSetChanged();
+            }
         }
     }
 }

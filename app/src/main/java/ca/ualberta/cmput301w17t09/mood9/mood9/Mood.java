@@ -29,10 +29,9 @@ public class Mood implements Parcelable {
     private SocialSituation socialSituation;
 
 
-    public Mood(String id, Double latitude, Double longitutde,
+    public Mood(Double latitude, Double longitutde,
                 String trigger, String emotionId, int emoticon, String socialSituationId,
                 String imageTriggerId, Date date,String user_id) {
-        this.id = id;
         this.latitude = latitude;
         this.longitutde = longitutde;
         this.trigger = trigger;
