@@ -48,7 +48,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -85,6 +84,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         markers.add(timmies);
         markers.add(new_test);
 
+        //TODO Need to get the list of moods and if they have a location put it on the map.
 
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
