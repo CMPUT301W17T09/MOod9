@@ -61,10 +61,12 @@ fos.write(string.getBytes());
 fos.close();
 */
 
-    /**public MoodModel(EmotionModel emodel,SocialSituationModel smodel){
-        this.emodel = emodel;
-        this.smodel = smodel;
-    }*/
+    /**
+     * public MoodModel(EmotionModel emodel,SocialSituationModel smodel){
+     * this.emodel = emodel;
+     * this.smodel = smodel;
+     * }
+     */
 
     public void setMoodsArray() {
         // First load all moods on elastic search
@@ -78,12 +80,12 @@ fos.close();
         }
         ArrayList<Mood> deleteMoods = readFromDeleted();
         ArrayList<Mood> fileMoods = readFromAdded();
-        ArrayList<Mood> finalarr =  new ArrayList<Mood>();  //
+        ArrayList<Mood> finalarr = new ArrayList<Mood>();  //
         ArrayList<Mood> finalarr2 = new ArrayList<Mood>();
         finalarr.addAll(elasticmoods);
         finalarr.addAll(fileMoods);
-        for(int i = 0; i < finalarr.size(); i++){
-            if(!finalarr2.contains(finalarr.get(i))){
+        for (int i = 0; i < finalarr.size(); i++) {
+            if (!finalarr2.contains(finalarr.get(i))) {
                 finalarr2.add(finalarr.get(i));
             }
         }
@@ -94,10 +96,10 @@ fos.close();
         //Load missing elastic onto file and vice versa
     }
 
-    public ArrayList<Mood> getMoodByUser(String userid){
+    public ArrayList<Mood> getMoodByUser(String userid) {
         ArrayList<Mood> returnarr = new ArrayList<Mood>();
-        for (int i = 0; i < moods.size(); i++){
-            if(moods.get(i).getUser_id().equals(userid)){
+        for (int i = 0; i < moods.size(); i++) {
+            if (moods.get(i).getUser_id().equals(userid)) {
                 returnarr.add(moods.get(i));
             }
         }
@@ -106,64 +108,62 @@ fos.close();
     }
 
     /**
-     *
      * @param user
      * @return latest mood of every person the user is following
      */
-    public ArrayList<Mood> getFollowedMoods(User user){
+    public ArrayList<Mood> getFollowedMoods(User user) {
         ArrayList<Mood> returnarr = new ArrayList<Mood>();
-        for (int i = 0; i < moods.size(); i++){
-            if(user.getFollowing().contains(moods.get(i).getUser())){
+        for (int i = 0; i < moods.size(); i++) {
+            if (user.getFollowing().contains(moods.get(i).getUser())) {
                 returnarr.add(moods.get(i));
             }
         }
         return returnarr;
     }
 
-    public ArrayList<Mood> getUniversalMoods(){
+    public ArrayList<Mood> getUniversalMoods() {
         setMoodsArray();
         return moods;
     }
 
-    public ArrayList<Mood> getMoodsNear(Double latitude, Double longitude){
+    public ArrayList<Mood> getMoodsNear(Double latitude, Double longitude) {
         // TODO
         return moods;
     }
 
 
-    public void updateMood(Mood mood){
+    public void updateMood(Mood mood) {
 
     }
 
     /**
      * Adds the given mood to elastic search and to the addMood file in a gson format
+     *
      * @param mood
      */
-    public void addMood(Mood mood){
+    public void addMood(Mood mood) {
         ElasticSearchMOodController.AddMoodsTask addMoodsTask = new ElasticSearchMOodController.AddMoodsTask();
         addMoodsTask.execute(mood); // add to elastic search
         Gson gson = new Gson();
         String mjs = gson.toJson(mood);
-        try{
+        try {
             BufferedWriter br = new BufferedWriter(new FileWriter(ADDEDNAME));
             br.write(mjs);
             br.flush();
-        }
-        catch (IOException e){
+        } catch (IOException e) {
             System.out.println("File not found");
         }
         setMoodsArray();
     }
 
-    public void deleteMood(Mood mood){
+    public void deleteMood(Mood mood) {
         Gson gson = new Gson();
         String mjs = gson.toJson(mood);
-        try{
+        try {
             BufferedWriter br = new BufferedWriter(new FileWriter(DELETEDNAME));
             br.write(mjs);
             br.flush();
-        }
-        catch (IOException e){
+        } catch (IOException e) {
             System.out.println("File not found");
         }
         setMoodsArray();
@@ -172,43 +172,40 @@ fos.close();
 
     private ArrayList<Mood> readFromAdded() {
         ArrayList<Mood> loaded = new ArrayList<Mood>();
-            try{
-                BufferedReader br = new BufferedReader(new FileReader(ADDEDNAME));
-                Gson gson = new Gson();
-                Type listType = new TypeToken<ArrayList<Mood>>(){}.getType();
-                loaded = gson.fromJson(br, listType);
-            }
-            catch (IOException e){
-                System.out.println("file not found");
-            }
-            return loaded;
+        try {
+            BufferedReader br = new BufferedReader(new FileReader(ADDEDNAME));
+            Gson gson = new Gson();
+            Type listType = new TypeToken<ArrayList<Mood>>() {
+            }.getType();
+            loaded = gson.fromJson(br, listType);
+        } catch (IOException e) {
+            System.out.println("file not found");
         }
-            //Code taken from http://stackoverflow.com/questions/12384064/gson-convert-from-json-to-a-typed-arraylistt Sept.22,2016
+        return loaded;
+    }
+    //Code taken from http://stackoverflow.com/questions/12384064/gson-convert-from-json-to-a-typed-arraylistt Sept.22,2016
 
-    private ArrayList<Mood> readFromDeleted(){
+    private ArrayList<Mood> readFromDeleted() {
         ArrayList<Mood> deleted = new ArrayList<Mood>();
-        try{
+        try {
             BufferedReader br = new BufferedReader(new FileReader(DELETEDNAME));
             Gson gson = new Gson();
-            Type listType = new TypeToken<ArrayList<Mood>>(){}.getType();
+            Type listType = new TypeToken<ArrayList<Mood>>() {
+            }.getType();
             deleted = gson.fromJson(br, listType);
-        }
-        catch (IOException e){
+        } catch (IOException e) {
             System.out.println("file not found");
         }
         return deleted;
     }
 
-    private void deletefromfile(){
+    private void deletefromfile() {
         try {
             FileOutputStream writer = new FileOutputStream(DELETEDNAME);
             writer.write(("").getBytes());
             writer.close();
-        }
-        catch (IOException e){
+        } catch (IOException e) {
             System.out.println("file not found");
         }
-
     }
-
 }

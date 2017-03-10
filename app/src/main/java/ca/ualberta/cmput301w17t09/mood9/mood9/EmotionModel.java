@@ -1,57 +1,86 @@
 package ca.ualberta.cmput301w17t09.mood9.mood9;
 
 
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
-import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.ExecutionException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.concurrent.ConcurrentHashMap;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 /**
  * Created by dannick on 2/22/17.
  */
 
 public class EmotionModel {
-    protected static LoadingCache<String, Emotion> emotions;
+    private ConcurrentHashMap<String, Emotion> emotions;
 
-    public static Emotion getEmotion(String id){
-        Emotion emo = null;
+    public EmotionModel(InputStream emotionsStream) {
+        //Get the DOM Builder Factory
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+
+        //Get the DOM Builder
+        DocumentBuilder builder;
         try {
-            emo = emotions.get(id);
-        } catch (ExecutionException e) {
-            // TODO
+             builder = factory.newDocumentBuilder();
+        } catch (ParserConfigurationException e) {
+            throw new RuntimeException("Unable to Configure Parser");
         }
-        return emo;
+        //Load and Parse the XML document
+        //document contains the complete XML as a Tree.
+        Document emotionsDocument;
+        try {
+            emotionsDocument = builder.parse(emotionsStream);
+        } catch (SAXException e) {
+            throw new RuntimeException("Unable to parse xml file");
+        } catch (IOException e){
+            throw new RuntimeException("Unable to read xml file");
+        }
+
+        emotions = new ConcurrentHashMap<String, Emotion>();
+
+        // Get all the emotions nodes
+        NodeList nList = emotionsDocument.getElementsByTagName("Emotion");
+
+        // Loop over them and add them to the emotions map
+        for (int i = 0; i < nList.getLength(); i++) {
+            Node nNode = nList.item(i);
+            Emotion e = new Emotion();
+            if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+                Element element = (Element) nNode;
+                e.setId(element.getElementsByTagName("id")
+                        .item(0)
+                        .getTextContent());
+                e.setName(element.getElementsByTagName("name")
+                        .item(0)
+                        .getTextContent());
+                e.setColor(element.getElementsByTagName("color")
+                        .item(0)
+                        .getTextContent());
+                e.setDescription(element.getElementsByTagName("description")
+                        .item(0)
+                        .getTextContent());
+                e.setImageName(element.getElementsByTagName("image")
+                        .item(0)
+                        .getTextContent());
+            }
+            emotions.put(e.getId(), e);
+        }
     }
 
-    public static void initEmotions() {
-        EmotionModel.emotions = CacheBuilder.newBuilder()
-                .maximumSize(100) // maximum 100 records can be cached
-                .build(new CacheLoader<String, Emotion>(){ // build the cacheloader
-
-                    @Override
-                    public Emotion load(String id) throws Exception {
-                        //make the expensive call
-                        return getFromXMLRessource(id);
-                    }
-                });
+    public Emotion getEmotion(String id){
+        //Iterating through the nodes and extracting the data.
+        return  emotions.get(id);
     }
 
-    public static ConcurrentMap<String, Emotion> getEmotions(){
-        return emotions.asMap();
-    }
-
-    public static Emotion getFromXMLRessource(String id){
-        // TODO
-        return new Emotion("", "", "", "", "");
-    }
-
-    public static void setOnXMLResource(Emotion emotion){
-        //Sets an emotion
-    }
-
-    public static void initialLoad(){
-
+    public ConcurrentHashMap<String, Emotion>getEmotions(){
+        return emotions;
     }
 }
