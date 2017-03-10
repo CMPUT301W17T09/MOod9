@@ -2,6 +2,7 @@ package ca.ualberta.cmput301w17t09.mood9.mood9;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import java.util.ArrayList;
 
 /**
  * Created by dannick on 2/22/17.
@@ -11,6 +12,8 @@ import android.os.Parcelable;
 public class User implements Parcelable {
     private String id;
     private String name;
+// arraylist of all users
+    private ArrayList<User> following = new ArrayList<>();
 
     public User(String id, String name) {
         this.id = id;
@@ -61,4 +64,19 @@ public class User implements Parcelable {
             return new User[size];
         }
     };
+    /**
+     *
+     * @return ArrayList of people the user is following
+     */
+    public ArrayList<User> getFollowing() {
+        return following;
+    }
+
+    public void addToFollowing(User user){
+        following.add(user);
+    }
+    public void removeFromFollowing(User user){
+        following.remove(user);
+    }
+
 }

@@ -22,7 +22,6 @@ import io.searchbox.indices.CreateIndex;
 import io.searchbox.indices.mapping.PutMapping;
 
 import static android.icu.lang.UCharacter.GraphemeClusterBreak.L;
-import static ca.ualberta.cmput301w17t09.mood9.mood9.MoodModel.moods;
 
 /**
  * Created by romansky on 10/20/16.

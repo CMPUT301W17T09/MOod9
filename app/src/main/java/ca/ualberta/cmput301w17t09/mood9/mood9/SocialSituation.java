@@ -13,6 +13,10 @@ public class SocialSituation implements Parcelable {
     private String name;
     private String description;
 
+    public  SocialSituation(){
+
+    }
+
     public SocialSituation(String id, String name, String description) {
         this.id = id;
         this.name = name;
@@ -61,4 +65,15 @@ public class SocialSituation implements Parcelable {
             return new SocialSituation[size];
         }
     };
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
 }

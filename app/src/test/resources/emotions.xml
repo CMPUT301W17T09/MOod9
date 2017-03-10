@@ -4,7 +4,7 @@
     <Emotion>
         <id>0</id>
         <name>Anger</name>
-        <description>You did not just quick a puppy!</description>
+        <description>You did not just kick a puppy!</description>
         <color>#ff0000</color>
         <image>anger.png</image>
     </Emotion>

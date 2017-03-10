@@ -5,6 +5,8 @@ import android.os.Parcelable;
 
 import java.util.Date;
 
+import io.searchbox.annotations.JestId;
+
 /**
  * Created by dannick on 2/22/17.
  * Converted to parcelable class by cdkushni on 3/8/17
@@ -12,6 +14,7 @@ import java.util.Date;
 
 public class Mood implements Parcelable {
     // The following fields are to be serialized
+    @JestId
     private String id;
     private Double latitude;
     private Double longitutde;
@@ -30,7 +33,11 @@ public class Mood implements Parcelable {
 
 
     public Mood(Double latitude, Double longitutde,
+<<<<<<< HEAD
                 String trigger, String emotionId, int emoticon, String socialSituationId,
+=======
+                String trigger, String emotionId, String socialSituationId,
+>>>>>>> origin/moodModelTest
                 String imageTriggerId, Date date,String user_id) {
         this.latitude = latitude;
         this.longitutde = longitutde;
@@ -49,7 +56,7 @@ public class Mood implements Parcelable {
     }
 
     public String getId() {
-        return id;
+        return this.id;
     }
 
     public void setId(String id) {
