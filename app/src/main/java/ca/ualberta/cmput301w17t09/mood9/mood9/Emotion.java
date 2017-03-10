@@ -9,14 +9,38 @@ public class Emotion {
     private String name;
     private String color;
     private String description;
-    private String image_name;
+    private String imageName;
 
-    public Emotion(String id, String name, String color, String description, String image_name) {
+    public Emotion(){
+
+    }
+
+    public Emotion(String id, String name, String color, String description, String imageName) {
         this.id = id;
         this.name = name;
         this.color = color;
         this.description = description;
-        this.image_name = image_name;
+        this.imageName = imageName;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setColor(String color) {
+        this.color = color;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public void setImageName(String imageName) {
+        this.imageName = imageName;
     }
 
     public String getId() {
@@ -36,6 +60,6 @@ public class Emotion {
     }
 
     public String getImageName() {
-        return image_name;
+        return imageName;
     }
 }

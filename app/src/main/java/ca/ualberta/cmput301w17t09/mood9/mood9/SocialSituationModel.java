@@ -1,52 +1,80 @@
 package ca.ualberta.cmput301w17t09.mood9.mood9;
 
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
 
-import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.ExecutionException;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.concurrent.ConcurrentHashMap;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 /**
  * Created by dannick on 2/22/17.
  */
 
 public class SocialSituationModel {
-    protected static LoadingCache<String, SocialSituation> socialSituations;
+    private ConcurrentHashMap<String, SocialSituation> socialSituations;
 
-    public static SocialSituation getSocialSituation(String id){
-        SocialSituation ss = null;
+    public SocialSituationModel(InputStream socialSituationStream) {
+        //Get the DOM Builder Factory
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+
+        //Get the DOM Builder
+        DocumentBuilder builder;
         try {
-            ss = socialSituations.get(id);
-        } catch (ExecutionException e) {
-            // TODO
+            builder = factory.newDocumentBuilder();
+        } catch (ParserConfigurationException e) {
+            throw new RuntimeException("Unable to Configure Parser");
         }
-        return ss;
+        //Load and Parse the XML document
+        //document contains the complete XML as a Tree.
+        Document socialSituationDocument;
+        try {
+            socialSituationDocument = builder.parse(socialSituationStream);
+        } catch (SAXException e) {
+            throw new RuntimeException("Unable to parse xml file");
+        } catch (IOException e){
+            throw new RuntimeException("Unable to read xml file");
+        }
+
+        socialSituations = new ConcurrentHashMap<String, SocialSituation>();
+
+        // Get all the socialsituations nodes
+        NodeList nList = socialSituationDocument.getElementsByTagName("SocialSituation");
+
+        // Loop over them and add them to the emotions map
+        for (int i = 0; i < nList.getLength(); i++) {
+            Node nNode = nList.item(i);
+            SocialSituation ss = new SocialSituation();
+            if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+                Element element = (Element) nNode;
+                ss.setId(element.getElementsByTagName("id")
+                        .item(0)
+                        .getTextContent());
+                ss.setName(element.getElementsByTagName("name")
+                        .item(0)
+                        .getTextContent());
+                ss.setDescription(element.getElementsByTagName("description")
+                        .item(0)
+                        .getTextContent());
+            }
+            socialSituations.put(ss.getId(), ss);
+        }
     }
 
-    public static void initSocialSituations() {
-        SocialSituationModel.socialSituations = CacheBuilder.newBuilder()
-                .maximumSize(100) // maximum 100 records can be cached
-                .build(new CacheLoader<String, SocialSituation>(){ // build the cacheloader
-
-                    @Override
-                    public SocialSituation load(String id) throws Exception {
-                        //make the expensive call
-                        return getFromXMLRessource(id);
-                    }
-                });
+    public SocialSituation getSocialSituation(String id){
+        //Iterating through the nodes and extracting the data.
+        return  socialSituations.get(id);
     }
 
-    public static ConcurrentMap<String, SocialSituation> getSocialSituations(){
-        return socialSituations.asMap();
-    }
-
-    public static SocialSituation getFromXMLRessource(String id){
-        // TODO
-        return new SocialSituation("", "", "");
-    }
-
-    public static void initialLoad(){
-
+    public ConcurrentHashMap<String, SocialSituation>getSocialSituations(){
+        return socialSituations;
     }
 }
