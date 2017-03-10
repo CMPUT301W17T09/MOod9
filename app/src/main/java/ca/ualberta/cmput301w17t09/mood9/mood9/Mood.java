@@ -2,6 +2,8 @@ package ca.ualberta.cmput301w17t09.mood9.mood9;
 
 import java.util.Date;
 
+import io.searchbox.annotations.JestId;
+
 /**
  * Created by dannick on 2/22/17.
  */
