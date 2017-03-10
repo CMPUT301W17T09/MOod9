@@ -27,10 +27,9 @@ public class Mood {
     private SocialSituation socialSituation;
 
 
-    public Mood(String id, Double latitude, Double longitutde,
+    public Mood(Double latitude, Double longitutde,
                 String trigger, String emotionId, String socialSituationId,
                 String imageTriggerId, Date date,String user_id) {
-        this.id = id;
         this.latitude = latitude;
         this.longitutde = longitutde;
         this.trigger = trigger;
@@ -47,7 +46,7 @@ public class Mood {
     }
 
     public String getId() {
-        return id;
+        return this.id;
     }
 
     public void setId(String id) {
