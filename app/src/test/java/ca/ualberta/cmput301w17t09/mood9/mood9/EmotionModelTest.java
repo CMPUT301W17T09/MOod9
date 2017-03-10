@@ -1,7 +1,13 @@
 package ca.ualberta.cmput301w17t09.mood9.mood9;
 
+import junit.framework.TestCase;
+
 import org.junit.Test;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.concurrent.ConcurrentMap;
 
 import static org.junit.Assert.*;
@@ -10,44 +16,47 @@ import static org.junit.Assert.*;
  * Created by Rohit on 2017-02-23.
  */
 
-public class EmotionModelTest {
+public class EmotionModelTest extends TestCase{
+    EmotionModel em;
 
-    @Test
-    public void testInitEmotions(){
-        EmotionModel test = new EmotionModel();
-        Emotion e1 = new Emotion("1","Test","Red","Happy","Happy.png");
-        Emotion e2  = new Emotion("2","Test1","blue","sad","sad.png");
-        test.setOnXMLResource(e1);
-        test.setOnXMLResource(e2);
-        test.initEmotions();
-        assertEquals(test.getEmotion("1"),e1);
-        assertEquals(test.getEmotion("2"),e2);
+    @Override
+    protected void setUp()
+    {
+        ClassLoader classLoader = this.getClass().getClassLoader();
+        URL url = classLoader.getResource("emotions.xml");
+        InputStream is = null;
+        try {
+            is = url.openStream();
+        } catch(IOException e) {
+            fail(e.getMessage());
+        }
+
+        em = new EmotionModel(is);
     }
 
     @Test
-    public void testXMLResource(){
-        EmotionModel test = new EmotionModel();
-        Emotion e1 = new Emotion("1","Test","Red","Happy","Happy.png");
-        Emotion e2  = new Emotion("2","Test1","blue","sad","sad.png");
-        test.setOnXMLResource(e1);
-        test.setOnXMLResource(e2);
-        Emotion teste = test.getFromXMLRessource("1");
-        Emotion teste2 = test.getFromXMLRessource("2");
-        assertEquals(e1,teste);
-        assertEquals(e2,teste2);
+    public void testGetEmotionExist() {
+        Emotion emo = em.getEmotion("0");
+        assertEquals(emo.getId(), "0");
+        assertEquals(emo.getName(), "Anger");
     }
 
-    @Test
-    public void testGetEmotions(){
-        EmotionModel test = new EmotionModel();
-        Emotion e1 = new Emotion("1","Test","Red","Happy","Happy.png");
-        Emotion e2  = new Emotion("2","Test1","blue","sad","sad.png");
-        test.setOnXMLResource(e1);
-        test.setOnXMLResource(e2);
-        test.initEmotions();
-        ConcurrentMap<String, Emotion> testing = test.getEmotions();
-        assertEquals(testing.size(),2);
-        assertEquals(testing.get("1"),e1);
-        assertEquals(testing.get("2"),e2);
+    public void testGetEmotionDoesNotExist() {
+        Emotion emo = em.getEmotion("abc");
+        assertNull(emo);
+    }
+
+    public void testGetEmotions() {
+        ConcurrentMap<String, Emotion> emos = em.getEmotions();
+        assertEquals(((Emotion) emos.get("0")).getName(), "Anger");
+        assertEquals(((Emotion) emos.get("1")).getName(), "Confusion");
+        assertEquals(((Emotion) emos.get("2")).getName(), "Disgust");
+        assertEquals(((Emotion) emos.get("3")).getName(), "Fear");
+        assertEquals(((Emotion) emos.get("4")).getName(), "Happiness");
+        assertEquals(((Emotion) emos.get("5")).getName(), "Sadness");
+        assertEquals(((Emotion) emos.get("6")).getName(), "Shame");
+        assertEquals(((Emotion) emos.get("7")).getName(), "Surprise");
+        Emotion emo = (Emotion) emos.get("8");
+        assertNull(emo);
     }
 }
