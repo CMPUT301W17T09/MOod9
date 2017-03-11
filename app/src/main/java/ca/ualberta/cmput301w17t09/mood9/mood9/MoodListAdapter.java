@@ -20,13 +20,14 @@ import java.util.LinkedList;
  * Created by cdkushni on 3/5/17.
  * code reference from https://www.caveofprogramming.com/guest-posts/custom-listview-with-imageview-and-textview-in-android.html
  * Changed by cdkushni on 3/8/17 to use ArrayLists instead of primitive arrays for compatibility reasons.
+ * Changed by cdkushni on 3/10/17 to use a linked list of moods rather than primitive arrays for better encapsulation.
  */
 
 public class MoodListAdapter extends BaseAdapter{
     Context context;
-    ArrayList<String> result;
-    ArrayList<Integer> imageId;
-    ArrayList<String> timeResult;
+    //ArrayList<String> result;
+    //ArrayList<Integer> imageId;
+    //ArrayList<String> timeResult;
     LinkedList<Mood> moodList;
     private static LayoutInflater inflater=null;
     public MoodListAdapter(FeedActivity feedActivity, LinkedList<Mood> moodLinkedList) {
@@ -73,7 +74,8 @@ public class MoodListAdapter extends BaseAdapter{
         holder.img=(ImageView) rowView.findViewById(R.id.imageView);
         holder.idtv.setText(moodList.get(position).getEmotionId());
         holder.timetv.setText(moodList.get(position).getDate().toString());
-        holder.img.setImageResource(moodList.get(position).getEmoticon());/*
+        holder.img.setImageResource(Integer.parseInt(moodList.get(position).getEmotion().getImageName()));
+        /*
         rowView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

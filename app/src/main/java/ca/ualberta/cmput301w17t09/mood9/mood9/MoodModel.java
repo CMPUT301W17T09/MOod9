@@ -34,6 +34,7 @@ import com.google.gson.reflect.TypeToken;
 import static android.provider.Telephony.Mms.Part.FILENAME;
 
 /**
+ * Added array size getter by cdkushni on 3/10/2017
  * Redone by Rohit on 2017-03-08
  * Created by dannick on 2/22/17.
  */
@@ -132,8 +133,12 @@ fos.close();
     }
 
 
-    public void updateMood(Mood mood) {
+    public void updateMood(int oldMoodId, Mood updatedMood) {
+        // TODO
+    }
 
+    public int getMoodModelSize() {
+        return moods.size();
     }
 
     /**

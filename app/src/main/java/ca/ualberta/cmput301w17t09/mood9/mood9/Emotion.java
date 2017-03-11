@@ -68,11 +68,11 @@ public class Emotion implements Parcelable {
     }
 
     protected Emotion(Parcel in) {
-        id = in.readString();
-        name = in.readString();
-        color = in.readString();
-        description = in.readString();
-        image_name = in.readString();
+        this.id = in.readString();
+        this.name = in.readString();
+        this.color = in.readString();
+        this.description = in.readString();
+        this.imageName = in.readString();
     }
 
     @Override
@@ -86,7 +86,7 @@ public class Emotion implements Parcelable {
         dest.writeString(name);
         dest.writeString(color);
         dest.writeString(description);
-        dest.writeString(image_name);
+        dest.writeString(imageName);
     }
 
     @SuppressWarnings("unused")

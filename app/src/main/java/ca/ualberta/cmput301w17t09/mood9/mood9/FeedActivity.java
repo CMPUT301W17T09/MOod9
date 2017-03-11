@@ -31,11 +31,13 @@ import java.util.Random;
 /**
  * Originally created by :
  * Modified by cdkushni on 3/5/17 and 3/8/17 to implement MoodListAdapter and data bundle receipt from addMood. Also made to inflate layout to a listview in the feed.
- *
+ * Modified by cdkushni on 3/10/17 to access the global application for global Models, changed over to using resource files for emotions and social situations,
+ * started updating MoodModel along with linkedList of moods
  */
 public class FeedActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
+    private Mood9Application mApplication;
     private ListView moodListView;
     private MoodListAdapter moodListAdapter;
     private LinkedList<Mood> moodLinkedList;
@@ -75,6 +77,7 @@ public class FeedActivity extends AppCompatActivity
 
         // set up list view adapter
         context = this;
+        mApplication = (Mood9Application)getApplicationContext();
         emoteImages = new ArrayList<Integer>();
         userNameList = new ArrayList<String>();
         dateList = new ArrayList<String>();
@@ -183,6 +186,7 @@ public class FeedActivity extends AppCompatActivity
         if (requestCode == 0) {
             Bundle returnData = data.getExtras();
             Mood returnMood = (Mood) returnData.getParcelable("mood");
+            mApplication.getMoodModel().addMood(returnMood);
             moodLinkedList.add(returnMood);
 
             LayoutInflater inflater = (LayoutInflater)this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -196,7 +200,7 @@ public class FeedActivity extends AppCompatActivity
 
             userNameList.add(returnMood.getEmotionId());
             dateList.add(returnMood.getDate().toString());
-            emoteImages.add(returnMood.getEmoticon());
+            //emoteImages.add(returnMood.getEmoticon());
             moodListAdapter.notifyDataSetChanged();
         } else {
             if (requestCode == 1) {
@@ -204,6 +208,7 @@ public class FeedActivity extends AppCompatActivity
                 Mood returnMood = (Mood) returnData.getParcelable("mood");
                 int oldMoodIndex = getIndexOfMoodID(returnMood.getId());
                 //moodLinkedList.set(getIndexOfMoodID(returnMood.getId()), returnMood);
+                mApplication.getMoodModel().updateMood(oldMoodIndex, returnMood);
                 moodLinkedList.set(oldMoodIndex, returnMood);
                 moodListAdapter.notifyDataSetChanged();
             }

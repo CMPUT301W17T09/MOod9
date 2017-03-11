@@ -10,6 +10,7 @@ import io.searchbox.annotations.JestId;
 /**
  * Created by dannick on 2/22/17.
  * Converted to parcelable class by cdkushni on 3/8/17
+ * Disabled this.emotion and this.socialSituation setting due to unusability at the moment by cdkushni on 3/10/17
  */
 
 public class Mood implements Parcelable {
@@ -19,7 +20,7 @@ public class Mood implements Parcelable {
     private Double latitude;
     private Double longitutde;
     private String trigger;
-    private int emoticon;
+    //private int emoticon;
     private String emotionId;
     private String socialSituationId;
     private String imageTriggerId;
@@ -33,17 +34,12 @@ public class Mood implements Parcelable {
 
 
     public Mood(Double latitude, Double longitutde,
-<<<<<<< HEAD
-                String trigger, String emotionId, int emoticon, String socialSituationId,
-=======
                 String trigger, String emotionId, String socialSituationId,
->>>>>>> origin/moodModelTest
                 String imageTriggerId, Date date,String user_id) {
         this.latitude = latitude;
         this.longitutde = longitutde;
         this.trigger = trigger;
         this.emotionId = emotionId;
-        this.emoticon = emoticon;
         this.socialSituationId = socialSituationId;
         this.imageTriggerId = imageTriggerId;
         this.date = date;
@@ -93,15 +89,15 @@ public class Mood implements Parcelable {
 
     public void setEmotionId(String emotionId) {
         this.emotionId = emotionId;
-        this.emotion = EmotionModel.getEmotion(emotionId);
-    }
+        //this.emotion = EmotionModel.getEmotion(emotionId); THIS DOESN'T WORK SINCE THERE IS NO INSTANCE OF THE MODEL TO ACCESS
+    }/*
     public int getEmoticon() {
         return emoticon;
     }
 
     public void setEmoticon(int emoticon) {
         this.emoticon = emoticon;
-    }
+    }*/
 
     public String getSocialSituationId() {
         return socialSituationId;
@@ -109,7 +105,7 @@ public class Mood implements Parcelable {
 
     public void setSocialSituationId(String socialSituationId) {
         this.socialSituationId = socialSituationId;
-        this.socialSituation = SocialSituationModel.getSocialSituation(socialSituationId);
+        //this.socialSituation = SocialSituationModel.getSocialSituation(socialSituationId); THIS DOESN'T WORK SINCE THERE IS NO INSTANCE OF THE MODEL TO ACCESS
     }
 
     public String getImageTriggerId() {
@@ -155,7 +151,7 @@ public class Mood implements Parcelable {
         longitutde = in.readByte() == 0x00 ? null : in.readDouble();
         trigger = in.readString();
         emotionId = in.readString();
-        emoticon = in.readInt();
+        //emoticon = in.readInt();
         socialSituationId = in.readString();
         imageTriggerId = in.readString();
         long tmpDate = in.readLong();
@@ -188,7 +184,7 @@ public class Mood implements Parcelable {
         }
         dest.writeString(trigger);
         dest.writeString(emotionId);
-        dest.writeInt(emoticon);
+        //dest.writeInt(emoticon);
         dest.writeString(socialSituationId);
         dest.writeString(imageTriggerId);
         dest.writeLong(date != null ? date.getTime() : -1L);
