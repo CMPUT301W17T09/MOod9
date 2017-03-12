@@ -17,7 +17,7 @@ public class ElasticSearchControllerTest {
     @Test
     public void testAdd() {
 
-        Mood m1 = new Mood(12.22,13.22,"Trigger","1","77","22",new Date(12-12-2016),"1");
+        Mood m1 = new Mood(12.22, 13.22, "Trigger", "1", "77", "22", new Date(12 - 12 - 2016), "1");
 
         ElasticSearchMOodController.AddMoodsTask addMoodsTask = new ElasticSearchMOodController.AddMoodsTask();
         addMoodsTask.execute(m1);
@@ -25,7 +25,7 @@ public class ElasticSearchControllerTest {
         ElasticSearchMOodController.GetMoodsTask getMoodsTask = new ElasticSearchMOodController.GetMoodsTask();
         getMoodsTask.execute("");
         try {
-             System.out.println(getMoodsTask.get());
+            System.out.println(getMoodsTask.get());
         } catch (Exception e) {
             Log.i("Error", "Can't get moods from ElasticSearch");
         }
@@ -82,5 +82,6 @@ public class ElasticSearchControllerTest {
         moods = getMoods(""); 
         assertTrue(moods.size() == 0);
     }
-
+    */
+    }
 }
