@@ -2,6 +2,7 @@ package ca.ualberta.cmput301w17t09.mood9.mood9;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -11,6 +12,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.lang.reflect.Array;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Date;
@@ -30,6 +32,7 @@ import android.widget.ListView;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.google.gson.stream.JsonReader;
 
 import static android.provider.Telephony.Mms.Part.FILENAME;
 
@@ -48,15 +51,14 @@ public class MoodModel {
     private EmotionModel emodel;
     private SocialSituationModel smodel;
     private FileInputStream moodsOnFile;
-    private static final String ADDEDNAME = "addedMoods.sav";
-    private static final String DELETEDNAME = "deletedMoods.sav";
+    File ADDEDNAME = new File("addedMoods.sav");
+    File DELETEDNAME = new File("deletedMoods.sav");
     ElasticSearchMOodController.GetMoodsTask getMoodsTask = new ElasticSearchMOodController.GetMoodsTask();
     ElasticSearchMOodController.AddMoodsTask addMoodsTask = new ElasticSearchMOodController.AddMoodsTask();
     ElasticSearchMOodController.UpdateMoodsTask UpdateMoodsTask = new ElasticSearchMOodController.UpdateMoodsTask();
     ElasticSearchMOodController.DeleteMoodTask deleteMoodTask = new ElasticSearchMOodController.DeleteMoodTask();
     /*String FILENAME = "hello_file";
 String string = "hello world!";
-
 FileOutputStream fos = openFileOutput(FILENAME, Context.MODE_PRIVATE);
 fos.write(string.getBytes());
 fos.close();
@@ -71,30 +73,43 @@ fos.close();
 
     public void setMoodsArray() {
         // First load all moods on elastic search
-        ElasticSearchMOodController.GetMoodsTask getMoodsTask = new ElasticSearchMOodController.GetMoodsTask();
-        getMoodsTask.execute("");
-        ArrayList<Mood> elasticmoods = new ArrayList<>(); //all moods on elasticsearch
-        try {
-            elasticmoods = getMoodsTask.get();
-        } catch (Exception e) {
-            Log.i("Error", "Can't get moods from ElasticSearch");
-        }
+//        try {
+//            elasticmoods = getMoodsTask.get();
+//        } catch (Exception e) {
+//            Log.i("Error", "Can't get moods from ElasticSearch");
+//        }
+        Mood m1 = new Mood(12.22,13.22,"Trigger","3","Fsun","222",new Date(12-12-2016),"10");
         ArrayList<Mood> deleteMoods = readFromDeleted();
-        ArrayList<Mood> fileMoods = readFromAdded();
+        ArrayList<Mood> fileMoods = readFromAdded(); //Last set of universal moods PLUS any offline moods
         ArrayList<Mood> finalarr = new ArrayList<Mood>();  //
         ArrayList<Mood> finalarr2 = new ArrayList<Mood>();
-        finalarr.addAll(elasticmoods);
-        finalarr.addAll(fileMoods);
+        finalarr.addAll(fileMoods); // final array contains all moods form elastic and add moods
         for (int i = 0; i < finalarr.size(); i++) {
             if (!finalarr2.contains(finalarr.get(i))) {
                 finalarr2.add(finalarr.get(i));
             }
+        } //finalarr2 has unique set of moods
+        if(deleteMoods != null) {
+            for(int i = 0; i < deleteMoods.size(); i++){
+                for(int j = 0; j < finalarr2.size(); j++){
+                    if (finalarr2.get(j).getOfflineid().equals(deleteMoods.get(i).getOfflineid())){
+                            finalarr2.remove(finalarr.get(j));
+                            break;
+                        }
+                    }
+                }
+            } //remove all moved pending for deletion from finalarr
+
+        deletefromfile(); //no more deleted modos
+        try {
+            FileOutputStream writer = new FileOutputStream(ADDEDNAME);
+            writer.write(("").getBytes());
+            writer.close();
+        } catch (IOException e) {
+            System.out.println("file not found1");
         }
-        finalarr2.removeAll(deleteMoods);
-        deletefromfile();
         moods = finalarr2;
-        //Subtract deletedMoods from elasticmoods, from filemoods
-        //Load missing elastic onto file and vice versa
+        saveListToFile();
     }
 
     public ArrayList<Mood> getMoodByUser(String userid) {
@@ -105,7 +120,6 @@ fos.close();
             }
         }
         return returnarr;
-
     }
 
     /**
@@ -133,9 +147,12 @@ fos.close();
     }
 
 
-    public void updateMood(String oldMoodId, Mood updatedMood) {
-        // TODO
-    }
+    public void updateMood(Mood mood) {
+        for(int i = 0; i<moods.size();i++) {
+            if (moods.get(i).getOfflineid().equals(mood.getOfflineid())) {
+                moods.set(i, mood);
+            }
+        }
 
     public int getMoodModelSize() {
         return moods.size();
@@ -143,42 +160,51 @@ fos.close();
 
     /**
      * Adds the given mood to elastic search and to the addMood file in a gson format
-     *
      * @param mood
      */
     public void addMood(Mood mood) {
         ElasticSearchMOodController.AddMoodsTask addMoodsTask = new ElasticSearchMOodController.AddMoodsTask();
         addMoodsTask.execute(mood); // add to elastic search
         Gson gson = new Gson();
-        String mjs = gson.toJson(mood);
+//      String mjs = gson.toJson(mood);
+        ArrayList<Mood> mjs1 = new ArrayList<Mood>();
+        mjs1 = readFromAdded();
+        if (mjs1==null){
+            mjs1 = new ArrayList<Mood>();
+        }
+        mjs1.add(mood);
         try {
             BufferedWriter br = new BufferedWriter(new FileWriter(ADDEDNAME));
-            br.write(mjs);
+            gson.toJson(mjs1, br);
             br.flush();
         } catch (IOException e) {
-            System.out.println("File not found");
+            System.out.println("File not found2");
         }
         setMoodsArray();
     }
 
     public void deleteMood(Mood mood) {
         Gson gson = new Gson();
-        String mjs = gson.toJson(mood);
+        ArrayList<Mood> mjs2 = new ArrayList<Mood>();
+        mjs2 = readFromDeleted();
+        if (mjs2==null){
+            mjs2 = new ArrayList<Mood>();
+        }
+        mjs2.add(mood);
         try {
             BufferedWriter br = new BufferedWriter(new FileWriter(DELETEDNAME));
-            br.write(mjs);
+            gson.toJson(mjs2,br);
             br.flush();
         } catch (IOException e) {
-            System.out.println("File not found");
+            System.out.println("File not found3");
         }
         setMoodsArray();
     }
 
-
     private ArrayList<Mood> readFromAdded() {
         ArrayList<Mood> loaded = new ArrayList<Mood>();
         try {
-            BufferedReader br = new BufferedReader(new FileReader(ADDEDNAME));
+            JsonReader br = new JsonReader(new FileReader(ADDEDNAME));
             Gson gson = new Gson();
             Type listType = new TypeToken<ArrayList<Mood>>() {
             }.getType();
@@ -188,23 +214,28 @@ fos.close();
         }
         return loaded;
     }
-    //Code taken from http://stackoverflow.com/questions/12384064/gson-convert-from-json-to-a-typed-arraylistt Sept.22,2016
-
+    /**
+     *
+     * @return arraylist of moods from the deletedname file
+     */
     private ArrayList<Mood> readFromDeleted() {
         ArrayList<Mood> deleted = new ArrayList<Mood>();
         try {
-            BufferedReader br = new BufferedReader(new FileReader(DELETEDNAME));
+            JsonReader br = new JsonReader(new FileReader(DELETEDNAME));
             Gson gson = new Gson();
             Type listType = new TypeToken<ArrayList<Mood>>() {
             }.getType();
             deleted = gson.fromJson(br, listType);
         } catch (IOException e) {
-            System.out.println("file not found");
+            System.out.println("file not found3");
         }
         return deleted;
     }
 
-    private void deletefromfile() {
+    /**
+     * Deletes all tweets form the deleted tweets file
+     */
+    public void deletefromfile() {
         try {
             FileOutputStream writer = new FileOutputStream(DELETEDNAME);
             writer.write(("").getBytes());
@@ -212,5 +243,30 @@ fos.close();
         } catch (IOException e) {
             System.out.println("file not found");
         }
+    }
+
+    public void clearAdded(){
+        try {
+            FileOutputStream writer = new FileOutputStream(ADDEDNAME);
+            writer.write(("").getBytes());
+            writer.close();
+        } catch (IOException e) {
+            System.out.println("file not found");
+        }
+    }
+    //http://stackoverflow.com/questions/24573598/write-arraylist-of-custom-objects-to-file
+    public int saveListToFile() {
+        try {
+            BufferedWriter buffWriter = new BufferedWriter(new FileWriter(ADDEDNAME, true));
+            Gson gson = new Gson();
+            Type type = new TypeToken<ArrayList<Mood>>() {}.getType();
+            String json = gson.toJson(moods, type);
+            buffWriter.append(json);
+            buffWriter.newLine();
+            buffWriter.close();
+        } catch (IOException e) {
+            return -1;
+        }
+        return 0;
     }
 }

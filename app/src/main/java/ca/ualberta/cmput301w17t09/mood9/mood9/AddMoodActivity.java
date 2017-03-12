@@ -1,6 +1,15 @@
 package ca.ualberta.cmput301w17t09.mood9.mood9;
 
+import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationManager;
+import android.provider.Settings;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -9,7 +18,11 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.SpinnerAdapter;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import android.location.LocationListener;
 
 import java.util.Date;
 import java.util.Map;
@@ -66,6 +79,7 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
         Button addLocation = (Button) findViewById(R.id.button);
         Button save = (Button) findViewById(R.id.button2);
         Button delete = (Button) findViewById(R.id.delete_button);
+        TextView addedLocation = (TextView) findViewById(R.id.textView5);
 
         emoticons = new int[mApplication.getEmotionModel().getEmotions().size()];
         emotions = new String[mApplication.getEmotionModel().getEmotions().size()];
@@ -127,7 +141,7 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
         addLocation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //TODO Add location functionality to the button
+                addedLocation.setText("Added!");
             }
         });
 
@@ -174,7 +188,6 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
                 }
             }
         });
-
     }
     //TODO: need to set up socialsituation spinner click listener
     //Performing action onItemSelected and onNothing selected
@@ -198,3 +211,4 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
         // TODO Auto-generated method stub
     }
 }
+

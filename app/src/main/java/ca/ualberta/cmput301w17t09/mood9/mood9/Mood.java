@@ -1,9 +1,9 @@
 package ca.ualberta.cmput301w17t09.mood9.mood9;
 
-import android.os.Parcel;
-import android.os.Parcelable;
+import android.media.MediaMuxer;
 
 import java.util.Date;
+import java.util.UUID;
 
 import io.searchbox.annotations.JestId;
 
@@ -17,6 +17,7 @@ public class Mood {
     // The following fields are to be serialized
     @JestId
     private String id;
+    private String offlineid;
     private Double latitude;
     private Double longitutde;
     private String trigger;
@@ -39,6 +40,8 @@ public class Mood {
     public Mood(Double latitude, Double longitutde,
                 String trigger, String emotionId, String socialSituationId,
                 String imageTriggerId, Date date,String user_id) {
+        //http://stackoverflow.com/questions/1389736/how-do-i-create-a-unique-id-in-java
+        this.offlineid = UUID.randomUUID().toString();
         this.latitude = latitude;
         this.longitutde = longitutde;
         this.trigger = trigger;
@@ -52,6 +55,13 @@ public class Mood {
 
     public Mood(){
 
+    }
+    public String getOfflineid() {
+        return offlineid;
+    }
+
+    public void setOfflineid(String offlineid) {
+        this.offlineid = offlineid;
     }
 
     public void setmApplication(Mood9Application mApplication) {
@@ -97,14 +107,7 @@ public class Mood {
     public void setEmotionId(String emotionId) {
         this.emotionId = emotionId;
         this.emotion = mApplication.getEmotionModel().getEmotion(emotionId);
-    }/*
-    public int getEmoticon() {
-        return emoticon;
     }
-
-    public void setEmoticon(int emoticon) {
-        this.emoticon = emoticon;
-    }*/
 
     public String getSocialSituationId() {
         return socialSituationId;
@@ -112,7 +115,8 @@ public class Mood {
 
     public void setSocialSituationId(String socialSituationId) {
         this.socialSituationId = socialSituationId;
-        this.socialSituation = mApplication.getSocialSituationModel().getSocialSituation(socialSituationId);
+        this.socialSituation = mApplication.getSocialSituationModel()
+					.getSocialSituation(socialSituationId);
     }
 
     public String getImageTriggerId() {

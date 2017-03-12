@@ -42,3 +42,7 @@ captures/
 
 # Keystore files
 *.jks
+
+# Map Key
+MOod9/app/src/debug/res/values/google_maps_api.xml
+MOod9/app/src/release/res/values/google_maps_api.xml

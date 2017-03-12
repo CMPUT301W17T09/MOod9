@@ -141,11 +141,13 @@ public class FeedActivity extends AppCompatActivity
         } else if (id == R.id.universal) {
 
         } else if (id == R.id.near_me) {
-
+            Intent mapIntent = new Intent(this, MapsActivity.class);
+            startActivity(mapIntent);
         } else if (id == R.id.profile) {
 
         } else if (id == R.id.about) {
-
+            Intent aboutIntent = new Intent(this, AboutActivity.class);
+            startActivity(aboutIntent);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

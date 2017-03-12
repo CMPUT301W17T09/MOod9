@@ -29,7 +29,7 @@ import static android.icu.lang.UCharacter.GraphemeClusterBreak.L;
 public class ElasticSearchMOodController {
     private static JestDroidClient client;
     private static String ElasticSearchServer = "http://cmput301.softwareprocess.es:8080";
-    private static String index_name = "cmput301w17t09";
+        private static String index_name = "cmput301w17t09";
     private static String mood_type = "mood9";
     private static String user_type = "user9";
 
@@ -75,6 +75,8 @@ public class ElasticSearchMOodController {
                         String id = result.getId();
                         mood.setId(result.getId());
                     }
+                    System.out.println(result.toString());
+
                 }
                 catch (Exception e) {
                     Log.i("Error", "The application failed to build and send the tweets");
