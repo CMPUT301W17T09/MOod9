@@ -1,14 +1,10 @@
 package ca.ualberta.cmput301w17t09.mood9.mood9;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-
 /**
  * Created by dannick on 2/22/17.
- * Converted to parcelable class by cdkushni on 3/8/17
  */
 
-public class Emotion implements Parcelable {
+public class Emotion {
     private String id;
     private String name;
     private String color;
@@ -66,39 +62,4 @@ public class Emotion implements Parcelable {
     public String getImageName() {
         return imageName;
     }
-
-    protected Emotion(Parcel in) {
-        this.id = in.readString();
-        this.name = in.readString();
-        this.color = in.readString();
-        this.description = in.readString();
-        this.imageName = in.readString();
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(id);
-        dest.writeString(name);
-        dest.writeString(color);
-        dest.writeString(description);
-        dest.writeString(imageName);
-    }
-
-    @SuppressWarnings("unused")
-    public static final Parcelable.Creator<Emotion> CREATOR = new Parcelable.Creator<Emotion>() {
-        @Override
-        public Emotion createFromParcel(Parcel in) {
-            return new Emotion(in);
-        }
-
-        @Override
-        public Emotion[] newArray(int size) {
-            return new Emotion[size];
-        }
-    };
 }

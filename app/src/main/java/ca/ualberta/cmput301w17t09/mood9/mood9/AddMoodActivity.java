@@ -1,7 +1,6 @@
 package ca.ualberta.cmput301w17t09.mood9.mood9;
 
 import android.content.Intent;
-import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -9,15 +8,12 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ExpandableListAdapter;
-import android.widget.ExpandableListView;
-import android.widget.SimpleExpandableListAdapter;
 import android.widget.Spinner;
-import android.widget.SpinnerAdapter;
 import android.widget.Toast;
 
 import java.util.Date;
 import java.util.Map;
+import java.util.Random;
 
 /**
  * Originally created by Fady
@@ -34,8 +30,16 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
     int[] emoticons;
     int emotionId = 0;
     int socialId = 0;
+    double latitude = 100;
+    double longitude = 100;
+    String imageTriggerId = "N/A";
     String selectedEmotion = "Anger";
+    String userId = "newUser";
+
+    int oldMoodIndex = 0;
+    Mood returnMood;
     int selectedEmote = R.drawable.anger;
+    String selectedSocial = "N/A";
     Bundle editCheckB;
     // map<Emotion> emotions = EmotionModel.getEmotions();
     //String[] socials = {"TEMP", "DO NOT USE", "With my enemies", "All Alone"};
@@ -50,6 +54,7 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
         int editCheck = editCheckB.getInt("editCheck", 0);
         if (editCheck == 1) {
             setContentView(R.layout.activity_edit_mood);
+            oldMoodIndex = editCheckB.getInt("moodIndex");
         } else {
             setContentView(R.layout.activity_add_mood);
         }
@@ -79,27 +84,44 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
 
         ArrayAdapter<String> socialSpinnerAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, socials);
         if (editCheck == 1) {
-            Mood oldMoodRestore = editCheckB.getParcelable("oldMood");
+            returnMood = mApplication.getMoodLinkedList().get(oldMoodIndex);
             int position = 0;
             for (Map.Entry<String, Emotion> entry : mApplication.getEmotionModel().getEmotions().entrySet()) {
-                if (entry.getValue().getName() == oldMoodRestore.getEmotion().getName()) {
+                if (entry.getValue().getName() == returnMood.getEmotion().getName()) {
                     position = Integer.parseInt(entry.getKey());
                 }
             }
+            emotionsSpinner.setAdapter(emotionsSpinnerAdapter);
             emotionsSpinner.setSelection(position);
             for (Map.Entry<String, SocialSituation> entry : mApplication.getSocialSituationModel().getSocialSituations().entrySet()) {
-                if (entry.getValue().getName() == oldMoodRestore.getSocialSituation().getName()) {
+                if (entry.getValue().getName() == returnMood.getSocialSituation().getName()) {
                     position = Integer.parseInt(entry.getKey());
                 }
             }
+            socialSpinner.setAdapter(socialSpinnerAdapter);
             socialSpinner.setSelection(position);
-            trigger.setText(oldMoodRestore.getTrigger());
+            trigger.setText(returnMood.getTrigger());
             //TODO: need to figure out how to reload saved map details
         }
-        emotionsSpinner.setAdapter(emotionsSpinnerAdapter);
+        else {
+            emotionsSpinner.setAdapter(emotionsSpinnerAdapter);
+            socialSpinner.setAdapter(socialSpinnerAdapter);
+        }
         emotionsSpinner.setOnItemSelectedListener(this);
-        socialSpinner.setAdapter(socialSpinnerAdapter);
+        socialSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                Toast.makeText(getApplicationContext(), socials[position], Toast.LENGTH_SHORT).show();
+                socialId = position;
+                selectedSocial = socials[position];
+            }
 
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                socialId = 0;
+                selectedSocial = socials[0];
+            }
+        });
 
         addLocation.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -113,37 +135,39 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
             public void onClick(View v) {
                 //TODO Need to actually save the information that is entered
 
-                if (editCheckB.getInt("editCheck", -1) == 0) {
-                    // added emoticon parameter to Mood class to store the r.drawable of the selected emotion
-                    Mood returnMood = new Mood(100.0, 100.0, trigger.getText().toString(), String.valueOf(emotionId), String.valueOf(socialId), "N/A", new Date(), "myName");
-                    returnMood.setmApplication(mApplication);
-                    returnMood.setEmotionId(String.valueOf(emotionId));
-                    returnMood.setSocialSituationId(String.valueOf(socialId));
-                    int newMoodId = editCheckB.getInt("moodId", 0);
-                    returnMood.setId(String.valueOf(newMoodId));
-                    // Parcelable http://www.parcelabler.com/
-                    Intent feedIntent = new Intent();
-                    feedIntent.putExtra("mood", returnMood);
-                    setResult(0, feedIntent);
-                    finish();
-                } else if (editCheckB.getInt("editCheck", -1) == 1) {
-                    Mood returnMood = editCheckB.getParcelable("oldMood");
-
-                    returnMood.setEmotionId(String.valueOf(emotionId));
-                    returnMood.setDate(new Date());
-                    returnMood.setmApplication(mApplication);
-                    returnMood.setEmotionId(String.valueOf(emotionId));
-                    returnMood.setSocialSituationId(String.valueOf(socialId));
-                    returnMood.setTrigger(trigger.getText().toString());
-                    //TODO: need to find a way to get latitude and longitude from the location setter
-                    Intent feedIntent = new Intent();
-                    feedIntent.putExtra("mood", returnMood);
-                    setResult(1, feedIntent);
-                    finish();
+                if (editCheckB.getInt("editCheck", -1) == 1) {
+                    try {
+                        returnMood.setEmotionId(String.valueOf(emotionId));
+                        returnMood.setDate(new Date());
+                        returnMood.setmApplication(mApplication);
+                        returnMood.setEmotionId(String.valueOf(emotionId));
+                        returnMood.setSocialSituationId(String.valueOf(socialId));
+                        returnMood.setTrigger(trigger.getText().toString());
+                        //TODO: need to find a way to get latitude and longitude from the location setter
+                        mApplication.getMoodLinkedList().set(oldMoodIndex, returnMood);
+                        //mApplication.getMoodModel().updateMood(returnMood.getId(), returnMood);
+                        Intent feedIntent = new Intent();
+                        feedIntent.putExtra("moodIndex", oldMoodIndex);
+                        setResult(1, feedIntent);
+                        finish();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        finish();
+                    }
                 }
-                else
-                {
-                    // TODO: implement failed to find edit check data so needs to error on return type and just make a new mood.
+                else {
+                    // added emoticon parameter to Mood class to store the r.drawable of the selected emotion
+                    returnMood = new Mood(latitude, longitude, trigger.getText().toString(), String.valueOf(emotionId), String.valueOf(socialId), imageTriggerId, new Date(), userId);
+                    returnMood.setmApplication(mApplication);
+                    returnMood.setEmotionId(String.valueOf(emotionId));
+                    returnMood.setSocialSituationId(String.valueOf(socialId));
+                    Random rand = new Random();
+                    userId = String.valueOf(rand.nextInt(1000000));
+                    returnMood.setId(String.valueOf(userId));
+
+                    mApplication.getMoodLinkedList().add(returnMood);
+                    //mApplication.getMoodModel().addMood(returnMood);
+                    finish();
                 }
             }
         });
@@ -153,10 +177,18 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
     //Performing action onItemSelected and onNothing selected
     @Override
     public void onItemSelected(AdapterView<?> arg0, View arg1, int position, long id) {
-        Toast.makeText(getApplicationContext(), emotions[position], Toast.LENGTH_SHORT).show();
-        emotionId = position;
-        selectedEmotion = emotions[position];
-        selectedEmote = emoticons[position];
+        Spinner spinner = (Spinner) arg0;
+        if (spinner.getId() == R.id.emotions_spinner) {
+            Toast.makeText(getApplicationContext(), emotions[position], Toast.LENGTH_SHORT).show();
+            emotionId = position;
+            selectedEmotion = emotions[position];
+            selectedEmote = emoticons[position];
+        }
+        else if (spinner.getId() == R.id.social_spinner) {
+            Toast.makeText(getApplicationContext(), socials[position], Toast.LENGTH_SHORT).show();
+            socialId = position;
+            selectedSocial = socials[position];
+        }
     }
     @Override
     public void onNothingSelected(AdapterView<?> arg0) {

@@ -13,7 +13,7 @@ import io.searchbox.annotations.JestId;
  * Disabled this.emotion and this.socialSituation setting due to unusability at the moment by cdkushni on 3/10/17
  */
 
-public class Mood implements Parcelable {
+public class Mood {
     // The following fields are to be serialized
     @JestId
     private String id;
@@ -151,66 +151,4 @@ public class Mood implements Parcelable {
         return socialSituation;
     }
 
-
-    protected Mood(Parcel in) {
-        id = in.readString();
-        latitude = in.readByte() == 0x00 ? null : in.readDouble();
-        longitutde = in.readByte() == 0x00 ? null : in.readDouble();
-        trigger = in.readString();
-        emotionId = in.readString();
-        socialSituationId = in.readString();
-        imageTriggerId = in.readString();
-        long tmpDate = in.readLong();
-        date = tmpDate != -1 ? new Date(tmpDate) : null;
-        user_id = in.readString();
-        user = (User) in.readValue(User.class.getClassLoader());
-        emotion = (Emotion) in.readValue(Emotion.class.getClassLoader());
-        socialSituation = (SocialSituation) in.readValue(SocialSituation.class.getClassLoader());
-        mApplication = (Mood9Application) in.readValue(Mood9Application.class.getClassLoader());
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(id);
-        if (latitude == null) {
-            dest.writeByte((byte) (0x00));
-        } else {
-            dest.writeByte((byte) (0x01));
-            dest.writeDouble(latitude);
-        }
-        if (longitutde == null) {
-            dest.writeByte((byte) (0x00));
-        } else {
-            dest.writeByte((byte) (0x01));
-            dest.writeDouble(longitutde);
-        }
-        dest.writeString(trigger);
-        dest.writeString(emotionId);
-        dest.writeString(socialSituationId);
-        dest.writeString(imageTriggerId);
-        dest.writeLong(date != null ? date.getTime() : -1L);
-        dest.writeString(user_id);
-        dest.writeValue(user);
-        dest.writeValue(emotion);
-        dest.writeValue(socialSituation);
-        dest.writeValue(mApplication);
-    }
-
-    @SuppressWarnings("unused")
-    public static final Parcelable.Creator<Mood> CREATOR = new Parcelable.Creator<Mood>() {
-        @Override
-        public Mood createFromParcel(Parcel in) {
-            return new Mood(in);
-        }
-
-        @Override
-        public Mood[] newArray(int size) {
-            return new Mood[size];
-        }
-    };
 }

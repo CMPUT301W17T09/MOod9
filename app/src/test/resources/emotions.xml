@@ -41,20 +41,20 @@
         <name>Sadness</name>
         <description>My puppy got run over by a car.</description>
         <color>#000eb4</color>
-        <image>happiness.png</image>
+        <image>sadness.png</image>
     </Emotion>
     <Emotion>
         <id>6</id>
         <name>Shame</name>
         <description>Oh no not again.</description>
         <color>#c8b7b7</color>
-        <image>happiness.png</image>
+        <image>shame.png</image>
     </Emotion>
     <Emotion>
         <id>7</id>
         <name>Surprise</name>
         <description>A present for me?</description>
         <color>#53e4e6</color>
-        <image>happiness.png</image>
+        <image>surprise.png</image>
     </Emotion>
 </Emotions>

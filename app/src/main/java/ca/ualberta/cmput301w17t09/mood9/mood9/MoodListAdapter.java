@@ -25,17 +25,11 @@ import java.util.LinkedList;
 
 public class MoodListAdapter extends BaseAdapter{
     Context context;
-    //ArrayList<String> result;
-    //ArrayList<Integer> imageId;
-    //ArrayList<String> timeResult;
     LinkedList<Mood> moodList;
     private static LayoutInflater inflater=null;
     public MoodListAdapter(FeedActivity feedActivity, LinkedList<Mood> moodLinkedList) {
-        //result = usrNameList;
-        //timeResult = dateList;
         moodList = moodLinkedList;
         context = feedActivity;
-        //imageId = emoteImages;
         inflater = ( LayoutInflater )context.
                 getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
@@ -72,7 +66,7 @@ public class MoodListAdapter extends BaseAdapter{
         holder.idtv=(TextView) rowView.findViewById(R.id.username);
         holder.timetv=(TextView) rowView.findViewById(R.id.time);
         holder.img=(ImageView) rowView.findViewById(R.id.imageView);
-        holder.idtv.setText(moodList.get(position).getEmotionId());
+        holder.idtv.setText(moodList.get(position).getSocialSituation().getName());
         holder.timetv.setText(moodList.get(position).getDate().toString());
         holder.img.setImageResource(context.getResources().getIdentifier(moodList.get(position).getEmotion().getImageName().substring(0, moodList.get(position).getEmotion().getImageName().lastIndexOf(".")), "drawable", context.getPackageName()));
         /*

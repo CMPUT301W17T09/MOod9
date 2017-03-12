@@ -133,7 +133,7 @@ fos.close();
     }
 
 
-    public void updateMood(int oldMoodId, Mood updatedMood) {
+    public void updateMood(String oldMoodId, Mood updatedMood) {
         // TODO
     }
 
