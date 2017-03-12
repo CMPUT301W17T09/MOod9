@@ -58,7 +58,6 @@ public class MoodModel {
     ElasticSearchMOodController.DeleteMoodTask deleteMoodTask = new ElasticSearchMOodController.DeleteMoodTask();
     /*String FILENAME = "hello_file";
 String string = "hello world!";
-
 FileOutputStream fos = openFileOutput(FILENAME, Context.MODE_PRIVATE);
 fos.write(string.getBytes());
 fos.close();
@@ -73,33 +72,32 @@ fos.close();
 
     public void setMoodsArray() {
         // First load all moods on elastic search
-        ElasticSearchMOodController.GetMoodsTask getMoodsTask = new ElasticSearchMOodController.GetMoodsTask();
-        getMoodsTask.execute(""); //gets all moods
-        ArrayList<Mood> elasticmoods = new ArrayList<>(); //all moods on elasticsearch
-        try {
-            elasticmoods = getMoodsTask.get();
-        } catch (Exception e) {
-            Log.i("Error", "Can't get moods from ElasticSearch");
-        }
+//        try {
+//            elasticmoods = getMoodsTask.get();
+//        } catch (Exception e) {
+//            Log.i("Error", "Can't get moods from ElasticSearch");
+//        }
+        Mood m1 = new Mood(12.22,13.22,"Trigger","3","Fsun","222",new Date(12-12-2016),"10");
         ArrayList<Mood> deleteMoods = readFromDeleted();
         ArrayList<Mood> fileMoods = readFromAdded(); //Last set of universal moods PLUS any offline moods
         ArrayList<Mood> finalarr = new ArrayList<Mood>();  //
         ArrayList<Mood> finalarr2 = new ArrayList<Mood>();
-        finalarr.addAll(elasticmoods); //Add everythingon elastic search
         finalarr.addAll(fileMoods); // final array contains all moods form elastic and add moods
         for (int i = 0; i < finalarr.size(); i++) {
             if (!finalarr2.contains(finalarr.get(i))) {
                 finalarr2.add(finalarr.get(i));
             }
         } //finalarr2 has unique set of moods
-        finalarr2.removeAll(deleteMoods); //remove all moved pending for deletion from finalarr
-        ElasticSearchMOodController.UpdateMoodsTask updateMoodsTask = new ElasticSearchMOodController.UpdateMoodsTask();
-        ElasticSearchMOodController.DeleteMoodTask deleteMoodTask = new ElasticSearchMOodController.DeleteMoodTask();
-        for (int i = 0; i < deleteMoods.size(); i++) {
-            if (!elasticmoods.contains(deleteMoods.get(i))) {
-                deleteMoodTask.execute(deleteMoods.get(i)); //mood deleted from elastic search
-            }
-        }
+        if(deleteMoods != null) {
+            for(int i = 0; i < deleteMoods.size(); i++){
+                for(int j = 0; j < finalarr2.size(); j++){
+                    if (finalarr2.get(j).getOfflineid().equals(deleteMoods.get(i).getOfflineid())){
+                            finalarr2.remove(finalarr.get(j));
+                            break;
+                        }
+                    }
+                }
+            } //remove all moved pending for deletion from finalarr
 
         deletefromfile(); //no more deleted modos
         try {
@@ -149,26 +147,32 @@ fos.close();
 
 
     public void updateMood(Mood mood) {
+        for(int i = 0; i<moods.size();i++) {
+            if (moods.get(i).getOfflineid().equals(mood.getOfflineid())) {
+                moods.set(i, mood);
+            }
+        }
 
     }
 
     /**
      * Adds the given mood to elastic search and to the addMood file in a gson format
-     *
      * @param mood
      */
     public void addMood(Mood mood) {
         ElasticSearchMOodController.AddMoodsTask addMoodsTask = new ElasticSearchMOodController.AddMoodsTask();
         addMoodsTask.execute(mood); // add to elastic search
         Gson gson = new Gson();
-        String mjs = gson.toJson(mood);
+//      String mjs = gson.toJson(mood);
         ArrayList<Mood> mjs1 = new ArrayList<Mood>();
-        mjs1.add(mjs);
+        mjs1 = readFromAdded();
+        if (mjs1==null){
+            mjs1 = new ArrayList<Mood>();
+        }
+        mjs1.add(mood);
         try {
             BufferedWriter br = new BufferedWriter(new FileWriter(ADDEDNAME));
-            System.out.println(mjs);
             gson.toJson(mjs1, br);
-            //wrties gson rep of mood to file
             br.flush();
         } catch (IOException e) {
             System.out.println("File not found2");
@@ -178,10 +182,15 @@ fos.close();
 
     public void deleteMood(Mood mood) {
         Gson gson = new Gson();
-        String mjs = gson.toJson(mood);
+        ArrayList<Mood> mjs2 = new ArrayList<Mood>();
+        mjs2 = readFromDeleted();
+        if (mjs2==null){
+            mjs2 = new ArrayList<Mood>();
+        }
+        mjs2.add(mood);
         try {
             BufferedWriter br = new BufferedWriter(new FileWriter(DELETEDNAME));
-            br.write(mjs);
+            gson.toJson(mjs2,br);
             br.flush();
         } catch (IOException e) {
             System.out.println("File not found3");
@@ -189,10 +198,6 @@ fos.close();
         setMoodsArray();
     }
 
-    /**
-     *
-     * @return arraylist of moods in the addedname file
-     */
     private ArrayList<Mood> readFromAdded() {
         ArrayList<Mood> loaded = new ArrayList<Mood>();
         try {
@@ -206,9 +211,6 @@ fos.close();
         }
         return loaded;
     }
-    //Code taken from http://stackoverflow.com/questions/12384064/gson-convert-from-json-to-a-typed-arraylistt Sept.22,2016
-
-
     /**
      *
      * @return arraylist of moods from the deletedname file
@@ -216,8 +218,7 @@ fos.close();
     private ArrayList<Mood> readFromDeleted() {
         ArrayList<Mood> deleted = new ArrayList<Mood>();
         try {
-            DELETEDNAME.createNewFile();
-            BufferedReader br = new BufferedReader(new FileReader(DELETEDNAME));
+            JsonReader br = new JsonReader(new FileReader(DELETEDNAME));
             Gson gson = new Gson();
             Type listType = new TypeToken<ArrayList<Mood>>() {
             }.getType();
@@ -231,9 +232,19 @@ fos.close();
     /**
      * Deletes all tweets form the deleted tweets file
      */
-    private void deletefromfile() {
+    public void deletefromfile() {
         try {
             FileOutputStream writer = new FileOutputStream(DELETEDNAME);
+            writer.write(("").getBytes());
+            writer.close();
+        } catch (IOException e) {
+            System.out.println("file not found");
+        }
+    }
+
+    public void clearAdded(){
+        try {
+            FileOutputStream writer = new FileOutputStream(ADDEDNAME);
             writer.write(("").getBytes());
             writer.close();
         } catch (IOException e) {

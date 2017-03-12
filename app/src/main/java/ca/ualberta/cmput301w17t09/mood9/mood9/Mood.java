@@ -1,6 +1,9 @@
 package ca.ualberta.cmput301w17t09.mood9.mood9;
 
+import android.media.MediaMuxer;
+
 import java.util.Date;
+import java.util.UUID;
 
 import io.searchbox.annotations.JestId;
 
@@ -12,6 +15,7 @@ public class Mood {
     // The following fields are to be serialized
     @JestId
     private String id;
+    private String offlineid;
     private Double latitude;
     private Double longitutde;
     private String trigger;
@@ -30,6 +34,8 @@ public class Mood {
     public Mood(Double latitude, Double longitutde,
                 String trigger, String emotionId, String socialSituationId,
                 String imageTriggerId, Date date,String user_id) {
+        //http://stackoverflow.com/questions/1389736/how-do-i-create-a-unique-id-in-java
+        this.offlineid = UUID.randomUUID().toString();
         this.latitude = latitude;
         this.longitutde = longitutde;
         this.trigger = trigger;
@@ -43,6 +49,13 @@ public class Mood {
 
     public Mood(){
 
+    }
+    public String getOfflineid() {
+        return offlineid;
+    }
+
+    public void setOfflineid(String offlineid) {
+        this.offlineid = offlineid;
     }
 
     public String getId() {

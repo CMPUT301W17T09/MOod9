@@ -20,7 +20,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
         Button goButton = (Button) findViewById(R.id.go);
         EditText usernameField = (EditText) findViewById(R.id.username_field);
 
