@@ -65,7 +65,8 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
         emotions = new String[mApplication.getEmotionModel().getEmotions().size()];
         for (Map.Entry<String, Emotion> entry : mApplication.getEmotionModel().getEmotions().entrySet()) {
             // drawable name may require not having a end extension like .png
-            emoticons[Integer.parseInt(entry.getKey())] = getResources().getIdentifier(entry.getValue().getImageName(), "drawable", getPackageName());
+            String test = entry.getValue().getImageName();
+            emoticons[Integer.parseInt(entry.getKey())] = getResources().getIdentifier(entry.getValue().getImageName().substring(0, entry.getValue().getImageName().lastIndexOf(".")), "drawable", getPackageName());
             emotions[Integer.parseInt(entry.getKey())] = entry.getValue().getName();
         }
         socials = new String[mApplication.getSocialSituationModel().getSocialSituations().entrySet().size()];
@@ -115,6 +116,9 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
                 if (editCheckB.getInt("editCheck", -1) == 0) {
                     // added emoticon parameter to Mood class to store the r.drawable of the selected emotion
                     Mood returnMood = new Mood(100.0, 100.0, trigger.getText().toString(), String.valueOf(emotionId), String.valueOf(socialId), "N/A", new Date(), "myName");
+                    returnMood.setmApplication(mApplication);
+                    returnMood.setEmotionId(String.valueOf(emotionId));
+                    returnMood.setSocialSituationId(String.valueOf(socialId));
                     int newMoodId = editCheckB.getInt("moodId", 0);
                     returnMood.setId(String.valueOf(newMoodId));
                     // Parcelable http://www.parcelabler.com/
@@ -127,7 +131,9 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
 
                     returnMood.setEmotionId(String.valueOf(emotionId));
                     returnMood.setDate(new Date());
-                    //returnMood.setSocialSituationId(String.valueOf(socialId));
+                    returnMood.setmApplication(mApplication);
+                    returnMood.setEmotionId(String.valueOf(emotionId));
+                    returnMood.setSocialSituationId(String.valueOf(socialId));
                     returnMood.setTrigger(trigger.getText().toString());
                     //TODO: need to find a way to get latitude and longitude from the location setter
                     Intent feedIntent = new Intent();

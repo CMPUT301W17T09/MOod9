@@ -33,6 +33,9 @@ public class Mood implements Parcelable {
     private SocialSituation socialSituation;
 
 
+    private Mood9Application mApplication;
+
+
     public Mood(Double latitude, Double longitutde,
                 String trigger, String emotionId, String socialSituationId,
                 String imageTriggerId, Date date,String user_id) {
@@ -49,6 +52,10 @@ public class Mood implements Parcelable {
 
     public Mood(){
 
+    }
+
+    public void setmApplication(Mood9Application mApplication) {
+        this.mApplication = mApplication;
     }
 
     public String getId() {
@@ -89,7 +96,7 @@ public class Mood implements Parcelable {
 
     public void setEmotionId(String emotionId) {
         this.emotionId = emotionId;
-        //this.emotion = EmotionModel.getEmotion(emotionId); THIS DOESN'T WORK SINCE THERE IS NO INSTANCE OF THE MODEL TO ACCESS
+        this.emotion = mApplication.getEmotionModel().getEmotion(emotionId);
     }/*
     public int getEmoticon() {
         return emoticon;
@@ -105,7 +112,7 @@ public class Mood implements Parcelable {
 
     public void setSocialSituationId(String socialSituationId) {
         this.socialSituationId = socialSituationId;
-        //this.socialSituation = SocialSituationModel.getSocialSituation(socialSituationId); THIS DOESN'T WORK SINCE THERE IS NO INSTANCE OF THE MODEL TO ACCESS
+        this.socialSituation = mApplication.getSocialSituationModel().getSocialSituation(socialSituationId);
     }
 
     public String getImageTriggerId() {
@@ -151,7 +158,6 @@ public class Mood implements Parcelable {
         longitutde = in.readByte() == 0x00 ? null : in.readDouble();
         trigger = in.readString();
         emotionId = in.readString();
-        //emoticon = in.readInt();
         socialSituationId = in.readString();
         imageTriggerId = in.readString();
         long tmpDate = in.readLong();
@@ -160,6 +166,7 @@ public class Mood implements Parcelable {
         user = (User) in.readValue(User.class.getClassLoader());
         emotion = (Emotion) in.readValue(Emotion.class.getClassLoader());
         socialSituation = (SocialSituation) in.readValue(SocialSituation.class.getClassLoader());
+        mApplication = (Mood9Application) in.readValue(Mood9Application.class.getClassLoader());
     }
 
     @Override
@@ -184,7 +191,6 @@ public class Mood implements Parcelable {
         }
         dest.writeString(trigger);
         dest.writeString(emotionId);
-        //dest.writeInt(emoticon);
         dest.writeString(socialSituationId);
         dest.writeString(imageTriggerId);
         dest.writeLong(date != null ? date.getTime() : -1L);
@@ -192,6 +198,7 @@ public class Mood implements Parcelable {
         dest.writeValue(user);
         dest.writeValue(emotion);
         dest.writeValue(socialSituation);
+        dest.writeValue(mApplication);
     }
 
     @SuppressWarnings("unused")
