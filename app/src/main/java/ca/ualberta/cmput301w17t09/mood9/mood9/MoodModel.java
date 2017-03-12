@@ -161,14 +161,13 @@ fos.close();
         ElasticSearchMOodController.AddMoodsTask addMoodsTask = new ElasticSearchMOodController.AddMoodsTask();
         addMoodsTask.execute(mood); // add to elastic search
         Gson gson = new Gson();
-        String mjs = gson.toJson(mood);
+//        String mjs = gson.toJson(mood);
         ArrayList<Mood> mjs1 = new ArrayList<Mood>();
-        mjs1.add(mjs);
+        mjs1.add(mood);
         try {
             BufferedWriter br = new BufferedWriter(new FileWriter(ADDEDNAME));
-            System.out.println(mjs);
+            System.out.println(mjs1);
             gson.toJson(mjs1, br);
-            //wrties gson rep of mood to file
             br.flush();
         } catch (IOException e) {
             System.out.println("File not found2");
