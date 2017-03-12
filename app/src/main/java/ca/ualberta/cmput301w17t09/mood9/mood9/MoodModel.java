@@ -2,6 +2,7 @@ package ca.ualberta.cmput301w17t09.mood9.mood9;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -11,6 +12,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.lang.reflect.Array;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Date;
@@ -30,6 +32,7 @@ import android.widget.ListView;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.google.gson.stream.JsonReader;
 
 import static android.provider.Telephony.Mms.Part.FILENAME;
 
@@ -47,8 +50,8 @@ public class MoodModel {
     private EmotionModel emodel;
     private SocialSituationModel smodel;
     private FileInputStream moodsOnFile;
-    private static final String ADDEDNAME = "addedMoods.sav";
-    private static final String DELETEDNAME = "deletedMoods.sav";
+    File ADDEDNAME = new File("addedMoods.sav");
+    File DELETEDNAME = new File("deletedMoods.sav");
     ElasticSearchMOodController.GetMoodsTask getMoodsTask = new ElasticSearchMOodController.GetMoodsTask();
     ElasticSearchMOodController.AddMoodsTask addMoodsTask = new ElasticSearchMOodController.AddMoodsTask();
     ElasticSearchMOodController.UpdateMoodsTask UpdateMoodsTask = new ElasticSearchMOodController.UpdateMoodsTask();
@@ -79,17 +82,17 @@ fos.close();
             Log.i("Error", "Can't get moods from ElasticSearch");
         }
         ArrayList<Mood> deleteMoods = readFromDeleted();
-        ArrayList<Mood> fileMoods = readFromAdded();
+        ArrayList<Mood> fileMoods = readFromAdded(); //Last set of universal moods PLUS any offline moods
         ArrayList<Mood> finalarr = new ArrayList<Mood>();  //
         ArrayList<Mood> finalarr2 = new ArrayList<Mood>();
-        finalarr.addAll(elasticmoods);
+        finalarr.addAll(elasticmoods); //Add everythingon elastic search
         finalarr.addAll(fileMoods); // final array contains all moods form elastic and add moods
         for (int i = 0; i < finalarr.size(); i++) {
             if (!finalarr2.contains(finalarr.get(i))) {
                 finalarr2.add(finalarr.get(i));
             }
-        }
-        finalarr2.removeAll(deleteMoods);
+        } //finalarr2 has unique set of moods
+        finalarr2.removeAll(deleteMoods); //remove all moved pending for deletion from finalarr
         ElasticSearchMOodController.UpdateMoodsTask updateMoodsTask = new ElasticSearchMOodController.UpdateMoodsTask();
         ElasticSearchMOodController.DeleteMoodTask deleteMoodTask = new ElasticSearchMOodController.DeleteMoodTask();
         for (int i = 0; i < deleteMoods.size(); i++) {
@@ -97,8 +100,17 @@ fos.close();
                 deleteMoodTask.execute(deleteMoods.get(i)); //mood deleted from elastic search
             }
         }
-        deletefromfile();
+
+        deletefromfile(); //no more deleted modos
+        try {
+            FileOutputStream writer = new FileOutputStream(ADDEDNAME);
+            writer.write(("").getBytes());
+            writer.close();
+        } catch (IOException e) {
+            System.out.println("file not found1");
+        }
         moods = finalarr2;
+        saveListToFile();
     }
 
     public ArrayList<Mood> getMoodByUser(String userid) {
@@ -150,12 +162,16 @@ fos.close();
         addMoodsTask.execute(mood); // add to elastic search
         Gson gson = new Gson();
         String mjs = gson.toJson(mood);
+        ArrayList<Mood> mjs1 = new ArrayList<Mood>();
+        mjs1.add(mjs);
         try {
             BufferedWriter br = new BufferedWriter(new FileWriter(ADDEDNAME));
-            br.write(mjs);
+            System.out.println(mjs);
+            gson.toJson(mjs1, br);
+            //wrties gson rep of mood to file
             br.flush();
         } catch (IOException e) {
-            System.out.println("File not found");
+            System.out.println("File not found2");
         }
         setMoodsArray();
     }
@@ -168,7 +184,7 @@ fos.close();
             br.write(mjs);
             br.flush();
         } catch (IOException e) {
-            System.out.println("File not found");
+            System.out.println("File not found3");
         }
         setMoodsArray();
     }
@@ -180,7 +196,7 @@ fos.close();
     private ArrayList<Mood> readFromAdded() {
         ArrayList<Mood> loaded = new ArrayList<Mood>();
         try {
-            BufferedReader br = new BufferedReader(new FileReader(ADDEDNAME));
+            JsonReader br = new JsonReader(new FileReader(ADDEDNAME));
             Gson gson = new Gson();
             Type listType = new TypeToken<ArrayList<Mood>>() {
             }.getType();
@@ -200,13 +216,14 @@ fos.close();
     private ArrayList<Mood> readFromDeleted() {
         ArrayList<Mood> deleted = new ArrayList<Mood>();
         try {
+            DELETEDNAME.createNewFile();
             BufferedReader br = new BufferedReader(new FileReader(DELETEDNAME));
             Gson gson = new Gson();
             Type listType = new TypeToken<ArrayList<Mood>>() {
             }.getType();
             deleted = gson.fromJson(br, listType);
         } catch (IOException e) {
-            System.out.println("file not found");
+            System.out.println("file not found3");
         }
         return deleted;
     }
@@ -222,5 +239,20 @@ fos.close();
         } catch (IOException e) {
             System.out.println("file not found");
         }
+    }
+    //http://stackoverflow.com/questions/24573598/write-arraylist-of-custom-objects-to-file
+    public int saveListToFile() {
+        try {
+            BufferedWriter buffWriter = new BufferedWriter(new FileWriter(ADDEDNAME, true));
+            Gson gson = new Gson();
+            Type type = new TypeToken<ArrayList<Mood>>() {}.getType();
+            String json = gson.toJson(moods, type);
+            buffWriter.append(json);
+            buffWriter.newLine();
+            buffWriter.close();
+        } catch (IOException e) {
+            return -1;
+        }
+        return 0;
     }
 }

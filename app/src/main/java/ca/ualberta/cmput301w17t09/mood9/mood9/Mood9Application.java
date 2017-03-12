@@ -36,6 +36,6 @@ public class Mood9Application extends Application {
         InputStream socialSituationsStream = this.getResources().openRawResource(R.raw.emotions);
         this.emotionModel = new EmotionModel(emotionsStream);
         this.socialSituationModel = new SocialSituationModel(socialSituationsStream);
-        this.moodModel = new MoodModel(emotionModel, socialSituationModel);
+        this.moodModel = new MoodModel();
     }
 }

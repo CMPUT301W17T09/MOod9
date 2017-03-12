@@ -83,7 +83,7 @@ public class Mood {
 
     public void setEmotionId(String emotionId) {
         this.emotionId = emotionId;
-        this.emotion = EmotionModel.getEmotion(emotionId);
+        //this.emotion = emo.getEmotion(emotionId);
     }
 
     public String getSocialSituationId() {
@@ -92,7 +92,7 @@ public class Mood {
 
     public void setSocialSituationId(String socialSituationId) {
         this.socialSituationId = socialSituationId;
-        this.socialSituation = SocialSituationModel.getSocialSituation(socialSituationId);
+        //this.socialSituation = SocialSituationModel.getSocialSituation(socialSituationId);
     }
 
     public String getImageTriggerId() {
