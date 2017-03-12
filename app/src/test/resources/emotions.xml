@@ -27,7 +27,7 @@
         <name>Fear</name>
         <description>Is there a monster in the closest?</description>
         <color>#ffffff</color>
-        <image>happiness.png</image>
+        <image>fear.png</image>
     </Emotion>
     <Emotion>
         <id>4</id>

@@ -68,7 +68,8 @@ public class MoodListAdapter extends BaseAdapter{
         holder.img=(ImageView) rowView.findViewById(R.id.imageView);
         holder.idtv.setText(moodList.get(position).getSocialSituation().getName());
         holder.timetv.setText(moodList.get(position).getDate().toString());
-        holder.img.setImageResource(context.getResources().getIdentifier(moodList.get(position).getEmotion().getImageName().substring(0, moodList.get(position).getEmotion().getImageName().lastIndexOf(".")), "drawable", context.getPackageName()));
+        String imgNameBuilder = moodList.get(position).getEmotion().getName().toLowerCase() + ".png";
+        holder.img.setImageResource(context.getResources().getIdentifier(imgNameBuilder.substring(0, imgNameBuilder.lastIndexOf(".")), "drawable", context.getPackageName()));
         /*
         rowView.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -65,13 +65,14 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
         EditText trigger = (EditText) findViewById(R.id.trigger_edittext);
         Button addLocation = (Button) findViewById(R.id.button);
         Button save = (Button) findViewById(R.id.button2);
+        Button delete = (Button) findViewById(R.id.delete_button);
 
         emoticons = new int[mApplication.getEmotionModel().getEmotions().size()];
         emotions = new String[mApplication.getEmotionModel().getEmotions().size()];
         for (Map.Entry<String, Emotion> entry : mApplication.getEmotionModel().getEmotions().entrySet()) {
             // drawable name may require not having a end extension like .png
-            String test = entry.getValue().getImageName();
-            emoticons[Integer.parseInt(entry.getKey())] = getResources().getIdentifier(entry.getValue().getImageName().substring(0, entry.getValue().getImageName().lastIndexOf(".")), "drawable", getPackageName());
+            String imgNameBuilder = entry.getValue().getName().toLowerCase() + ".png";
+            emoticons[Integer.parseInt(entry.getKey())] = getResources().getIdentifier(imgNameBuilder.substring(0, imgNameBuilder.lastIndexOf(".")), "drawable", getPackageName());
             emotions[Integer.parseInt(entry.getKey())] = entry.getValue().getName();
         }
         socials = new String[mApplication.getSocialSituationModel().getSocialSituations().entrySet().size()];
@@ -129,6 +130,8 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
                 //TODO Add location functionality to the button
             }
         });
+
+
 
         save.setOnClickListener(new View.OnClickListener() {
             @Override

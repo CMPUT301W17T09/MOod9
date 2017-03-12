@@ -21,20 +21,27 @@
             app:srcCompat="@drawable/happiness"
             android:id="@+id/imageView" />
 
-        <TextView
-            android:textSize="@dimen/text_size"
-            android:text="TextView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/username" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
-        <TextView
-            android:textColor="@color/colorGrey"
-            android:text="TextView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/time"
-            android:layout_weight="1.20" />
+            <TextView
+                android:id="@+id/username"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="TextView"
+                android:textSize="@dimen/text_size" />
+
+            <TextView
+                android:id="@+id/time"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/username"
+                android:layout_weight="1.20"
+                android:text="TextView"
+                android:textColor="@color/colorGrey" />
+        </LinearLayout>
 
     </LinearLayout>
 
