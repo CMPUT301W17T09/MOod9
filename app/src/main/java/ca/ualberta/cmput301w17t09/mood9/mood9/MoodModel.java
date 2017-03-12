@@ -71,7 +71,7 @@ fos.close();
     public void setMoodsArray() {
         // First load all moods on elastic search
         ElasticSearchMOodController.GetMoodsTask getMoodsTask = new ElasticSearchMOodController.GetMoodsTask();
-        getMoodsTask.execute("");
+        getMoodsTask.execute(""); //gets all moods
         ArrayList<Mood> elasticmoods = new ArrayList<>(); //all moods on elasticsearch
         try {
             elasticmoods = getMoodsTask.get();
@@ -83,17 +83,22 @@ fos.close();
         ArrayList<Mood> finalarr = new ArrayList<Mood>();  //
         ArrayList<Mood> finalarr2 = new ArrayList<Mood>();
         finalarr.addAll(elasticmoods);
-        finalarr.addAll(fileMoods);
+        finalarr.addAll(fileMoods); // final array contains all moods form elastic and add moods
         for (int i = 0; i < finalarr.size(); i++) {
             if (!finalarr2.contains(finalarr.get(i))) {
                 finalarr2.add(finalarr.get(i));
             }
         }
         finalarr2.removeAll(deleteMoods);
+        ElasticSearchMOodController.UpdateMoodsTask updateMoodsTask = new ElasticSearchMOodController.UpdateMoodsTask();
+        ElasticSearchMOodController.DeleteMoodTask deleteMoodTask = new ElasticSearchMOodController.DeleteMoodTask();
+        for (int i = 0; i < deleteMoods.size(); i++) {
+            if (!elasticmoods.contains(deleteMoods.get(i))) {
+                deleteMoodTask.execute(deleteMoods.get(i)); //mood deleted from elastic search
+            }
+        }
         deletefromfile();
         moods = finalarr2;
-        //Subtract deletedMoods from elasticmoods, from filemoods
-        //Load missing elastic onto file and vice versa
     }
 
     public ArrayList<Mood> getMoodByUser(String userid) {
@@ -104,7 +109,6 @@ fos.close();
             }
         }
         return returnarr;
-
     }
 
     /**
@@ -169,7 +173,10 @@ fos.close();
         setMoodsArray();
     }
 
-
+    /**
+     *
+     * @return arraylist of moods in the addedname file
+     */
     private ArrayList<Mood> readFromAdded() {
         ArrayList<Mood> loaded = new ArrayList<Mood>();
         try {
@@ -185,6 +192,11 @@ fos.close();
     }
     //Code taken from http://stackoverflow.com/questions/12384064/gson-convert-from-json-to-a-typed-arraylistt Sept.22,2016
 
+
+    /**
+     *
+     * @return arraylist of moods from the deletedname file
+     */
     private ArrayList<Mood> readFromDeleted() {
         ArrayList<Mood> deleted = new ArrayList<Mood>();
         try {
@@ -199,6 +211,9 @@ fos.close();
         return deleted;
     }
 
+    /**
+     * Deletes all tweets form the deleted tweets file
+     */
     private void deletefromfile() {
         try {
             FileOutputStream writer = new FileOutputStream(DELETEDNAME);
