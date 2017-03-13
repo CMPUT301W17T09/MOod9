@@ -16,12 +16,18 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 /**
- * Created by dannick on 2/22/17.
+ * This class holds all the different types of emotions.
+ *
+ * @author CMPUT301W17T09
  */
 
 public class EmotionModel {
     private ConcurrentHashMap<String, Emotion> emotions;
 
+    /**
+     * Parses an XML file containing all the emotions and saves the parsed emotions into a map.
+     * @param emotionsStream: The filestream to the XML file
+     */
     public EmotionModel(InputStream emotionsStream) {
         //Get the DOM Builder Factory
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -80,6 +86,10 @@ public class EmotionModel {
         return  emotions.get(id);
     }
 
+    /**
+     * Get all the emotions
+     * @return
+     */
     public ConcurrentHashMap<String, Emotion>getEmotions(){
         return emotions;
     }
