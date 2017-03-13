@@ -71,6 +71,8 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        locationService = new LocationService(this);
+
         if ( ContextCompat.checkSelfPermission( addMContext, android.Manifest.permission.ACCESS_COARSE_LOCATION ) != PackageManager.PERMISSION_GRANTED ) {
             if (ActivityCompat.shouldShowRequestPermissionRationale(this,
                     Manifest.permission.ACCESS_FINE_LOCATION)) {
@@ -78,9 +80,11 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
             } else {
                 //Request the location permission.
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_PERMISSION_FINE);
+                locationService.setNetworkEnabled(true);
             }
+        } else {
+            locationService.setNetworkEnabled(true);
         }
-        locationService = new LocationService(this);
 
         mApplication = (Mood9Application)getApplicationContext();
         Intent thisIntent = getIntent();
@@ -169,6 +173,7 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
         addLocation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                locationService.getLocation();
                 longitude = locationService.getLongitude();
                 latitude = locationService.getLatitude();
                 addedLocation.setText("Added!");

@@ -41,6 +41,10 @@ public class LocationService implements LocationListener {
         getLocation();
     }
 
+    public void setNetworkEnabled(boolean networkEnabled) {
+        isNetworkEnabled = networkEnabled;
+    }
+
     /**
      * Function to get the user's current location
      *
@@ -48,15 +52,14 @@ public class LocationService implements LocationListener {
      */
     public Location getLocation() {
         if ( Build.VERSION.SDK_INT >= 23 &&
-                ContextCompat.checkSelfPermission( mContext, android.Manifest.permission.ACCESS_FINE_LOCATION ) != PackageManager.PERMISSION_GRANTED &&
-                ContextCompat.checkSelfPermission( mContext, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                ContextCompat.checkSelfPermission( mContext, android.Manifest.permission.ACCESS_FINE_LOCATION ) == PackageManager.PERMISSION_GRANTED ) {
             try {
                 locationManager = (LocationManager) mContext
                         .getSystemService(Context.LOCATION_SERVICE);
 
                 // getting network status
-                isNetworkEnabled = locationManager
-                        .isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+                //isNetworkEnabled = locationManager
+                        //.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
 
                 Log.v("isNetworkEnabled", "=" + isNetworkEnabled);
 
