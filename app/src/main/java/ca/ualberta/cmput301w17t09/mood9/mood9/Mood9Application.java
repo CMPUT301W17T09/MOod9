@@ -6,7 +6,9 @@ import java.io.InputStream;
 import java.util.LinkedList;
 
 /**
- * Created by dannick on 3/5/17.
+ * Mood9 Application Context
+ * Contains all our models.
+ * @author CMPUT301W17T09
  */
 
 public class Mood9Application extends Application {
@@ -30,6 +32,10 @@ public class Mood9Application extends Application {
     public LinkedList<Mood> getMoodLinkedList() {
         return moodLinkedList;
     }
+
+    /**
+     * Initializes all our models on application creation.
+     */
     @Override
     public void onCreate() {
         super.onCreate();
