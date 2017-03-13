@@ -362,6 +362,10 @@ public class ElasticSearchMOodController {
                         "        \"type\": \"string\",\n" +
                         "        \"store\": \"yes\"\n" +
                         "      },\n" +
+                        "      \"offlineid\": {\n" +
+                        "        \"type\": \"string\",\n" +
+                        "        \"store\": \"yes\"\n" +
+                        "      },\n" +
                         "      \"socialSituationId\": {\n" +
                         "        \"type\": \"string\",\n" +
                         "        \"store\": \"yes\"\n" +

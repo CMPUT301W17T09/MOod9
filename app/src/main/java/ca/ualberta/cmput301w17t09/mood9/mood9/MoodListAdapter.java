@@ -26,10 +26,12 @@ import java.util.LinkedList;
 public class MoodListAdapter extends BaseAdapter{
     Context context;
     LinkedList<Mood> moodList;
+    Mood9Application mApplication;
     private static LayoutInflater inflater=null;
-    public MoodListAdapter(FeedActivity feedActivity, LinkedList<Mood> moodLinkedList) {
+    public MoodListAdapter(FeedActivity feedActivity, LinkedList<Mood> moodLinkedList, Mood9Application mApplication) {
         moodList = moodLinkedList;
         context = feedActivity;
+        this.mApplication = mApplication;
         inflater = ( LayoutInflater )context.
                 getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
@@ -66,9 +68,10 @@ public class MoodListAdapter extends BaseAdapter{
         holder.idtv=(TextView) rowView.findViewById(R.id.username);
         holder.timetv=(TextView) rowView.findViewById(R.id.time);
         holder.img=(ImageView) rowView.findViewById(R.id.imageView);
-        holder.idtv.setText(moodList.get(position).getSocialSituation().getName());
+
+        holder.idtv.setText(mApplication.getSocialSituationModel().getSocialSituation(moodList.get(position).getSocialSituationId()).getName());
         holder.timetv.setText(moodList.get(position).getDate().toString());
-        String imgNameBuilder = moodList.get(position).getEmotion().getName().toLowerCase() + ".png";
+        String imgNameBuilder = mApplication.getEmotionModel().getEmotion(moodList.get(position).getEmotionId()).getName().toLowerCase() + ".png";
         holder.img.setImageResource(context.getResources().getIdentifier(imgNameBuilder.substring(0, imgNameBuilder.lastIndexOf(".")), "drawable", context.getPackageName()));
         /*
         rowView.setOnClickListener(new View.OnClickListener() {

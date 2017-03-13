@@ -138,7 +138,9 @@ fos.close();
     public ArrayList<Mood> getFollowedMoods(User user) {
         ArrayList<Mood> returnarr = new ArrayList<Mood>();
         for (int i = 0; i < moods.size(); i++) {
-            if (user.getFollowees().contains(moods.get(i).getUser())) {
+            String id = moods.get(i).getUser_id();
+            User returned_user = UserModel.getUserProfile(id);
+            if (user.getFollowees().contains(returned_user.getName())) {
                 returnarr.add(moods.get(i));
             }
         }

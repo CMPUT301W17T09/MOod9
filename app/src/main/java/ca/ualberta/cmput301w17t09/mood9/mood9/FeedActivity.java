@@ -80,14 +80,13 @@ public class FeedActivity extends AppCompatActivity
         String userName = shPref.getString("username", "test");
         String userId = UserModel.getUserID(userName).getId();
         ArrayList<Mood> temp = mApplication.getMoodModel().getMoodByUser(userId);
-
+        //LOADING FROM ELASTIC SEARCH
         for (int i = 0; i < temp.size(); i++) {
             moodLinkedList.add(temp.get(i));
         }
-        //TODO: LOADING FROM ELASTIC SEARCH
 
         moodListView = (ListView) findViewById(R.id.moodList);
-        moodListAdapter = new MoodListAdapter(this, moodLinkedList);
+        moodListAdapter = new MoodListAdapter(this, moodLinkedList, mApplication);
         moodListView.setAdapter(moodListAdapter);
 
         moodListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -100,7 +99,6 @@ public class FeedActivity extends AppCompatActivity
                 startActivityForResult(editMoodIntent, 1);
             }
         });
-
     }
 
     @Override
@@ -194,7 +192,7 @@ public class FeedActivity extends AppCompatActivity
             username.setTypeface(null, Typeface.BOLD);
 
             //TODO: Get rid of text view and move all display functionality over to linearlayout
-            ArrayList<Mood> temp = mApplication.getMoodModel().getUniversalMoods();
+            //ArrayList<Mood> temp = mApplication.getMoodModel().getUniversalMoods();
             moodListAdapter.notifyDataSetChanged();
 
         } else {

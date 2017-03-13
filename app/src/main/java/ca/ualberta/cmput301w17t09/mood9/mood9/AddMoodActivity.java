@@ -2,6 +2,7 @@ package ca.ualberta.cmput301w17t09.mood9.mood9;
 
 import android.app.DatePickerDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -70,6 +71,10 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
             setContentView(R.layout.activity_add_mood);
         }
 
+        SharedPreferences shPref = getApplicationContext().getSharedPreferences(getString(R.string.stored_name), MODE_PRIVATE);
+        String userName = shPref.getString("username", "test");
+        userId = UserModel.getUserID(userName).getId();
+
 
         Spinner emotionsSpinner = (Spinner) findViewById(R.id.emotions_spinner);
         Spinner socialSpinner = (Spinner) findViewById(R.id.social_spinner);
@@ -101,14 +106,14 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
             returnMood = mApplication.getMoodLinkedList().get(oldMoodIndex);
             int position = 0;
             for (Map.Entry<String, Emotion> entry : mApplication.getEmotionModel().getEmotions().entrySet()) {
-                if (entry.getValue().getName() == returnMood.getEmotion().getName()) {
+                if (entry.getValue().getName() == mApplication.getEmotionModel().getEmotion(returnMood.getEmotionId()).getName()) {
                     position = Integer.parseInt(entry.getKey());
                 }
             }
             emotionsSpinner.setAdapter(emotionsSpinnerAdapter);
             emotionsSpinner.setSelection(position);
             for (Map.Entry<String, SocialSituation> entry : mApplication.getSocialSituationModel().getSocialSituations().entrySet()) {
-                if (entry.getValue().getName() == returnMood.getSocialSituation().getName()) {
+                if (entry.getValue().getName() == mApplication.getSocialSituationModel().getSocialSituation(returnMood.getSocialSituationId()).getName()) {
                     position = Integer.parseInt(entry.getKey());
                 }
             }
@@ -232,7 +237,6 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
                     try {
                         returnMood.setEmotionId(String.valueOf(emotionId));
                         returnMood.setDate(curDate);
-                        returnMood.setmApplication(mApplication);
                         returnMood.setEmotionId(String.valueOf(emotionId));
                         returnMood.setSocialSituationId(String.valueOf(socialId));
                         returnMood.setTrigger(trigger.getText().toString());
@@ -249,15 +253,13 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
                 else {
                     // added emoticon parameter to Mood class to store the r.drawable of the selected emotion
                     returnMood = new Mood(latitude, longitude, trigger.getText().toString(), String.valueOf(emotionId), String.valueOf(socialId), imageTriggerId, new Date(), userId);
-                    returnMood.setmApplication(mApplication);
-                    returnMood.setDate(curDate);
+                    //returnMood.setDate(curDate);
                     returnMood.setEmotionId(String.valueOf(emotionId));
                     returnMood.setSocialSituationId(String.valueOf(socialId));
-                    Random rand = new Random();
-                    userId = String.valueOf(rand.nextInt(1000000));
-                    returnMood.setId(String.valueOf(userId));
 
                     mApplication.getMoodLinkedList().add(returnMood);
+
+                    //Mood mood = new Mood(12.22, 13.22, "Trigger", "1", "77", "22", new Date(12 - 12 - 2016), userId);
                     mApplication.getMoodModel().addMood(returnMood);
                     finish();
                 }

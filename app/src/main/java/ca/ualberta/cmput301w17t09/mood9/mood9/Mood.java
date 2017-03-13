@@ -28,15 +28,6 @@ public class Mood {
     private Date date;
     private String user_id;
 
-    // The following fields should not be serialized
-    private User user;
-    private Emotion emotion;
-    private SocialSituation socialSituation;
-
-
-    private Mood9Application mApplication;
-
-
     public Mood(Double latitude, Double longitutde,
                 String trigger, String emotionId, String socialSituationId,
                 String imageTriggerId, Date date,String user_id) {
@@ -62,10 +53,6 @@ public class Mood {
 
     public void setOfflineid(String offlineid) {
         this.offlineid = offlineid;
-    }
-
-    public void setmApplication(Mood9Application mApplication) {
-        this.mApplication = mApplication;
     }
 
     public String getId() {
@@ -106,7 +93,7 @@ public class Mood {
 
     public void setEmotionId(String emotionId) {
         this.emotionId = emotionId;
-        this.emotion = mApplication.getEmotionModel().getEmotion(emotionId);
+
     }
 
     public String getSocialSituationId() {
@@ -115,8 +102,6 @@ public class Mood {
 
     public void setSocialSituationId(String socialSituationId) {
         this.socialSituationId = socialSituationId;
-        this.socialSituation = mApplication.getSocialSituationModel()
-					.getSocialSituation(socialSituationId);
     }
 
     public String getImageTriggerId() {
@@ -142,17 +127,4 @@ public class Mood {
     public void setUser_id(String user_id) {
         this.user_id = user_id;
     }
-
-    public User getUser() {
-        return user;
-    }
-
-    public Emotion getEmotion() {
-        return emotion;
-    }
-
-    public SocialSituation getSocialSituation() {
-        return socialSituation;
-    }
-
 }
