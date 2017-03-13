@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 
 import io.searchbox.core.Get;
@@ -19,19 +20,20 @@ public class ProfileActivity extends AppCompatActivity {
 
         SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences(getString(R.string.stored_name), MODE_PRIVATE);
         String name = sharedPreferences.getString("username", null);
+        String user_id = sharedPreferences.getString("user_id", null);
         TextView profileName = (TextView) findViewById(R.id.profile_name);
         profileName.setText(name);
+//
+        User current_user = UserModel.getUserProfile(user_id);
+//
+        ArrayList<String> followee_names = new ArrayList<String>();
+//
+        for (String id : current_user.getFollowees()) {
+            User followee = UserModel.getUserProfile(id);
+            followee_names.add(followee.getName());
+        }
 
-        ElasticSearchMOodController.GetUsersTask getUsersTask = new ElasticSearchMOodController.GetUsersTask();
-        getUsersTask.execute(name);
 
-        User user = new User("");
-        try {
-            user = getUsersTask.get();
-
-        } catch (Exception e) {}
-
-        user.getFollowees();
 
     }
 }
