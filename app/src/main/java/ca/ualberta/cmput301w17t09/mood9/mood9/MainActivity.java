@@ -54,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
                     snackbar.show();
                     return;
                 }
-
+                editor.putString("user_id", user.getId());
                 editor.apply();
                 Intent feedIntent = new Intent(MainActivity.this, FeedActivity.class);
                 startActivity(feedIntent);
