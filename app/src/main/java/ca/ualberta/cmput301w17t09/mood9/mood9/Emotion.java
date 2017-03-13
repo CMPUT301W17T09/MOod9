@@ -1,6 +1,8 @@
 package ca.ualberta.cmput301w17t09.mood9.mood9;
 
 /**
+ * This is the emotions used in the moods.
+ * @author CMPUT301W17T09
  * Created by dannick on 2/22/17.
  */
 

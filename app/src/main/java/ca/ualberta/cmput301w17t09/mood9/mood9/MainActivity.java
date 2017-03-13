@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -43,6 +44,17 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 editor.putString("username", usernameField.getText().toString());
+
+                User user = UserModel.getUser(usernameField.getText().toString());
+
+                if (user == null) {
+                    Snackbar snackbar = Snackbar
+                            .make(v, "Username already exists, please enter a different unique username", Snackbar.LENGTH_LONG);
+
+                    snackbar.show();
+                    return;
+                }
+                editor.putString("user_id", user.getId());
                 editor.apply();
                 Intent feedIntent = new Intent(MainActivity.this, FeedActivity.class);
                 startActivity(feedIntent);
