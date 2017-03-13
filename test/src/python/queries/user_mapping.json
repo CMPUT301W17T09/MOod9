@@ -1,0 +1,19 @@
+{
+    "user9": {
+        "properties": {
+            "id": {
+                "type": "string", 
+                "store" : "yes"
+            },
+            "name": {
+                "type": "string", 
+                "store" : "yes"
+            },
+            "followees" : { 
+                "type": "string", 
+                "store" : "yes" , 
+                "index":"not_analyzed" 
+            }
+        }
+    }
+}

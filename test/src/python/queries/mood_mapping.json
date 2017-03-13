@@ -1,0 +1,43 @@
+{
+    "mood9": {
+        "properties": {
+            "id": {
+                "type": "string",
+                    "store": "yes"
+            },
+            "latitude": {
+                "type": "double",
+                "store": "yes"
+            },
+            "longitude": {
+                "type": "double",
+                "store": "yes"
+            },
+            "trigger": {
+                "type": "string",
+                "store": "yes"
+            },
+            "emotionId": {
+                "type": "string",
+                "store": "yes"
+            },
+            "socialSituationId": {
+                "type": "string",
+                "store": "yes"
+            },
+            "imageTriggerId": {
+                "type": "string",
+                "store": "yes"
+            },
+            "date": {
+                "type": "date",
+                "format": "yyyy-MM-dd'T'HH:mm:ss",
+                "store": "yes"
+            },
+            "user_id": {
+                "type": "string",
+                "store": "yes"
+            }
+        }
+    }
+}
