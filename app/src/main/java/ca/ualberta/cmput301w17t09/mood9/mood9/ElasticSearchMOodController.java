@@ -272,26 +272,10 @@ public class ElasticSearchMOodController {
 
             User user = new User("");
 
-            String query = "{\n" +
-                    "    \"query\": {\n" +
-                    "        \"query_string\" : {\n" +
-                    "            \"fields\" : [\"id\"],\n" +
-                    "            \"query\" : \"" + params[0] + "\"\n" +
-                    "        }\n" +
-                    "    }\n" +
-                    "}";
-
-            if (params[0].equals("")){
-                query = "";
-            }
-
-            Search search = new Search.Builder(query)
-                    .addIndex(index_name)
-                    .addType(user_type)
-                    .build();
+            Get get = new Get.Builder(index_name, params[0]).type(user_type).build();
 
             try {
-                SearchResult result = client.execute(search);
+                JestResult result = client.execute(get);
                 if (result.isSucceeded()){
                     user = result.getSourceAsObject(User.class);
                 }
