@@ -27,9 +27,9 @@ public class ProfileActivity extends AppCompatActivity {
         TextView profileName = (TextView) findViewById(R.id.profile_name);
         ListView followees = (ListView) findViewById(R.id.followees);
         profileName.setText(name);
-//
+
         User current_user = UserModel.getUserProfile(user_id);
-//
+
         ArrayList<String> followee_names = new ArrayList<String>();
         for (String id : current_user.getFollowees()) {
             User followee = UserModel.getUserProfile(id);
