@@ -1,8 +1,16 @@
 package ca.ualberta.cmput301w17t09.mood9.mood9;
 
+import android.Manifest;
 import android.app.DatePickerDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -33,6 +41,7 @@ import java.util.Random;
 public class AddMoodActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener{
 
     private Mood9Application mApplication;
+    Context addMContext = this;
     //String[] emotions = {"Anger", "Confusion", "Happiness", "Sadness", "Shame", "Surprise"};
     //int[] emoticons = {R.drawable.anger, R.drawable.confusion, R.drawable.happiness, R.drawable.sadness, R.drawable.shame, R.drawable.surpise};
     String[] emotions;
@@ -56,10 +65,27 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
     // map<Emotion> emotions = EmotionModel.getEmotions();
     //String[] socials = {"TEMP", "DO NOT USE", "With my enemies", "All Alone"};
     String[] socials;
+    private static final int REQUEST_PERMISSION_FINE = 0;
+    private LocationService locationService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        locationService = new LocationService(this);
+
+        if ( ContextCompat.checkSelfPermission( addMContext, android.Manifest.permission.ACCESS_COARSE_LOCATION ) != PackageManager.PERMISSION_GRANTED ) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                    Manifest.permission.ACCESS_FINE_LOCATION)) {
+                ActivityCompat.requestPermissions(AddMoodActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_PERMISSION_FINE);
+            } else {
+                //Request the location permission.
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_PERMISSION_FINE);
+                locationService.setNetworkEnabled(true);
+            }
+        } else {
+            locationService.setNetworkEnabled(true);
+        }
+
         mApplication = (Mood9Application)getApplicationContext();
         Intent thisIntent = getIntent();
         editCheckB = thisIntent.getExtras();
@@ -147,6 +173,9 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
         addLocation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                locationService.getLocation();
+                longitude = locationService.getLongitude();
+                latitude = locationService.getLatitude();
                 addedLocation.setText("Added!");
             }
         });
