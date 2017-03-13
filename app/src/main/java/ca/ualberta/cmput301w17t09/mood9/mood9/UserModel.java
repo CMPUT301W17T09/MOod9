@@ -49,4 +49,20 @@ public class UserModel {
 
         return user;
     }
+
+    public static User getUserID(String username) {
+        ElasticSearchMOodController.GetUsersTaskName getUsersTaskName = new ElasticSearchMOodController.GetUsersTaskName();
+        getUsersTaskName.execute(username);
+
+        User user = new User("");
+
+        try {
+            user = getUsersTaskName.get();
+        } catch (Exception e) {
+
+        }
+
+        return user;
+    }
+
 }

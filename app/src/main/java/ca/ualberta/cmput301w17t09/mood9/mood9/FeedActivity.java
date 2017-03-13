@@ -78,7 +78,7 @@ public class FeedActivity extends AppCompatActivity
         moodLinkedList = mApplication.getMoodLinkedList();
         SharedPreferences shPref = getApplicationContext().getSharedPreferences(getString(R.string.stored_name), MODE_PRIVATE);
         String userName = shPref.getString("username", "test");
-        String userId = UserModel.getUser(userName).getId();
+        String userId = UserModel.getUserID(userName).getId();
         ArrayList<Mood> temp = mApplication.getMoodModel().getMoodByUser(userId);
 
         for (int i = 0; i < temp.size(); i++) {
