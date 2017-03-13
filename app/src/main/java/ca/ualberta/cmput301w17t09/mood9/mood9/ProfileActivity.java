@@ -4,6 +4,11 @@ import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.widget.TextView;
+
+import java.util.concurrent.ExecutionException;
+
+import io.searchbox.core.Get;
 
 public class ProfileActivity extends AppCompatActivity {
 
@@ -13,11 +18,20 @@ public class ProfileActivity extends AppCompatActivity {
         setContentView(R.layout.activity_profile);
 
         SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences(getString(R.string.stored_name), MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
         String name = sharedPreferences.getString("username", null);
+        TextView profileName = (TextView) findViewById(R.id.profile_name);
+        profileName.setText(name);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        toolbar.setTitle(name);
+        ElasticSearchMOodController.GetUsersTask getUsersTask = new ElasticSearchMOodController.GetUsersTask();
+        getUsersTask.execute(name);
+
+        User user = new User("");
+        try {
+            user = getUsersTask.get();
+
+        } catch (Exception e) {}
+
+        user.getFollowees();
+
     }
 }
