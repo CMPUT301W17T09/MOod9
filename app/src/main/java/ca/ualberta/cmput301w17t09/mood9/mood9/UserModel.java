@@ -54,6 +54,6 @@ public class UserModel {
 
     public static User getFromElasticSearch(String id){
         // TODO
-        return new User("", "");
+        return new User("");
     }
 }

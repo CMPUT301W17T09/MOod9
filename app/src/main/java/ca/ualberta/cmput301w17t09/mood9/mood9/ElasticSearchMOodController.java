@@ -8,7 +8,6 @@ import com.searchly.jestdroid.DroidClientConfig;
 import com.searchly.jestdroid.JestClientFactory;
 import com.searchly.jestdroid.JestDroidClient;
 
-import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -23,12 +22,7 @@ import io.searchbox.core.Update;
 import io.searchbox.indices.CreateIndex;
 import io.searchbox.indices.DeleteIndex;
 import io.searchbox.indices.mapping.PutMapping;
-import java.text.SimpleDateFormat;
-import static android.R.attr.id;
-import static android.icu.lang.UCharacter.GraphemeClusterBreak.L;
-import static ca.ualberta.cmput301w17t09.mood9.mood9.ElasticSearchMOodController.verifySettings;
-import static ca.ualberta.cmput301w17t09.mood9.mood9.MoodModel.moods;
-import static ca.ualberta.cmput301w17t09.mood9.mood9.UserModel.users;
+
 
 public class ElasticSearchMOodController {
     private static JestDroidClient client;

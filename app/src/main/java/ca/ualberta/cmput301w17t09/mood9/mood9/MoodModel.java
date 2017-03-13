@@ -53,10 +53,6 @@ public class MoodModel {
     private FileInputStream moodsOnFile;
     File ADDEDNAME = new File("addedMoods.sav");
     File DELETEDNAME = new File("deletedMoods.sav");
-    ElasticSearchMOodController.GetMoodsTask getMoodsTask = new ElasticSearchMOodController.GetMoodsTask();
-    ElasticSearchMOodController.AddMoodsTask addMoodsTask = new ElasticSearchMOodController.AddMoodsTask();
-    ElasticSearchMOodController.UpdateMoodsTask UpdateMoodsTask = new ElasticSearchMOodController.UpdateMoodsTask();
-    ElasticSearchMOodController.DeleteMoodTask deleteMoodTask = new ElasticSearchMOodController.DeleteMoodTask();
     /*String FILENAME = "hello_file";
 String string = "hello world!";
 FileOutputStream fos = openFileOutput(FILENAME, Context.MODE_PRIVATE);
@@ -129,7 +125,7 @@ fos.close();
     public ArrayList<Mood> getFollowedMoods(User user) {
         ArrayList<Mood> returnarr = new ArrayList<Mood>();
         for (int i = 0; i < moods.size(); i++) {
-            if (user.getFollowing().contains(moods.get(i).getUser())) {
+            if (user.getFollowees().contains(moods.get(i).getUser())) {
                 returnarr.add(moods.get(i));
             }
         }
