@@ -64,9 +64,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/button2"
-        android:layout_below="@+id/button"
+        android:layout_below="@+id/calendar"
         android:layout_alignParentStart="true"
-        android:layout_marginTop="48dp"
+        android:layout_marginTop="24dp"
         android:layout_alignParentEnd="true" />
 
     <Button
@@ -89,6 +89,27 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/button"
         android:layout_centerHorizontal="true" />
+
+    <Button
+        android:id="@+id/calendar"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/button"
+        android:layout_marginTop="24dp"
+        android:textColor="@color/colorWhite"
+        android:background="@color/colorPrimary"
+        android:text="Set Calendar" />
+    <TextView
+        android:id="@+id/curDate"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/calendar"
+        android:layout_alignBottom="@+id/calendar"
+        android:layout_alignParentEnd="true"
+        android:text="Date:"
+        android:textSize="24sp"
+        android:layout_marginEnd="25dp" />
 
 
 </RelativeLayout>

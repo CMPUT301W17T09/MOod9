@@ -148,11 +148,12 @@ fos.close();
 
 
     public void updateMood(Mood mood) {
-        for(int i = 0; i<moods.size();i++) {
+        for (int i = 0; i < moods.size(); i++) {
             if (moods.get(i).getOfflineid().equals(mood.getOfflineid())) {
                 moods.set(i, mood);
             }
         }
+    }
 
     public int getMoodModelSize() {
         return moods.size();

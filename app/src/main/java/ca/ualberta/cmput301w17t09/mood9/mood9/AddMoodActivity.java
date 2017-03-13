@@ -1,30 +1,25 @@
 package ca.ualberta.cmput301w17t09.mood9.mood9;
 
-import android.Manifest;
-import android.content.Context;
+import android.app.DatePickerDialog;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.location.Location;
-import android.location.LocationManager;
-import android.provider.Settings;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Spinner;
-import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import android.location.LocationListener;
-
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
 
@@ -45,9 +40,12 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
     int socialId = 0;
     double latitude = 100;
     double longitude = 100;
+    Date curDate = new Date();
     String imageTriggerId = "N/A";
     String selectedEmotion = "Anger";
     String userId = "newUser";
+
+    private int mYear, mMonth, mDay;
 
     int oldMoodIndex = 0;
     Mood returnMood;
@@ -78,8 +76,9 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
         EditText trigger = (EditText) findViewById(R.id.trigger_edittext);
         Button addLocation = (Button) findViewById(R.id.button);
         Button save = (Button) findViewById(R.id.button2);
-        Button delete = (Button) findViewById(R.id.delete_button);
+        Button calendar = (Button) findViewById(R.id.calendar);
         TextView addedLocation = (TextView) findViewById(R.id.textView5);
+        TextView txtDate = (TextView) findViewById(R.id.curDate);
 
         emoticons = new int[mApplication.getEmotionModel().getEmotions().size()];
         emotions = new String[mApplication.getEmotionModel().getEmotions().size()];
@@ -116,6 +115,8 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
             socialSpinner.setAdapter(socialSpinnerAdapter);
             socialSpinner.setSelection(position);
             trigger.setText(returnMood.getTrigger());
+            txtDate.setText(returnMood.getDate().toString());
+
             //TODO: need to figure out how to reload saved map details
         }
         else {
@@ -145,7 +146,80 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
             }
         });
 
+        calendar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog alert = new AlertDialog.Builder(AddMoodActivity.this).create();
+                // Date Field code taken from http://stackoverflow.com/questions/39051210/how-to-give-input-date-field-for-registration-form-in-android
+                final Calendar myCalendar = Calendar.getInstance();
+                final DatePickerDialog.OnDateSetListener date = new DatePickerDialog.OnDateSetListener() {
+                    @Override
+                    public void onDateSet(DatePicker view, int year, int month, int day) {
+                        myCalendar.set(Calendar.YEAR, year);
+                        myCalendar.set(Calendar.MONTH, month);
+                        myCalendar.set(Calendar.DAY_OF_MONTH, day);
+                        String myFormat = "yyyy-MM-dd";
+                        SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.US);
 
+                        //String value1 = sdf.format(myCalendar.getTime());
+                    }
+                };
+                final Calendar c = Calendar.getInstance();
+
+                mYear = c.get(Calendar.YEAR);
+                mMonth = c.get(Calendar.MONTH);
+                mDay = c.get(Calendar.DAY_OF_MONTH);
+                // Launch Date Picker Dialog
+                DatePickerDialog dpd = new DatePickerDialog(AddMoodActivity.this, android.R.style.Theme_Holo_Panel,
+                        new DatePickerDialog.OnDateSetListener() {
+
+                            @Override
+                            public void onDateSet(DatePicker view, int year,
+                                                  int monthOfYear, int dayOfMonth) {
+                                // Display Selected date in textbox
+
+
+                                if (year < mYear)
+                                    view.updateDate(mYear,mMonth,mDay);
+
+                                if (monthOfYear < mMonth && year == mYear)
+                                    view.updateDate(mYear,mMonth,mDay);
+
+                                if (dayOfMonth < mDay && year == mYear && monthOfYear == mMonth)
+                                    view.updateDate(mYear,mMonth,mDay);
+                                String strMonth = String.format("%02d", monthOfYear+1);
+                                String strDay = String.format("%02d", dayOfMonth);
+                                String value = (year + "-" + strMonth + "-" + strDay);
+
+                                txtDate.setText(value);
+                                String myFormat = "yyyy-MM-dd";
+                                SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.US);
+                                try {
+                                    curDate = sdf.parse(value);
+                                } catch (ParseException e) {
+                                    e.printStackTrace();
+                                }
+
+
+
+                            }
+                        }, mYear, mMonth, mDay);
+
+                dpd.getDatePicker().setMinDate(1973);
+                dpd.getDatePicker().setMaxDate(2018);
+                dpd.show();
+            }
+        });
+
+        if (editCheck == 1) {
+            Button delete = (Button) findViewById(R.id.delete_button);
+            delete.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    //TODO: delete mood
+                }
+            });
+        }
 
         save.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -155,7 +229,7 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
                 if (editCheckB.getInt("editCheck", -1) == 1) {
                     try {
                         returnMood.setEmotionId(String.valueOf(emotionId));
-                        returnMood.setDate(new Date());
+                        returnMood.setDate(curDate);
                         returnMood.setmApplication(mApplication);
                         returnMood.setEmotionId(String.valueOf(emotionId));
                         returnMood.setSocialSituationId(String.valueOf(socialId));
@@ -176,6 +250,7 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
                     // added emoticon parameter to Mood class to store the r.drawable of the selected emotion
                     returnMood = new Mood(latitude, longitude, trigger.getText().toString(), String.valueOf(emotionId), String.valueOf(socialId), imageTriggerId, new Date(), userId);
                     returnMood.setmApplication(mApplication);
+                    returnMood.setDate(curDate);
                     returnMood.setEmotionId(String.valueOf(emotionId));
                     returnMood.setSocialSituationId(String.valueOf(socialId));
                     Random rand = new Random();
