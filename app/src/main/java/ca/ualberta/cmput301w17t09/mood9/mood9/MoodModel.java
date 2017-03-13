@@ -34,6 +34,8 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 
+import io.searchbox.core.Get;
+
 import static android.provider.Telephony.Mms.Part.FILENAME;
 
 /**
@@ -109,13 +111,24 @@ fos.close();
     }
 
     public ArrayList<Mood> getMoodByUser(String userid) {
+        ElasticSearchMOodController.GetMoodsTask getMoodsTask = new ElasticSearchMOodController.GetMoodsTask();
+        getMoodsTask.execute(userid);
+
         ArrayList<Mood> returnarr = new ArrayList<Mood>();
+
+        try {
+            returnarr = getMoodsTask.get(); // use more unique array to avoid overwrite
+        } catch (Exception e) {
+            System.out.println("Could not find moods");
+        }
+        return returnarr;
+        /*
         for (int i = 0; i < moods.size(); i++) {
             if (moods.get(i).getUser_id().equals(userid)) {
                 returnarr.add(moods.get(i));
             }
         }
-        return returnarr;
+        return returnarr;*/
     }
 
     /**
@@ -144,11 +157,14 @@ fos.close();
 
 
     public void updateMood(Mood mood) {
+        ElasticSearchMOodController.AddMoodsTask addMoodsTask = new ElasticSearchMOodController.AddMoodsTask();
+        addMoodsTask.execute(mood);
+        /*
         for (int i = 0; i < moods.size(); i++) {
             if (moods.get(i).getOfflineid().equals(mood.getOfflineid())) {
                 moods.set(i, mood);
             }
-        }
+        }*/
     }
 
     public int getMoodModelSize() {
@@ -162,6 +178,8 @@ fos.close();
     public void addMood(Mood mood) {
         ElasticSearchMOodController.AddMoodsTask addMoodsTask = new ElasticSearchMOodController.AddMoodsTask();
         addMoodsTask.execute(mood); // add to elastic search
+
+        /*
         Gson gson = new Gson();
 //      String mjs = gson.toJson(mood);
         ArrayList<Mood> mjs1 = new ArrayList<Mood>();
@@ -177,10 +195,14 @@ fos.close();
         } catch (IOException e) {
             System.out.println("File not found2");
         }
-        setMoodsArray();
+        setMoodsArray();*/
     }
 
     public void deleteMood(Mood mood) {
+        ElasticSearchMOodController.DeleteMoodTask deleteMoodTask = new ElasticSearchMOodController.DeleteMoodTask();
+        deleteMoodTask.execute(mood);
+
+        /*
         Gson gson = new Gson();
         ArrayList<Mood> mjs2 = new ArrayList<Mood>();
         mjs2 = readFromDeleted();
@@ -195,10 +217,11 @@ fos.close();
         } catch (IOException e) {
             System.out.println("File not found3");
         }
-        setMoodsArray();
+        setMoodsArray();*/
     }
 
     private ArrayList<Mood> readFromAdded() {
+
         ArrayList<Mood> loaded = new ArrayList<Mood>();
         try {
             JsonReader br = new JsonReader(new FileReader(ADDEDNAME));
