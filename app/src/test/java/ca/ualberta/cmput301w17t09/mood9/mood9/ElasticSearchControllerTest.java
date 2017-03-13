@@ -3,6 +3,7 @@ import android.util.Log;
 
 import org.junit.Test;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.concurrent.ConcurrentMap;
@@ -17,7 +18,7 @@ public class ElasticSearchControllerTest {
     @Test
     public void testAdd() {
 
-        Mood m1 = new Mood(12.22, 13.22, "Trigger", "1", "77", "22", new Date(12 - 12 - 2016), "1");
+        Mood m1 = new Mood(12.22, 13.22, "Trigger", "1", "77", "22", new SimpleDateFormat(), "1");
 
         ElasticSearchMOodController.AddMoodsTask addMoodsTask = new ElasticSearchMOodController.AddMoodsTask();
         addMoodsTask.execute(m1);

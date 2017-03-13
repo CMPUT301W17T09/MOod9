@@ -1,7 +1,9 @@
 package ca.ualberta.cmput301w17t09.mood9.mood9;
 
+
 import android.media.MediaMuxer;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.UUID;
 
@@ -25,7 +27,7 @@ public class Mood {
     private String emotionId;
     private String socialSituationId;
     private String imageTriggerId;
-    private Date date;
+    private SimpleDateFormat date;
     private String user_id;
 
     // The following fields should not be serialized
@@ -39,7 +41,7 @@ public class Mood {
 
     public Mood(Double latitude, Double longitutde,
                 String trigger, String emotionId, String socialSituationId,
-                String imageTriggerId, Date date,String user_id) {
+                String imageTriggerId, SimpleDateFormat date,String user_id) {
         //http://stackoverflow.com/questions/1389736/how-do-i-create-a-unique-id-in-java
         this.offlineid = UUID.randomUUID().toString();
         this.latitude = latitude;
@@ -127,11 +129,11 @@ public class Mood {
         this.imageTriggerId = imageTriggerId;
     }
 
-    public Date getDate() {
+    public SimpleDateFormat getDate() {
         return date;
     }
 
-    public void setDate(Date date) {
+    public void setDate(SimpleDateFormat date) {
         this.date = date;
     }
 

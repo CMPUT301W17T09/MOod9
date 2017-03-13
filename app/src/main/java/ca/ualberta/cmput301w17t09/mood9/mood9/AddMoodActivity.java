@@ -24,6 +24,8 @@ import android.widget.Toast;
 
 import android.location.LocationListener;
 
+import java.io.FileOutputStream;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
 import java.util.Random;
@@ -35,7 +37,6 @@ import java.util.Random;
  * Fixed to use mood model, grabbing emotion model and socialmodel data for spinners and reloading other edit details from passed in mood by cdkushni on 3/10/17
  */
 public class AddMoodActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener{
-
     private Mood9Application mApplication;
     //String[] emotions = {"Anger", "Confusion", "Happiness", "Sadness", "Shame", "Surprise"};
     //int[] emoticons = {R.drawable.anger, R.drawable.confusion, R.drawable.happiness, R.drawable.sadness, R.drawable.shame, R.drawable.surpise};
@@ -48,7 +49,6 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
     String imageTriggerId = "N/A";
     String selectedEmotion = "Anger";
     String userId = "newUser";
-
     int oldMoodIndex = 0;
     Mood returnMood;
     int selectedEmote = R.drawable.anger;
@@ -155,7 +155,7 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
                 if (editCheckB.getInt("editCheck", -1) == 1) {
                     try {
                         returnMood.setEmotionId(String.valueOf(emotionId));
-                        returnMood.setDate(new Date());
+                        returnMood.setDate(new SimpleDateFormat());
                         returnMood.setmApplication(mApplication);
                         returnMood.setEmotionId(String.valueOf(emotionId));
                         returnMood.setSocialSituationId(String.valueOf(socialId));
@@ -174,16 +174,15 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
                 }
                 else {
                     // added emoticon parameter to Mood class to store the r.drawable of the selected emotion
-                    returnMood = new Mood(latitude, longitude, trigger.getText().toString(), String.valueOf(emotionId), String.valueOf(socialId), imageTriggerId, new Date(), userId);
+                    returnMood = new Mood(latitude, longitude, trigger.getText().toString(), String.valueOf(emotionId), String.valueOf(socialId), imageTriggerId, new SimpleDateFormat(), userId);
                     returnMood.setmApplication(mApplication);
                     returnMood.setEmotionId(String.valueOf(emotionId));
                     returnMood.setSocialSituationId(String.valueOf(socialId));
                     Random rand = new Random();
                     userId = String.valueOf(rand.nextInt(1000000));
                     returnMood.setId(String.valueOf(userId));
-
+                    mApplication.getMoodModel().addMood(returnMood);
                     mApplication.getMoodLinkedList().add(returnMood);
-                    //mApplication.getMoodModel().addMood(returnMood);
                     finish();
                 }
             }

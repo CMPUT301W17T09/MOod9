@@ -1,40 +1,21 @@
 package ca.ualberta.cmput301w17t09.mood9.mood9;
 
-import java.io.BufferedReader;
+
 import java.io.BufferedWriter;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.lang.reflect.Array;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Date;
-
-import android.app.Activity;
-import android.content.Context;
-import android.content.Intent;
-import android.os.Bundle;
-import android.util.Log;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ListView;
-
-
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
-
-import static android.provider.Telephony.Mms.Part.FILENAME;
 
 /**
  * Added array size getter by cdkushni on 3/10/2017
@@ -45,40 +26,25 @@ import static android.provider.Telephony.Mms.Part.FILENAME;
 /**
  * The MoodModel includes functionality to add, and delete moods and the ability to synchronize
  * with elastic search
+ * @throws IOException
  */
 public class MoodModel {
     private static ArrayList<Mood> moods = new ArrayList<Mood>();
     private EmotionModel emodel;
     private SocialSituationModel smodel;
     private FileInputStream moodsOnFile;
-    File ADDEDNAME = new File("addedMoods.sav");
-    File DELETEDNAME = new File("deletedMoods.sav");
+    File ADDEDNAME;
+    File DELETEDNAME;
     ElasticSearchMOodController.GetMoodsTask getMoodsTask = new ElasticSearchMOodController.GetMoodsTask();
     ElasticSearchMOodController.AddMoodsTask addMoodsTask = new ElasticSearchMOodController.AddMoodsTask();
     ElasticSearchMOodController.UpdateMoodsTask UpdateMoodsTask = new ElasticSearchMOodController.UpdateMoodsTask();
     ElasticSearchMOodController.DeleteMoodTask deleteMoodTask = new ElasticSearchMOodController.DeleteMoodTask();
-    /*String FILENAME = "hello_file";
-String string = "hello world!";
-FileOutputStream fos = openFileOutput(FILENAME, Context.MODE_PRIVATE);
-fos.write(string.getBytes());
-fos.close();
-*/
+
 
     /**
-     * public MoodModel(EmotionModel emodel,SocialSituationModel smodel){
-     * this.emodel = emodel;
-     * this.smodel = smodel;
-     * }
+     * Updates the moods arrayList to reflect the moods on elasticsearch and on disk
      */
-
     public void setMoodsArray() {
-        // First load all moods on elastic search
-//        try {
-//            elasticmoods = getMoodsTask.get();
-//        } catch (Exception e) {
-//            Log.i("Error", "Can't get moods from ElasticSearch");
-//        }
-        Mood m1 = new Mood(12.22,13.22,"Trigger","3","Fsun","222",new Date(12-12-2016),"10");
         ArrayList<Mood> deleteMoods = readFromDeleted();
         ArrayList<Mood> fileMoods = readFromAdded(); //Last set of universal moods PLUS any offline moods
         ArrayList<Mood> finalarr = new ArrayList<Mood>();  //
@@ -100,7 +66,7 @@ fos.close();
                 }
             } //remove all moved pending for deletion from finalarr
 
-        deletefromfile(); //no more deleted modos
+        deletefromfile(); //no more deleted mooos
         try {
             FileOutputStream writer = new FileOutputStream(ADDEDNAME);
             writer.write(("").getBytes());
@@ -112,6 +78,16 @@ fos.close();
         saveListToFile();
     }
 
+    public MoodModel(File f1, File f2){
+        this.DELETEDNAME = f2;
+        this.ADDEDNAME = f1;
+
+    }
+    /**
+     *
+     * @param userid User provides a user ID
+     * @return an ArrayList of all moods of that user
+     */
     public ArrayList<Mood> getMoodByUser(String userid) {
         ArrayList<Mood> returnarr = new ArrayList<Mood>();
         for (int i = 0; i < moods.size(); i++) {
@@ -124,7 +100,7 @@ fos.close();
 
     /**
      * @param user
-     * @return latest mood of every person the user is following
+     * @return All moods of every person the user is following
      */
     public ArrayList<Mood> getFollowedMoods(User user) {
         ArrayList<Mood> returnarr = new ArrayList<Mood>();
@@ -136,23 +112,39 @@ fos.close();
         return returnarr;
     }
 
+    /**
+     *
+     * @return All files on disk and/or elasticsearch in an ArrayList format
+     */
     public ArrayList<Mood> getUniversalMoods() {
         setMoodsArray();
         return moods;
     }
 
+    /**
+     * Returns an arraylist of all moods near a certain latitude and longitude
+     * @param latitude
+     * @param longitude
+     * @return TO DO
+     */
     public ArrayList<Mood> getMoodsNear(Double latitude, Double longitude) {
         // TODO
         return moods;
     }
 
-
+    /**
+     * When a user clicks on a mood and edits it, the changed information is passed to this function
+     * and updated in place
+     * @param mood
+     */
     public void updateMood(Mood mood) {
-        for(int i = 0; i<moods.size();i++) {
+        for (int i = 0; i < moods.size(); i++) {
             if (moods.get(i).getOfflineid().equals(mood.getOfflineid())) {
                 moods.set(i, mood);
             }
         }
+    }
+
 
     public int getMoodModelSize() {
         return moods.size();
@@ -161,10 +153,12 @@ fos.close();
     /**
      * Adds the given mood to elastic search and to the addMood file in a gson format
      * @param mood
+     * @throws IOException e
      */
     public void addMood(Mood mood) {
         ElasticSearchMOodController.AddMoodsTask addMoodsTask = new ElasticSearchMOodController.AddMoodsTask();
-        addMoodsTask.execute(mood); // add to elastic search
+        addMoodsTask.execute(mood);
+        // add to elastic search
         Gson gson = new Gson();
 //      String mjs = gson.toJson(mood);
         ArrayList<Mood> mjs1 = new ArrayList<Mood>();
@@ -174,15 +168,21 @@ fos.close();
         }
         mjs1.add(mood);
         try {
-            BufferedWriter br = new BufferedWriter(new FileWriter(ADDEDNAME));
-            gson.toJson(mjs1, br);
-            br.flush();
+            FileOutputStream fos = new FileOutputStream(ADDEDNAME);
+            ByteArrayOutputStream baos =  new ByteArrayOutputStream();
+            OutputStreamWriter osw = new OutputStreamWriter(baos);
+            gson.toJson(mjs1, osw);
+            String x = osw.toString();
         } catch (IOException e) {
             System.out.println("File not found2");
         }
         setMoodsArray();
     }
 
+/**
+ * Adds a mood to the deletedMoods file, and deletes the mood form addedmoods as well as
+ * elasticsearch
+ */
     public void deleteMood(Mood mood) {
         Gson gson = new Gson();
         ArrayList<Mood> mjs2 = new ArrayList<Mood>();
@@ -201,6 +201,10 @@ fos.close();
         setMoodsArray();
     }
 
+    /**
+     * Returns all moods in the addedname file
+     * @return an Arraylist of all moods from a JSON file
+     */
     private ArrayList<Mood> readFromAdded() {
         ArrayList<Mood> loaded = new ArrayList<Mood>();
         try {
@@ -215,7 +219,7 @@ fos.close();
         return loaded;
     }
     /**
-     *
+     * Returns all moods in the deletedname file
      * @return arraylist of moods from the deletedname file
      */
     private ArrayList<Mood> readFromDeleted() {
@@ -233,7 +237,7 @@ fos.close();
     }
 
     /**
-     * Deletes all tweets form the deleted tweets file
+     * Deletes all moods form the deleted mooods file
      */
     public void deletefromfile() {
         try {
@@ -245,6 +249,9 @@ fos.close();
         }
     }
 
+    /**
+     * Clears all moods from the added file. Mainly used for testing
+     */
     public void clearAdded(){
         try {
             FileOutputStream writer = new FileOutputStream(ADDEDNAME);
@@ -255,6 +262,11 @@ fos.close();
         }
     }
     //http://stackoverflow.com/questions/24573598/write-arraylist-of-custom-objects-to-file
+
+    /**
+     * Saves the arrayList(moods) to addedname file
+     * @return int if an error occurs
+     */
     public int saveListToFile() {
         try {
             BufferedWriter buffWriter = new BufferedWriter(new FileWriter(ADDEDNAME, true));
