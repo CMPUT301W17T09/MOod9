@@ -34,10 +34,11 @@ import com.google.android.gms.location.LocationServices;
 
 import java.util.ArrayList;
 
-/** @author CMPUT301W17T09
+/**
  * Provides a google maps view so that the user can see moods that are near them.
  * The icons on the map are clickable and allows the user to see the specific mood when clicked.
- * */
+ * @author CMPUT301W17T09
+ */
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
@@ -142,7 +143,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
 
-    /**Makes the icon smaller so it fits on the map properly*/
+    /**
+     * Makes the icon smaller so it fits on the map properly
+     */
     Bitmap makeSmallerIcon(int icon) {
         BitmapDrawable bitmapdraw = (BitmapDrawable) getDrawable(icon);
         Bitmap bitmap = bitmapdraw.getBitmap();
