@@ -76,6 +76,7 @@ public class FeedActivity extends AppCompatActivity
         //userNameList = new ArrayList<String>();
         //dateList = new ArrayList<String>();
         moodLinkedList = mApplication.getMoodLinkedList();
+        //TODO: LOADING FROM ELASTIC SEARCH
 
         moodListView = (ListView) findViewById(R.id.moodList);
         moodListAdapter = new MoodListAdapter(this, moodLinkedList);
@@ -184,7 +185,9 @@ public class FeedActivity extends AppCompatActivity
             username.setTypeface(null, Typeface.BOLD);
 
             //TODO: Get rid of text view and move all display functionality over to linearlayout
+            ArrayList<Mood> temp = mApplication.getMoodModel().getUniversalMoods();
             moodListAdapter.notifyDataSetChanged();
+
         } else {
             if (requestCode == 1) {
                 moodListAdapter.notifyDataSetChanged();

@@ -206,7 +206,6 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
                         }, mYear, mMonth, mDay);
 
                 dpd.getDatePicker().setMinDate(1973);
-                dpd.getDatePicker().setMaxDate(2018);
                 dpd.show();
             }
         });
@@ -217,6 +216,9 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
                 @Override
                 public void onClick(View v) {
                     //TODO: delete mood
+                    mApplication.getMoodLinkedList().remove(oldMoodIndex);
+                    mApplication.getMoodModel().deleteMood(returnMood);
+                    finish();
                 }
             });
         }
@@ -236,10 +238,8 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
                         returnMood.setTrigger(trigger.getText().toString());
                         //TODO: need to find a way to get latitude and longitude from the location setter
                         mApplication.getMoodLinkedList().set(oldMoodIndex, returnMood);
-                        //mApplication.getMoodModel().updateMood(returnMood.getId(), returnMood);
-                        Intent feedIntent = new Intent();
-                        feedIntent.putExtra("moodIndex", oldMoodIndex);
-                        setResult(1, feedIntent);
+
+                        mApplication.getMoodModel().updateMood(returnMood);
                         finish();
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -258,7 +258,7 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
                     returnMood.setId(String.valueOf(userId));
 
                     mApplication.getMoodLinkedList().add(returnMood);
-                    //mApplication.getMoodModel().addMood(returnMood);
+                    mApplication.getMoodModel().addMood(returnMood);
                     finish();
                 }
             }

@@ -74,7 +74,7 @@ fos.close();
 //        } catch (Exception e) {
 //            Log.i("Error", "Can't get moods from ElasticSearch");
 //        }
-        Mood m1 = new Mood(12.22,13.22,"Trigger","3","Fsun","222",new Date(12-12-2016),"10");
+        //Mood m1 = new Mood(12.22,13.22,"Trigger","3","Fsun","222",new Date(12-12-2016),"10");
         ArrayList<Mood> deleteMoods = readFromDeleted();
         ArrayList<Mood> fileMoods = readFromAdded(); //Last set of universal moods PLUS any offline moods
         ArrayList<Mood> finalarr = new ArrayList<Mood>();  //
