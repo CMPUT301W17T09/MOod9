@@ -53,34 +53,29 @@ public class MoodModel {
     private EmotionModel emodel;
     private SocialSituationModel smodel;
     private FileInputStream moodsOnFile;
-    File ADDEDNAME = new File("addedMoods.sav");
-    File DELETEDNAME = new File("deletedMoods.sav");
-    /*String FILENAME = "hello_file";
-String string = "hello world!";
-FileOutputStream fos = openFileOutput(FILENAME, Context.MODE_PRIVATE);
-fos.write(string.getBytes());
-fos.close();
-*/
+    File ADDEDNAME;
+    File DELETEDNAME;
 
-    /**
-     * public MoodModel(EmotionModel emodel,SocialSituationModel smodel){
-     * this.emodel = emodel;
-     * this.smodel = smodel;
-     * }
-     */
+    public MoodModel(File f1,File f2){
+        this.ADDEDNAME = f1;
+        this.DELETEDNAME = f2;
+    }
 
     public void setMoodsArray() {
-        // First load all moods on elastic search
-//        try {
-//            elasticmoods = getMoodsTask.get();
-//        } catch (Exception e) {
-//            Log.i("Error", "Can't get moods from ElasticSearch");
-//        }
+        ElasticSearchMOodController.GetMoodsTask getMoodsTask = new ElasticSearchMOodController.GetMoodsTask();
+        getMoodsTask.execute("");
+        ArrayList<Mood> elasticmoods = new ArrayList<Mood>();
+        try {
+          elasticmoods = getMoodsTask.get(); // All moods from elastic search
+       } catch (Exception e) {
+           Log.i("Error", "Can't get moods from ElasticSearch");
+       }
         //Mood m1 = new Mood(12.22,13.22,"Trigger","3","Fsun","222",new Date(12-12-2016),"10");
-        ArrayList<Mood> deleteMoods = readFromDeleted();
+        ArrayList<Mood> deleteMoods = readFromDeleted(); //all moods from deleted file
         ArrayList<Mood> fileMoods = readFromAdded(); //Last set of universal moods PLUS any offline moods
         ArrayList<Mood> finalarr = new ArrayList<Mood>();  //
         ArrayList<Mood> finalarr2 = new ArrayList<Mood>();
+        finalarr.addAll(elasticmoods);
         finalarr.addAll(fileMoods); // final array contains all moods form elastic and add moods
         for (int i = 0; i < finalarr.size(); i++) {
             if (!finalarr2.contains(finalarr.get(i))) {
@@ -180,8 +175,6 @@ fos.close();
     public void addMood(Mood mood) {
         ElasticSearchMOodController.AddMoodsTask addMoodsTask = new ElasticSearchMOodController.AddMoodsTask();
         addMoodsTask.execute(mood); // add to elastic search
-
-        /*
         Gson gson = new Gson();
 //      String mjs = gson.toJson(mood);
         ArrayList<Mood> mjs1 = new ArrayList<Mood>();
@@ -197,14 +190,12 @@ fos.close();
         } catch (IOException e) {
             System.out.println("File not found2");
         }
-        setMoodsArray();*/
+        setMoodsArray();
     }
 
     public void deleteMood(Mood mood) {
         ElasticSearchMOodController.DeleteMoodTask deleteMoodTask = new ElasticSearchMOodController.DeleteMoodTask();
         deleteMoodTask.execute(mood);
-
-        /*
         Gson gson = new Gson();
         ArrayList<Mood> mjs2 = new ArrayList<Mood>();
         mjs2 = readFromDeleted();
@@ -219,7 +210,7 @@ fos.close();
         } catch (IOException e) {
             System.out.println("File not found3");
         }
-        setMoodsArray();*/
+        setMoodsArray();
     }
 
     private ArrayList<Mood> readFromAdded() {

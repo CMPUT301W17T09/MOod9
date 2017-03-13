@@ -81,7 +81,9 @@ public class ElasticSearchMOodController {
 
                 try {
                     DocumentResult result = client.execute(index);
+                    System.out.println(result.toString());
                     if (result.isSucceeded()){
+                        System.out.println("PUSH");
                         String id = result.getId();
                         mood.setId(result.getId());
                     }
