@@ -226,7 +226,7 @@ public class ElasticSearchMOodController {
         }
     }
 
-    public static class GetUsersTask extends AsyncTask<String, Void, User> {
+    public static class GetUsersTaskName extends AsyncTask<String, Void, User> {
         @Override
         protected User doInBackground(String...params) {
             verifySettings();
@@ -237,6 +237,45 @@ public class ElasticSearchMOodController {
                     "    \"query\": {\n" +
                     "        \"query_string\" : {\n" +
                     "            \"fields\" : [\"name\"],\n" +
+                    "            \"query\" : \"" + params[0] + "\"\n" +
+                    "        }\n" +
+                    "    }\n" +
+                    "}";
+
+            if (params[0].equals("")){
+                query = "";
+            }
+
+            Search search = new Search.Builder(query)
+                    .addIndex(index_name)
+                    .addType(user_type)
+                    .build();
+
+            try {
+                SearchResult result = client.execute(search);
+                if (result.isSucceeded()){
+                    user = result.getSourceAsObject(User.class);
+                }
+            }
+            catch (Exception e) {
+                Log.i("Error", "Something went wrong when we tried to communicate with the elasticsearch server!");
+            }
+
+            return user;
+        }
+    }
+
+    public static class GetUsersTaskID extends AsyncTask<String, Void, User> {
+        @Override
+        protected User doInBackground(String...params) {
+            verifySettings();
+
+            User user = new User("");
+
+            String query = "{\n" +
+                    "    \"query\": {\n" +
+                    "        \"query_string\" : {\n" +
+                    "            \"fields\" : [\"id\"],\n" +
                     "            \"query\" : \"" + params[0] + "\"\n" +
                     "        }\n" +
                     "    }\n" +
