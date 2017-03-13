@@ -2,6 +2,7 @@ package ca.ualberta.cmput301w17t09.mood9.mood9;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -18,6 +19,8 @@ import android.view.MenuItem;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import org.apache.commons.lang3.ObjectUtils;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -72,10 +75,15 @@ public class FeedActivity extends AppCompatActivity
         // set up list view adapter
         context = this;
         mApplication = (Mood9Application)getApplicationContext();
-        //emoteImages = new ArrayList<Integer>();
-        //userNameList = new ArrayList<String>();
-        //dateList = new ArrayList<String>();
         moodLinkedList = mApplication.getMoodLinkedList();
+        SharedPreferences shPref = getApplicationContext().getSharedPreferences(getString(R.string.stored_name), MODE_PRIVATE);
+        String userName = shPref.getString("username", "test");
+        String userId = UserModel.getUserID(userName).getId();
+        ArrayList<Mood> temp = mApplication.getMoodModel().getMoodByUser(userId);
+
+        for (int i = 0; i < temp.size(); i++) {
+            moodLinkedList.add(temp.get(i));
+        }
         //TODO: LOADING FROM ELASTIC SEARCH
 
         moodListView = (ListView) findViewById(R.id.moodList);

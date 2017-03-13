@@ -20,4 +20,5 @@
     <string name="about_text">This is a social media application where we encourage the sharing of your MOods. It was created for a group project for CMPUT 301 at the University of
                                 Alberta.</string>
     <string name="stored_name">username</string>
+    <string name="stored_id">user_id</string>
 </resources>
