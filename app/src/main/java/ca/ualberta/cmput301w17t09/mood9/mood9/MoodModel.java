@@ -98,7 +98,7 @@ fos.close();
 
         deletefromfile(); //no more deleted modos
         try {
-            FileOutputStream writer = new FileOutputStream(ADDEDNAME);
+            FileOutputStream writer = new FileOutputStream(this.ADDEDNAME);
             writer.write(("").getBytes());
             writer.close();
         } catch (IOException e) {

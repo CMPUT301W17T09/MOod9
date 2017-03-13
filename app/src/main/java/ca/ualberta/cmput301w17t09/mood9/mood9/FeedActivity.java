@@ -145,7 +145,8 @@ public class FeedActivity extends AppCompatActivity
             Intent mapIntent = new Intent(this, MapsActivity.class);
             startActivity(mapIntent);
         } else if (id == R.id.profile) {
-
+            Intent profileIntent = new Intent(this, ProfileActivity.class);
+            startActivity(profileIntent);
         } else if (id == R.id.about) {
             Intent aboutIntent = new Intent(this, AboutActivity.class);
             startActivity(aboutIntent);
