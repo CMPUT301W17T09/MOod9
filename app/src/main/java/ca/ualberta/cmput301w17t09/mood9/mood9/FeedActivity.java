@@ -187,8 +187,6 @@ public class FeedActivity extends AppCompatActivity
             moodListAdapter.notifyDataSetChanged();
         } else {
             if (requestCode == 1) {
-                Bundle returnData = data.getExtras();
-                int position = returnData.getInt("moodIndex");
                 moodListAdapter.notifyDataSetChanged();
             }
         }
