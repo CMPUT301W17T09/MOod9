@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -76,9 +77,10 @@ public class FeedActivity extends AppCompatActivity
         context = this;
         mApplication = (Mood9Application)getApplicationContext();
         moodLinkedList = mApplication.getMoodLinkedList();
-        SharedPreferences shPref = getApplicationContext().getSharedPreferences(getString(R.string.stored_name), MODE_PRIVATE);
-        String userName = shPref.getString("username", "test");
-        String userId = UserModel.getUserID(userName).getId();
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        String username = sharedPreferences.getString("username", null);
+        String userId = sharedPreferences.getString("user_id", null);
+//        String userId = UserModel.getUserID(userName).getId();
         ArrayList<Mood> temp = mApplication.getMoodModel().getMoodByUser(userId);
         //LOADING FROM ELASTIC SEARCH
         for (int i = 0; i < temp.size(); i++) {

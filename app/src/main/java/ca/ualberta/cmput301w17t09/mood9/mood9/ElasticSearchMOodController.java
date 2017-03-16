@@ -289,10 +289,10 @@ public class ElasticSearchMOodController {
         }
     }
 
-    public static class AddUsersTask extends AsyncTask<User, Void, Void> {
+    public static class AddUsersTask extends AsyncTask<User, Void, String> {
 
         @Override
-        protected Void doInBackground(User...users) {
+        protected String doInBackground(User...users) {
             verifySettings();
 
             for (User user : users) {
@@ -308,6 +308,7 @@ public class ElasticSearchMOodController {
                 catch (Exception e) {
                     Log.i("Error", "The application failed to build and send the tweets");
                 }
+                return user.getId();
             }
             return null;
         }

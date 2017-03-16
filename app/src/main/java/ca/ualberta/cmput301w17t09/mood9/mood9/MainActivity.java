@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -28,7 +29,7 @@ public class MainActivity extends AppCompatActivity {
         EditText usernameField = (EditText) findViewById(R.id.username_field);
 
 
-        SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences(getString(R.string.stored_name), MODE_PRIVATE);
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         String name = sharedPreferences.getString("username", null);
 
@@ -45,17 +46,20 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 editor.putString("username", usernameField.getText().toString());
 
-                User user = UserModel.getUser(usernameField.getText().toString());
+                String user_id = UserModel.getUser(usernameField.getText().toString());
 
-                if (user == null) {
+                if (user_id == null) {
                     Snackbar snackbar = Snackbar
                             .make(v, "Username already exists, please enter a different unique username", Snackbar.LENGTH_LONG);
 
                     snackbar.show();
                     return;
                 }
-                editor.putString("user_id", user.getId());
-                editor.apply();
+                editor.putString("user_id", user_id);
+
+                editor.commit();
+                String test = sharedPreferences.getString("user_id", "TESTER IN MAIN");
+
                 Intent feedIntent = new Intent(MainActivity.this, FeedActivity.class);
                 startActivity(feedIntent);
                 finish();

@@ -10,7 +10,7 @@ public class UserModel {
      * @param username the username
      * @return null  if username already existed User object with the new username, as well as push the new User object to ElasticSearch
      */
-    public static User getUser(String username){
+    public static String getUser(String username){
 
         ElasticSearchMOodController.GetUsersTaskName getUsersTask = new ElasticSearchMOodController.GetUsersTaskName();
         getUsersTask.execute(username);
@@ -23,15 +23,19 @@ public class UserModel {
 
         }
 
+        // If user already exists, return null
         if (user != null)
             return null;
         else {
             user = new User(username);
-
             ElasticSearchMOodController.AddUsersTask addUsersTask = new ElasticSearchMOodController.AddUsersTask();
-            addUsersTask.execute(user);
+            String id = null;
+            try {
+                id = addUsersTask.execute(user).get();
+            } catch (Exception e){ return null;}
 
-            return user;
+            return id;
+
         }
     }
 
