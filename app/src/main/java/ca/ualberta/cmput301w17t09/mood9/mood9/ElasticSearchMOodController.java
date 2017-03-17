@@ -27,7 +27,6 @@ import io.searchbox.indices.mapping.PutMapping;
 
 public class ElasticSearchMOodController {
     private static JestDroidClient client;
-    private static String ElasticSearchServer = "http://cmput301.softwareprocess.es:8080";
     private static String index_name = "cmput301w17t09";
     private static String test_index_name = "test_" + index_name;
     private static String mood_type = "mood9";
@@ -155,6 +154,7 @@ public class ElasticSearchMOodController {
 
     public static void verifySettings() {
         if (client == null) {
+            String ElasticSearchServer = "http://cmput301.softwareprocess.es:8080";
             DroidClientConfig.Builder builder = new DroidClientConfig.Builder(ElasticSearchServer);
             DroidClientConfig config = builder.build();
 

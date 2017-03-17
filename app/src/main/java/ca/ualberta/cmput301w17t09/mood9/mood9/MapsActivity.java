@@ -47,8 +47,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private GoogleApiClient googleApiClient;
     private LocationRequest locationRequest;
     private FusedLocationProviderApi locationProvider = LocationServices.FusedLocationApi;
-    private Double myLat;
-    private Double myLong;
     private ArrayList<Marker> markers = new ArrayList<>();
 
 
@@ -181,8 +179,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     @Override
     public void onLocationChanged(Location location) {
-        myLong = location.getLongitude();
-        myLat = location.getLatitude();
+        Double myLong = location.getLongitude();
+        Double myLat = location.getLatitude();
         LatLng newCord = new LatLng(myLat, myLong);
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(newCord, 10));
 

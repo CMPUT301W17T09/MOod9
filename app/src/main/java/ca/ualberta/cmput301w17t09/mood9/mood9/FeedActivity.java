@@ -35,8 +35,6 @@ import java.util.LinkedList;
 public class FeedActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    private Mood9Application mApplication;
-    private ListView moodListView;
     private MoodListAdapter moodListAdapter;
     private LinkedList<Mood> moodLinkedList;
     //private ArrayList<Integer> emoteImages; // {R.drawable.anger, R.drawable.confusion, R.drawable.happiness, R.drawable.sadness, R.drawable.shame, R.drawable.surpise}
@@ -75,7 +73,7 @@ public class FeedActivity extends AppCompatActivity
 
         // set up list view adapter
         context = this;
-        mApplication = (Mood9Application)getApplicationContext();
+        Mood9Application mApplication = (Mood9Application) getApplicationContext();
         moodLinkedList = mApplication.getMoodLinkedList();
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         String username = sharedPreferences.getString("username", null);
@@ -87,7 +85,7 @@ public class FeedActivity extends AppCompatActivity
             moodLinkedList.add(temp.get(i));
         }
 
-        moodListView = (ListView) findViewById(R.id.moodList);
+        ListView moodListView = (ListView) findViewById(R.id.moodList);
         moodListAdapter = new MoodListAdapter(this, moodLinkedList, mApplication);
         moodListView.setAdapter(moodListAdapter);
 
