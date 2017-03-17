@@ -48,10 +48,10 @@ public class SocialSituationTest extends TestCase {
     @Test
     public void testGetSocialSituations() {
         ConcurrentHashMap<String, SocialSituation> sss = ssm.getSocialSituations();
-        assertEquals(((SocialSituation) sss.get("3")).getName(), "With Parents");
-        assertEquals(((SocialSituation) sss.get("5")).getName(), "Just got dumped");
-        assertEquals(((SocialSituation) sss.get("7")).getName(), "The day after");
-        assertEquals(((SocialSituation) sss.get("10")).getName(), "Driving Home");
+        assertEquals((sss.get("3")).getName(), "With Parents");
+        assertEquals((sss.get("5")).getName(), "Just got dumped");
+        assertEquals((sss.get("7")).getName(), "The day after");
+        assertEquals((sss.get("10")).getName(), "Driving Home");
 
         assertNull(sss.get(":("));
     }

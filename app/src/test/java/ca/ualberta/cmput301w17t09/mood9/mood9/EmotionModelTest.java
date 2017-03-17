@@ -4,13 +4,10 @@ import junit.framework.TestCase;
 
 import org.junit.Test;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.concurrent.ConcurrentMap;
-
-import static org.junit.Assert.*;
 
 /**
  * Created by Rohit on 2017-02-23.
@@ -48,15 +45,15 @@ public class EmotionModelTest extends TestCase{
 
     public void testGetEmotions() {
         ConcurrentMap<String, Emotion> emos = em.getEmotions();
-        assertEquals(((Emotion) emos.get("0")).getName(), "Anger");
-        assertEquals(((Emotion) emos.get("1")).getName(), "Confusion");
-        assertEquals(((Emotion) emos.get("2")).getName(), "Disgust");
-        assertEquals(((Emotion) emos.get("3")).getName(), "Fear");
-        assertEquals(((Emotion) emos.get("4")).getName(), "Happiness");
-        assertEquals(((Emotion) emos.get("5")).getName(), "Sadness");
-        assertEquals(((Emotion) emos.get("6")).getName(), "Shame");
-        assertEquals(((Emotion) emos.get("7")).getName(), "Surprise");
-        Emotion emo = (Emotion) emos.get("8");
+        assertEquals((emos.get("0")).getName(), "Anger");
+        assertEquals((emos.get("1")).getName(), "Confusion");
+        assertEquals((emos.get("2")).getName(), "Disgust");
+        assertEquals((emos.get("3")).getName(), "Fear");
+        assertEquals((emos.get("4")).getName(), "Happiness");
+        assertEquals((emos.get("5")).getName(), "Sadness");
+        assertEquals((emos.get("6")).getName(), "Shame");
+        assertEquals((emos.get("7")).getName(), "Surprise");
+        Emotion emo = emos.get("8");
         assertNull(emo);
     }
 }

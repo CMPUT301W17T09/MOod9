@@ -6,9 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
@@ -23,14 +20,12 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Random;
 
 /**
  * Originally created by Fady
@@ -132,14 +127,14 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
             returnMood = mApplication.getMoodLinkedList().get(oldMoodIndex);
             int position = 0;
             for (Map.Entry<String, Emotion> entry : mApplication.getEmotionModel().getEmotions().entrySet()) {
-                if (entry.getValue().getName() == mApplication.getEmotionModel().getEmotion(returnMood.getEmotionId()).getName()) {
+                if (entry.getValue().getName().equals(mApplication.getEmotionModel().getEmotion(returnMood.getEmotionId()).getName())) {
                     position = Integer.parseInt(entry.getKey());
                 }
             }
             emotionsSpinner.setAdapter(emotionsSpinnerAdapter);
             emotionsSpinner.setSelection(position);
             for (Map.Entry<String, SocialSituation> entry : mApplication.getSocialSituationModel().getSocialSituations().entrySet()) {
-                if (entry.getValue().getName() == mApplication.getSocialSituationModel().getSocialSituation(returnMood.getSocialSituationId()).getName()) {
+                if (entry.getValue().getName().equals(mApplication.getSocialSituationModel().getSocialSituation(returnMood.getSocialSituationId()).getName())) {
                     position = Integer.parseInt(entry.getKey());
                 }
             }
