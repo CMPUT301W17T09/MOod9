@@ -48,7 +48,7 @@ public class LocationService implements LocationListener {
     /**
      * Function to get the user's current location
      *
-     * @return
+     * @return: Location
      */
     public Location getLocation() {
         if ( Build.VERSION.SDK_INT >= 23 &&

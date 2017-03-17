@@ -1,17 +1,12 @@
 package ca.ualberta.cmput301w17t09.mood9.mood9;
 
 import android.os.AsyncTask;
-import android.support.v7.widget.LinearLayoutCompat;
 import android.util.Log;
-
 import com.searchly.jestdroid.DroidClientConfig;
 import com.searchly.jestdroid.JestClientFactory;
 import com.searchly.jestdroid.JestDroidClient;
-
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-
 import io.searchbox.client.JestResult;
 import io.searchbox.core.Delete;
 import io.searchbox.core.DocumentResult;
@@ -27,9 +22,7 @@ import io.searchbox.indices.mapping.PutMapping;
 
 public class ElasticSearchMOodController {
     private static JestDroidClient client;
-    private static String ElasticSearchServer = "http://cmput301.softwareprocess.es:8080";
     private static String index_name = "cmput301w17t09";
-    private static String test_index_name = "test_" + index_name;
     private static String mood_type = "mood9";
     private static String user_type = "user9";
 
@@ -155,7 +148,8 @@ public class ElasticSearchMOodController {
 
     public static void verifySettings() {
         if (client == null) {
-            DroidClientConfig.Builder builder = new DroidClientConfig.Builder(ElasticSearchServer);
+            String elasticSearchServer = "http://cmput301.softwareprocess.es:8080";
+            DroidClientConfig.Builder builder = new DroidClientConfig.Builder(elasticSearchServer);
             DroidClientConfig config = builder.build();
 
             JestClientFactory factory = new JestClientFactory();

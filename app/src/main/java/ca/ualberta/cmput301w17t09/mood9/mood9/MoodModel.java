@@ -42,9 +42,6 @@ import static android.provider.Telephony.Mms.Part.FILENAME;
  * Added array size getter by cdkushni on 3/10/2017
  * Redone by Rohit on 2017-03-08
  * Created by dannick on 2/22/17.
- */
-
-/**
  * The MoodModel includes functionality to add, and delete moods and the ability to synchronize
  * with elastic search
  */

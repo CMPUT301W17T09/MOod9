@@ -88,7 +88,7 @@ public class EmotionModel {
 
     /**
      * Get all the emotions
-     * @return
+     * @return: Emotions
      */
     public ConcurrentHashMap<String, Emotion>getEmotions(){
         return emotions;
