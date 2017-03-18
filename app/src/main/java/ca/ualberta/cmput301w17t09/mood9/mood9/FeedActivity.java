@@ -1,5 +1,6 @@
 package ca.ualberta.cmput301w17t09.mood9.mood9;
 
+import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -7,6 +8,8 @@ import android.graphics.Typeface;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.view.MenuItemCompat;
+import android.support.v7.widget.SearchView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -37,9 +40,7 @@ public class FeedActivity extends AppCompatActivity
 
     private MoodListAdapter moodListAdapter;
     private LinkedList<Mood> moodLinkedList;
-    //private ArrayList<Integer> emoteImages; // {R.drawable.anger, R.drawable.confusion, R.drawable.happiness, R.drawable.sadness, R.drawable.shame, R.drawable.surpise}
-    //private ArrayList<String> userNameList; //{"Anger","Confusion","Happiness","Sadness","Shame","Surprise"}
-    //private ArrayList<String> dateList;
+    private Mood9Application mApplication;
     Context context;
 
 
@@ -73,7 +74,7 @@ public class FeedActivity extends AppCompatActivity
 
         // set up list view adapter
         context = this;
-        Mood9Application mApplication = (Mood9Application) getApplicationContext();
+        mApplication = (Mood9Application) getApplicationContext();
         moodLinkedList = mApplication.getMoodLinkedList();
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         String username = sharedPreferences.getString("username", null);
@@ -115,7 +116,26 @@ public class FeedActivity extends AppCompatActivity
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_feed, menu);
-        return true;
+        MenuItem searchItem = menu.findItem(R.id.search);
+        SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
+        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        if (null != searchView) {
+            searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+            searchView.setIconifiedByDefault(true);
+        }
+        SearchView.OnQueryTextListener queryTextListener = new SearchView.OnQueryTextListener() {
+            public boolean onQueryTextChange(String newText) {
+                // this is your adapter that will be filtered
+                return true;
+            }
+            public boolean onQueryTextSubmit(String query) {
+                ArrayList<Mood> searchResult = mApplication.getMoodModel().getMoodByUser(query);
+                return true;
+            }
+        };
+        searchView.setOnQueryTextListener(queryTextListener);
+
+        return super.onCreateOptionsMenu(menu);
     }
 
     @Override
