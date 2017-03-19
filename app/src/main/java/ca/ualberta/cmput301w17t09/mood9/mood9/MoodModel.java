@@ -106,6 +106,18 @@ fos.close();
         moods = finalarr2;
         saveListToFile();
     }
+    public ArrayList<Mood> getMoodsByQuery(String query) {
+        ElasticSearchMOodController.SearchMoodsTask searchMoodsTask = new ElasticSearchMOodController.SearchMoodsTask();
+        searchMoodsTask.execute(query);
+        ArrayList<Mood> returnarr = new ArrayList<Mood>();
+
+        try {
+            returnarr = searchMoodsTask.get();
+        } catch (Exception e) {
+            System.out.println("Count not find moods");
+        }
+        return returnarr;
+    }
 
     public ArrayList<Mood> getMoodByUser(String userid) {
         ElasticSearchMOodController.GetMoodsTask getMoodsTask = new ElasticSearchMOodController.GetMoodsTask();

@@ -129,7 +129,7 @@ public class FeedActivity extends AppCompatActivity
                 return true;
             }
             public boolean onQueryTextSubmit(String query) {
-                ArrayList<Mood> searchResult = mApplication.getMoodModel().getMoodByUser(query);
+                ArrayList<Mood> search = mApplication.getMoodModel().getMoodsByQuery(query);
                 return true;
             }
         };

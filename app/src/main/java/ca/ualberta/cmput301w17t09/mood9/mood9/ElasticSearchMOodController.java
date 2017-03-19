@@ -5,6 +5,8 @@ import android.util.Log;
 import com.searchly.jestdroid.DroidClientConfig;
 import com.searchly.jestdroid.JestClientFactory;
 import com.searchly.jestdroid.JestDroidClient;
+
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 import io.searchbox.client.JestResult;
@@ -101,6 +103,43 @@ public class ElasticSearchMOodController {
                 }
             }
             return null;
+        }
+    }
+
+    public static class SearchMoodsTask extends AsyncTask<String, Void, ArrayList<Mood>> {
+        @Override
+        protected ArrayList<Mood> doInBackground(String...searchParameters) {
+            verifySettings();
+
+            ArrayList<Mood> moods = new ArrayList<Mood>();
+            String query = "{\n" +
+                    "   \"query\": {\n" +
+                    "       \"query_string\" : {\n" +
+                    "           \"query\" : \"" + searchParameters[0] + "\"\n" +
+                    "       }\n" +
+                    "   }\n" +
+                    "}";
+            if (searchParameters[0].equals("")){
+                query = "";
+            }
+
+            Search search = new Search.Builder(query)
+                    .addIndex(index_name)
+                    .addType(mood_type)
+                    .build();
+
+            try {
+                SearchResult result = client.execute(search);
+                if (result.isSucceeded()){
+                    List<Mood> foundsMoods = result.getSourceAsObjectList(Mood.class);
+                    moods.addAll(foundsMoods);
+                }
+            }
+            catch (Exception e) {
+                Log.i("Error", "Something went wrong when we tried to communicate with the elasticsearch server!");
+            }
+
+            return moods;
         }
     }
 
