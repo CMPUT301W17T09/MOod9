@@ -1,7 +1,6 @@
 package ca.ualberta.cmput301w17t09.mood9.mood9;
 
-import android.media.MediaMuxer;
-
+import java.io.Serializable;
 import java.util.Date;
 import java.util.UUID;
 
@@ -13,13 +12,13 @@ import io.searchbox.annotations.JestId;
  * Disabled this.emotion and this.socialSituation setting due to unusability at the moment by cdkushni on 3/10/17
  */
 
-public class Mood {
+public class Mood implements Serializable {
     // The following fields are to be serialized
     @JestId
     private String id;
     private String offlineid;
     private Double latitude;
-    private Double longitutde;
+    private Double longitude;
     private String trigger;
     //private int emoticon;
     private String emotionId;
@@ -28,13 +27,13 @@ public class Mood {
     private Date date;
     private String user_id;
 
-    public Mood(Double latitude, Double longitutde,
+    public Mood(Double latitude, Double longitude,
                 String trigger, String emotionId, String socialSituationId,
                 String imageTriggerId, Date date,String user_id) {
         //http://stackoverflow.com/questions/1389736/how-do-i-create-a-unique-id-in-java
         this.offlineid = UUID.randomUUID().toString();
         this.latitude = latitude;
-        this.longitutde = longitutde;
+        this.longitude = longitude;
         this.trigger = trigger;
         this.emotionId = emotionId;
         this.socialSituationId = socialSituationId;
@@ -71,12 +70,12 @@ public class Mood {
         this.latitude = latitude;
     }
 
-    public Double getLongitutde() {
-        return longitutde;
+    public Double getLongitude() {
+        return longitude;
     }
 
-    public void setLongitutde(Double longitutde) {
-        this.longitutde = longitutde;
+    public void setLongitude(Double longitude) {
+        this.longitude = longitude;
     }
 
     public String getTrigger() {

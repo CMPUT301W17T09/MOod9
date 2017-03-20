@@ -1,7 +1,6 @@
 package ca.ualberta.cmput301w17t09.mood9.mood9;
 
 import android.Manifest;
-import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
@@ -13,7 +12,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AlertDialog;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -23,7 +22,6 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.LocationSource;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -33,6 +31,8 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.location.LocationServices;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedList;
 
 /**
  * Provides a google maps view so that the user can see moods that are near them.
@@ -74,6 +74,26 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+
+        LinkedList<Mood> moodList = new LinkedList<Mood>((Collection<? extends Mood>) getIntent().getSerializableExtra("moodList"));
+        for(int i = 0; i < moodList.size(); i++){
+            Mood tempMood = moodList.get(i);
+//            If both the long and lat don't equal 0 (the default) then create the mood on the map
+            if(!(tempMood.getLatitude() == 0 & tempMood.getLongitude() == 0)){
+                LatLng tempCord = new LatLng(tempMood.getLatitude(), tempMood.getLongitude());
+                Mood9Application app = (Mood9Application) getApplication();
+                EmotionModel em = app.getEmotionModel();
+                Emotion emotion = em.getEmotion(tempMood.getEmotionId());
+                String emotionName = emotion.getName();
+                int iconNumber = getResources().getIdentifier(emotionName.toLowerCase().trim(), "drawable", getPackageName());
+                Marker tempMarker = mMap.addMarker(new MarkerOptions().title(tempMood.getUser_id()).position(tempCord).icon(BitmapDescriptorFactory.fromBitmap(makeSmallerIcon(iconNumber))));
+                markers.add(tempMarker);
+            }
+        }
+
+
+
+
 
         // Add a marker at tim hortons and move the camera
         LatLng timmiesCord = new LatLng(53.526599, -113.524596);

@@ -44,8 +44,8 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
     int[] emoticons;
     int emotionId = 0;
     int socialId = 0;
-    double latitude = 100;
-    double longitude = 100;
+    double latitude = 0;
+    double longitude = 0;
     Date curDate = new Date();
     String imageTriggerId = "N/A";
     String selectedEmotion = "Anger";
@@ -304,7 +304,7 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        locationService.stopUsingGPS();
+//        locationService.stopUsingGPS();
     }
 }
 
