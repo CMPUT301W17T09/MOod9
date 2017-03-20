@@ -1,0 +1,9 @@
+Attendance: everyone is presents.
+
+elasticsearch is not consistant. Have a situation where the elasticsearch can run in the background. 
+
+turn on services manually if they are not automatically starting. 
+
+get rid of guava. properly refactor it. look into getting rid of jackOptions
+
+command pattern for the actions. 
