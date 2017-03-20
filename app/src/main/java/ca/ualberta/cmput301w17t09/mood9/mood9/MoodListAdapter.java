@@ -69,21 +69,11 @@ public class MoodListAdapter extends BaseAdapter{
         holder.timetv=(TextView) rowView.findViewById(R.id.time);
         holder.img=(ImageView) rowView.findViewById(R.id.imageView);
 
-        //holder.idtv.setText(mApplication.getSocialSituationModel().getSocialSituation(moodList.get(position).getSocialSituationId()).getName());
-        //holder.idtv.setText(UserModel.getUserProfile(mApplication.getMoodModel().getCachedMoods().get(position).getUser_id()).getName());
         ArrayList<Mood> temp = mApplication.getMoodModel().getCachedMoods();
         holder.idtv.setText(UserModel.getUserProfile(temp.get(position).getUser_id()).getName());
         holder.timetv.setText(moodList.get(position).getDate().toString());
         String imgNameBuilder = mApplication.getEmotionModel().getEmotion(moodList.get(position).getEmotionId()).getName().toLowerCase() + ".png";
         holder.img.setImageResource(context.getResources().getIdentifier(imgNameBuilder.substring(0, imgNameBuilder.lastIndexOf(".")), "drawable", context.getPackageName()));
-        /*
-        rowView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // TODO Auto-generated method stub
-                Toast.makeText(context, "You Clicked "+ result.get(position), Toast.LENGTH_LONG).show();
-            }
-        });*/
         return rowView;
     }
 

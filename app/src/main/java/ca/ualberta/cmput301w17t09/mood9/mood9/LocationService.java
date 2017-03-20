@@ -65,7 +65,6 @@ public class LocationService implements LocationListener {
                 this.canGetLocation = true;
                 // First get location from Network Provider
                 if (checkNetwork) {
-                    Toast.makeText(mContext, "Network", Toast.LENGTH_SHORT).show();
 
                     try {
                         locationManager.requestLocationUpdates(
@@ -82,6 +81,7 @@ public class LocationService implements LocationListener {
                         if (loc != null) {
                             latitude = loc.getLatitude();
                             longitude = loc.getLongitude();
+                            Toast.makeText(mContext,"Network Longitude: "+longitude+" Latitude: "+latitude,Toast.LENGTH_SHORT).show();
                         }
                     }
                     catch(SecurityException e){
@@ -91,7 +91,6 @@ public class LocationService implements LocationListener {
             }
             // if GPS Enabled get lat/long using GPS Services
             if (checkGPS) {
-                Toast.makeText(mContext,"GPS",Toast.LENGTH_SHORT).show();
                 if (loc == null) {
                     try {
                         locationManager.requestLocationUpdates(
@@ -105,6 +104,7 @@ public class LocationService implements LocationListener {
                             if (loc != null) {
                                 latitude = loc.getLatitude();
                                 longitude = loc.getLongitude();
+                                Toast.makeText(mContext,"GPS Longitude: "+longitude+" Latitude: "+latitude,Toast.LENGTH_SHORT).show();
                             }
                         }
                     } catch (SecurityException e) {

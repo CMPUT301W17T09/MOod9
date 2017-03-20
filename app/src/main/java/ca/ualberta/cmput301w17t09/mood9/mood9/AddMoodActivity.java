@@ -35,6 +35,7 @@ import java.util.Map;
  * Fixed to use mood model, grabbing emotion model and socialmodel data for spinners and reloading other edit details from passed in mood by cdkushni on 3/10/17
  * Modified by cdkushni on 3/20/17, fixed some bugs with shared preferences that came up whenever a new account was made and implemented a new version of the location
  * service, not tested yet.
+ * Modified by cdkushni on 3/20/17 gps location grabbing is now working, network location grabbing is still not working for whatever reason.
  */
 public class AddMoodActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener{
 
@@ -86,12 +87,11 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
 
         Spinner emotionsSpinner = (Spinner) findViewById(R.id.emotions_spinner);
         Spinner socialSpinner = (Spinner) findViewById(R.id.social_spinner);
-        EditText trigger = (EditText) findViewById(R.id.trigger_edittext);
+        final EditText trigger = (EditText) findViewById(R.id.trigger_edittext);
         Button addLocation = (Button) findViewById(R.id.button);
         Button save = (Button) findViewById(R.id.button2);
         Button calendar = (Button) findViewById(R.id.calendar);
-        TextView addedLocation = (TextView) findViewById(R.id.textView5);
-        TextView txtDate = (TextView) findViewById(R.id.curDate);
+        final TextView txtDate = (TextView) findViewById(R.id.curDate);
 
         emoticons = new int[mApplication.getEmotionModel().getEmotions().size()];
         emotions = new String[mApplication.getEmotionModel().getEmotions().size()];
@@ -140,7 +140,7 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
         socialSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                Toast.makeText(getApplicationContext(), socials[position], Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getApplicationContext(), socials[position], Toast.LENGTH_SHORT).show();
                 socialId = position;
                 selectedSocial = socials[position];
             }
@@ -159,7 +159,6 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
                 if (locationService.canGetLocation()) {
                     longitude = locationService.getLongitude();
                     latitude = locationService.getLatitude();
-                    addedLocation.setText("Added!");
                 }
             }
         });
@@ -267,13 +266,10 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
                 else {
                     // added emoticon parameter to Mood class to store the r.drawable of the selected emotion
                     returnMood = new Mood(latitude, longitude, trigger.getText().toString(), String.valueOf(emotionId), String.valueOf(socialId), imageTriggerId, new Date(), userId);
-                    //returnMood.setDate(curDate);
                     returnMood.setEmotionId(String.valueOf(emotionId));
                     returnMood.setSocialSituationId(String.valueOf(socialId));
 
                     mApplication.getMoodLinkedList().add(returnMood);
-
-                    //Mood mood = new Mood(12.22, 13.22, "Trigger", "1", "77", "22", new Date(12 - 12 - 2016), userId);
                     mApplication.getMoodModel().addMood(returnMood);
                     finish();
                 }
@@ -286,13 +282,13 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
     public void onItemSelected(AdapterView<?> arg0, View arg1, int position, long id) {
         Spinner spinner = (Spinner) arg0;
         if (spinner.getId() == R.id.emotions_spinner) {
-            Toast.makeText(getApplicationContext(), emotions[position], Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getApplicationContext(), emotions[position], Toast.LENGTH_SHORT).show();
             emotionId = position;
             selectedEmotion = emotions[position];
             selectedEmote = emoticons[position];
         }
         else if (spinner.getId() == R.id.social_spinner) {
-            Toast.makeText(getApplicationContext(), socials[position], Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getApplicationContext(), socials[position], Toast.LENGTH_SHORT).show();
             socialId = position;
             selectedSocial = socials[position];
         }
@@ -300,11 +296,6 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
     @Override
     public void onNothingSelected(AdapterView<?> arg0) {
         // TODO Auto-generated method stub
-    }
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        locationService.stopUsingGPS();
     }
 }
 

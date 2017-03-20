@@ -6,11 +6,6 @@
         <description>There's no one here besides me.</description>
     </SocialSituation>
     <SocialSituation>
-        <id>12</id>
-        <name>With Friends</name>
-        <description>Are they really my friends?</description>
-    </SocialSituation>
-    <SocialSituation>
         <id>1</id>
         <name>With the SO</name>
         <description>Is it really a Sassy Officer</description>
@@ -64,5 +59,10 @@
         <id>11</id>
         <name>Fighting with the SO</name>
         <description>She's really a Sick Ostriche.</description>
+    </SocialSituation>
+    <SocialSituation>
+        <id>12</id>
+        <name>With Friends</name>
+        <description>Are they really my friends?</description>
     </SocialSituation>
 </SocialSituations>

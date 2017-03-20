@@ -30,6 +30,7 @@ import org.apache.commons.lang3.ObjectUtils;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.Map;
 
 /**
  * Originally created by :
@@ -41,6 +42,7 @@ import java.util.LinkedList;
  * Also, kept using moodLinkedList so that we can use the linkedList as a displayer that can be cleared when searching without affecting the moodModel which holds the default moods
  * Fixed some bugs with shared preferences that came up upon new accounts after a clear data
  * Disabled editing mood events while searching. Instead clicking on a mood will bring up a dialog window with username, trigger and social description.
+ * Modified by cdkushni on 3/20/17 to start a new function that will take input queries and convert it to usable id queries
  */
 public class FeedActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -150,6 +152,8 @@ public class FeedActivity extends AppCompatActivity
             }
             public boolean onQueryTextSubmit(String query) {
                 searching = 1;
+                //TODO: make a query keyword converter
+                queryConverter(query);
                 ArrayList<Mood> search = mApplication.getMoodModel().getMoodsByQuery(query);
                 moodLinkedList.clear();
                 mApplication.getMoodModel().getCachedMoods().clear();
@@ -240,6 +244,21 @@ public class FeedActivity extends AppCompatActivity
             moodLinkedList.add(newMoods.get(i));
             mApplication.getMoodModel().getCachedMoods().add(newMoods.get(i));
         }
+    }
+    private String[] queryConverter(String query) {
+        // Convert user queries into usable id search queries
+        String[] queryConverted = new String[2];
+        mApplication.getSocialSituationModel().getSocialSituations();
+
+        for (Map.Entry<String, SocialSituation> entry : mApplication.getSocialSituationModel().getSocialSituations().entrySet()) {
+            if (entry.getValue().getName().toLowerCase().contains(query.toLowerCase()) || entry.getValue().getDescription().toLowerCase().contains(query.toLowerCase())) {
+                queryConverted[0] = "socialSituationId";
+                queryConverted[1] = entry.getValue().getId();
+                break;
+            }
+        }
+
+        return queryConverted;
     }
 
     private int getIndexOfMoodID(String moodId) {
