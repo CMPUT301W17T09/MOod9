@@ -9,10 +9,6 @@ android {
     defaultConfig {
         applicationId "ca.ualberta.cmput301w17t09.mood9.mood9"
         minSdkVersion 23
-        jackOptions {
-            enabled true
-        }
-
         targetSdkVersion 25
         versionCode 1
         versionName "1.0"

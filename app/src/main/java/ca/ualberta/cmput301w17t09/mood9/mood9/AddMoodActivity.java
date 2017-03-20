@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.preference.PreferenceManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
@@ -32,13 +33,13 @@ import java.util.Map;
  * Save returns data through intent extras implemented by cdkushni 3/5/17
  * Changed to implement AdapterView.OnItemSelectedListener by cdkushni on 3/8/17
  * Fixed to use mood model, grabbing emotion model and socialmodel data for spinners and reloading other edit details from passed in mood by cdkushni on 3/10/17
+ * Modified by cdkushni on 3/20/17, fixed some bugs with shared preferences that came up whenever a new account was made and implemented a new version of the location
+ * service, not tested yet.
  */
 public class AddMoodActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener{
 
     private Mood9Application mApplication;
     Context addMContext = this;
-    //String[] emotions = {"Anger", "Confusion", "Happiness", "Sadness", "Shame", "Surprise"};
-    //int[] emoticons = {R.drawable.anger, R.drawable.confusion, R.drawable.happiness, R.drawable.sadness, R.drawable.shame, R.drawable.surpise};
     String[] emotions;
     int[] emoticons;
     int emotionId = 0;
@@ -57,8 +58,6 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
     int selectedEmote = R.drawable.anger;
     String selectedSocial = "N/A";
     Bundle editCheckB;
-    // map<Emotion> emotions = EmotionModel.getEmotions();
-    //String[] socials = {"TEMP", "DO NOT USE", "With my enemies", "All Alone"};
     String[] socials;
     private static final int REQUEST_PERMISSION_FINE = 0;
     private LocationService locationService;
@@ -66,20 +65,8 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        locationService = new LocationService(this);
 
-        if ( ContextCompat.checkSelfPermission( addMContext, android.Manifest.permission.ACCESS_COARSE_LOCATION ) != PackageManager.PERMISSION_GRANTED ) {
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
-                    Manifest.permission.ACCESS_FINE_LOCATION)) {
-                ActivityCompat.requestPermissions(AddMoodActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_PERMISSION_FINE);
-            } else {
-                //Request the location permission.
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_PERMISSION_FINE);
-                locationService.setNetworkEnabled(true);
-            }
-        } else {
-            locationService.setNetworkEnabled(true);
-        }
+
 
         mApplication = (Mood9Application)getApplicationContext();
         Intent thisIntent = getIntent();
@@ -92,8 +79,8 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
             setContentView(R.layout.activity_add_mood);
         }
 
-        SharedPreferences shPref = getApplicationContext().getSharedPreferences(getString(R.string.stored_name), MODE_PRIVATE);
-        String userName = shPref.getString("username", "test");
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        String userName = sharedPreferences.getString("username", "test");
         userId = UserModel.getUserID(userName).getId();
 
 
@@ -168,10 +155,12 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
         addLocation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                locationService.getLocation();
-                longitude = locationService.getLongitude();
-                latitude = locationService.getLatitude();
-                addedLocation.setText("Added!");
+                locationService = new LocationService(AddMoodActivity.this);
+                if (locationService.canGetLocation()) {
+                    longitude = locationService.getLongitude();
+                    latitude = locationService.getLatitude();
+                    addedLocation.setText("Added!");
+                }
             }
         });
 
@@ -268,6 +257,7 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
                         mApplication.getMoodLinkedList().set(oldMoodIndex, returnMood);
 
                         mApplication.getMoodModel().updateMood(returnMood);
+                        mApplication.getMoodModel().getCachedMoods().set(oldMoodIndex, returnMood);
                         finish();
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -310,6 +300,11 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
     @Override
     public void onNothingSelected(AdapterView<?> arg0) {
         // TODO Auto-generated method stub
+    }
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        locationService.stopUsingGPS();
     }
 }
 

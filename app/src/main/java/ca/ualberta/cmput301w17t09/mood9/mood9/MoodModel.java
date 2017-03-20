@@ -66,6 +66,10 @@ fos.close();
      * }
      */
 
+    public ArrayList<Mood> getCachedMoods() {
+        return moods;
+    }
+
     public void setMoodsArray() {
         // First load all moods on elastic search
 //        try {
@@ -189,6 +193,7 @@ fos.close();
     public void addMood(Mood mood) {
         ElasticSearchMOodController.AddMoodsTask addMoodsTask = new ElasticSearchMOodController.AddMoodsTask();
         addMoodsTask.execute(mood); // add to elastic search
+        moods.add(mood);
 
         /*
         Gson gson = new Gson();
@@ -212,6 +217,7 @@ fos.close();
     public void deleteMood(Mood mood) {
         ElasticSearchMOodController.DeleteMoodTask deleteMoodTask = new ElasticSearchMOodController.DeleteMoodTask();
         deleteMoodTask.execute(mood);
+        moods.remove(mood);
 
         /*
         Gson gson = new Gson();
