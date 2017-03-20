@@ -117,6 +117,25 @@
         android:textSize="24sp"
         android:layout_marginEnd="25dp" />
 
+    <ImageButton
+        android:background="@color/colorPrimary"
+        android:id="@+id/cameraButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:srcCompat="@drawable/ic_menu_camera"
+        android:layout_alignParentEnd="true"
+        android:layout_alignTop="@+id/cameraImage"
+        android:layout_alignBottom="@+id/cameraImage" />
+
+    <ImageView
+        android:id="@+id/cameraImage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignEnd="@+id/curDate"
+        android:layout_alignTop="@+id/trigger_edittext"
+        android:layout_marginEnd="34dp"
+        app:srcCompat="@android:drawable/ic_menu_report_image" />
+
 
 </RelativeLayout>
 

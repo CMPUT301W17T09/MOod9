@@ -79,15 +79,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         for(int i = 0; i < moodList.size(); i++){
             Mood tempMood = moodList.get(i);
 //            If both the long and lat don't equal 0 (the default) then create the mood on the map
-            if(!(tempMood.getLatitude() == 0 & tempMood.getLongitude() == 0)){
-                LatLng tempCord = new LatLng(tempMood.getLatitude(), tempMood.getLongitude());
-                Mood9Application app = (Mood9Application) getApplication();
-                EmotionModel em = app.getEmotionModel();
-                Emotion emotion = em.getEmotion(tempMood.getEmotionId());
-                String emotionName = emotion.getName();
-                int iconNumber = getResources().getIdentifier(emotionName.toLowerCase().trim(), "drawable", getPackageName());
-                Marker tempMarker = mMap.addMarker(new MarkerOptions().title(tempMood.getTrigger()).position(tempCord).icon(BitmapDescriptorFactory.fromBitmap(makeSmallerIcon(iconNumber))));
-                markers.add(tempMarker);
+            if(!(tempMood.getLatitude() == null | tempMood.getLongitude() == null)) {
+                if (!(tempMood.getLatitude() == 0 & tempMood.getLongitude() == 0)) {
+                    LatLng tempCord = new LatLng(tempMood.getLatitude(), tempMood.getLongitude());
+                    Mood9Application app = (Mood9Application) getApplication();
+                    EmotionModel em = app.getEmotionModel();
+                    Emotion emotion = em.getEmotion(tempMood.getEmotionId());
+                    String emotionName = emotion.getName();
+                    int iconNumber = getResources().getIdentifier(emotionName.toLowerCase().trim(), "drawable", getPackageName());
+                    Marker tempMarker = mMap.addMarker(new MarkerOptions().title(tempMood.getTrigger()).position(tempCord).icon(BitmapDescriptorFactory.fromBitmap(makeSmallerIcon(iconNumber))));
+                    markers.add(tempMarker);
+                }
             }
         }
 
