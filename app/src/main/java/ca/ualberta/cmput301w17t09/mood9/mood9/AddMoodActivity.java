@@ -240,7 +240,6 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
             delete.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    //TODO: delete mood
                     mApplication.getMoodLinkedList().remove(oldMoodIndex);
                     mApplication.getMoodModel().deleteMood(returnMood);
                     finish();
@@ -260,8 +259,6 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
         save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //TODO Need to actually save the information that is entered
-
                 if (editCheckB.getInt("editCheck", -1) == 1) {
                     try {
                         returnMood.setEmotionId(String.valueOf(emotionId));
@@ -269,7 +266,6 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
                         returnMood.setEmotionId(String.valueOf(emotionId));
                         returnMood.setSocialSituationId(String.valueOf(socialId));
                         returnMood.setTrigger(trigger.getText().toString());
-                        //TODO: need to find a way to get latitude and longitude from the location setter
                         mApplication.getMoodLinkedList().set(oldMoodIndex, returnMood);
 
                         mApplication.getMoodModel().updateMood(returnMood);
@@ -301,7 +297,6 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
         cameraImage.setImageBitmap(imageBitmap);
     }
 
-    //TODO: need to set up socialsituation spinner click listener
     //Performing action onItemSelected and onNothing selected
     @Override
     public void onItemSelected(AdapterView<?> arg0, View arg1, int position, long id) {

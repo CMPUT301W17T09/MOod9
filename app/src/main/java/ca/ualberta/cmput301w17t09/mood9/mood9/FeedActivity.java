@@ -283,8 +283,6 @@ public class FeedActivity extends AppCompatActivity
 
             TextView username = (TextView)view.findViewById(R.id.username);
             username.setTypeface(null, Typeface.BOLD);
-
-            //TODO: Get rid of text view and move all display functionality over to linearlayout
             //ArrayList<Mood> temp = mApplication.getMoodModel().getUniversalMoods();
             moodListAdapter.notifyDataSetChanged();
 
