@@ -212,6 +212,7 @@ public class FeedActivity extends AppCompatActivity
 
         } else if (id == R.id.near_me) {
             Intent mapIntent = new Intent(this, MapsActivity.class);
+            mapIntent.putExtra("moodList", moodLinkedList);
             startActivity(mapIntent);
         } else if (id == R.id.profile) {
             Intent profileIntent = new Intent(this, ProfileActivity.class);

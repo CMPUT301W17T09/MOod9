@@ -6,7 +6,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.preference.PreferenceManager;
+import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
@@ -18,6 +20,8 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -45,14 +49,17 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
     int[] emoticons;
     int emotionId = 0;
     int socialId = 0;
-    double latitude = 100;
-    double longitude = 100;
+    double latitude = 0.0;
+    double longitude = 0.0;
     Date curDate = new Date();
     String imageTriggerId = "N/A";
     String selectedEmotion = "Anger";
     String userId = "newUser";
 
     private int mYear, mMonth, mDay;
+
+    ImageView cameraImage;
+    Bitmap imageBitmap = null;
 
     int oldMoodIndex = 0;
     Mood returnMood;
@@ -84,7 +91,8 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
         String userName = sharedPreferences.getString("username", "test");
         userId = UserModel.getUserID(userName).getId();
 
-
+        cameraImage  = (ImageView) findViewById(R.id.cameraImage);
+        ImageButton cameraButton = (ImageButton) findViewById(R.id.cameraButton);
         Spinner emotionsSpinner = (Spinner) findViewById(R.id.emotions_spinner);
         Spinner socialSpinner = (Spinner) findViewById(R.id.social_spinner);
         final EditText trigger = (EditText) findViewById(R.id.trigger_edittext);
@@ -240,6 +248,15 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
             });
         }
 
+        cameraButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                startActivityForResult(cameraIntent, 0);
+            }
+        });
+
+
         save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -276,6 +293,14 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
             }
         });
     }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        imageBitmap = (Bitmap)data.getExtras().get("data");
+        cameraImage.setImageBitmap(imageBitmap);
+    }
+
     //TODO: need to set up socialsituation spinner click listener
     //Performing action onItemSelected and onNothing selected
     @Override
