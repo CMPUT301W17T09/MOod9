@@ -152,9 +152,9 @@ public class FeedActivity extends AppCompatActivity
             }
             public boolean onQueryTextSubmit(String query) {
                 searching = 1;
-                //TODO: make a query keyword converter
-                queryConverter(query);
-                ArrayList<Mood> search = mApplication.getMoodModel().getMoodsByQuery(query);
+                String returnConversion = queryConverter(query);
+                // TODO: move this call to the queryConverter so that you can grab multiple possible queries in one search, so query every time something is found and add to list
+                ArrayList<Mood> search = mApplication.getMoodModel().getMoodsByQuery(returnConversion);
                 moodLinkedList.clear();
                 mApplication.getMoodModel().getCachedMoods().clear();
                 populateFromMoodLoad(search);
@@ -246,16 +246,21 @@ public class FeedActivity extends AppCompatActivity
             mApplication.getMoodModel().getCachedMoods().add(newMoods.get(i));
         }
     }
-    private String[] queryConverter(String query) {
+    private String queryConverter(String query) {
         // Convert user queries into usable id search queries
-        String[] queryConverted = new String[2];
+        String queryConverted = query;
         mApplication.getSocialSituationModel().getSocialSituations();
 
         for (Map.Entry<String, SocialSituation> entry : mApplication.getSocialSituationModel().getSocialSituations().entrySet()) {
             if (entry.getValue().getName().toLowerCase().contains(query.toLowerCase()) || entry.getValue().getDescription().toLowerCase().contains(query.toLowerCase())) {
-                queryConverted[0] = "socialSituationId";
-                queryConverted[1] = entry.getValue().getId();
-                break;
+                queryConverted = "socialSituationId:"+entry.getValue().getId();
+                return queryConverted;
+            }
+        }
+        for (Map.Entry<String, Emotion> entry: mApplication.getEmotionModel().getEmotions().entrySet()) {
+            if (entry.getValue().getName().toLowerCase().contains(query.toLowerCase()) || entry.getValue().getDescription().toLowerCase().contains(query.toLowerCase())) {
+                queryConverted = "emotionId:"+entry.getValue().getId();
+                return queryConverted;
             }
         }
 

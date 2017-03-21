@@ -111,14 +111,36 @@ public class ElasticSearchMOodController {
         protected ArrayList<Mood> doInBackground(String...searchParameters) {
             verifySettings();
 
+            int toField = 0;
+            String field = "";
+            String fieldQuery = "";
+            if (searchParameters[0].indexOf(':') > -1) {
+                toField = 1;
+                field = searchParameters[0].substring(0, searchParameters[0].indexOf(':'));
+                fieldQuery = searchParameters[0].substring(searchParameters[0].indexOf(':')+1);
+            } else {
+                toField = 0;
+            }
             ArrayList<Mood> moods = new ArrayList<Mood>();
-            String query = "{\n" +
-                    "   \"query\": {\n" +
-                    "       \"query_string\" : {\n" +
-                    "           \"query\" : \"" + searchParameters[0] + "\"\n" +
-                    "       }\n" +
-                    "   }\n" +
-                    "}";
+            String query;
+            if (toField == 1) {
+                query = "{\n" +
+                        "    \"query\": {\n" +
+                        "        \"query_string\" : {\n" +
+                        "            \"fields\" : [\""+field+"\"],\n" +
+                        "            \"query\" : \"" + fieldQuery + "\"\n" +
+                        "        }\n" +
+                        "    }\n" +
+                        "}";
+            } else {
+                query = "{\n" +
+                        "   \"query\": {\n" +
+                        "       \"query_string\" : {\n" +
+                        "           \"query\" : \"" + searchParameters[0] + "\"\n" +
+                        "       }\n" +
+                        "   }\n" +
+                        "}";
+            }
             if (searchParameters[0].equals("")){
                 query = "";
             }
