@@ -66,7 +66,6 @@ public class SocialSituationModel {
                         .getTextContent());
             }
             socialSituations.put(ss.getId(), ss);
-            //socialSituations.put(String.valueOf(i), ss);
         }
     }
 

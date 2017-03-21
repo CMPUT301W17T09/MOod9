@@ -17,8 +17,8 @@
     </SocialSituation>
     <SocialSituation>
         <id>3</id>
-        <name>With Parents</name>
-        <description>Free food is always  nice</description>
+        <name>At Work</name>
+        <description>Hard work is real work</description>
     </SocialSituation>
     <SocialSituation>
         <id>4</id>
@@ -52,8 +52,8 @@
     </SocialSituation>
     <SocialSituation>
         <id>10</id>
-        <name>Driving Home</name>
-        <description>Awkward baby talk...</description>
+        <name>Cruising</name>
+        <description>Looking for something to do...</description>
     </SocialSituation>
     <SocialSituation>
         <id>11</id>

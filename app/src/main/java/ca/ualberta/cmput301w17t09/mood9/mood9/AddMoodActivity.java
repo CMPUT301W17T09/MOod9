@@ -104,8 +104,8 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
         emoticons = new int[mApplication.getEmotionModel().getEmotions().size()];
         emotions = new String[mApplication.getEmotionModel().getEmotions().size()];
         for (Map.Entry<String, Emotion> entry : mApplication.getEmotionModel().getEmotions().entrySet()) {
-            // drawable name may require not having a end extension like .png
-            String imgNameBuilder = entry.getValue().getName().toLowerCase() + ".png";
+            //String imgNameBuilder = entry.getValue().getName().toLowerCase() + ".png";
+            String imgNameBuilder = entry.getValue().getImageName();
             emoticons[Integer.parseInt(entry.getKey())] = getResources().getIdentifier(imgNameBuilder.substring(0, imgNameBuilder.lastIndexOf(".")), "drawable", getPackageName());
             emotions[Integer.parseInt(entry.getKey())] = entry.getValue().getName();
         }
