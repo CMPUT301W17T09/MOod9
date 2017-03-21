@@ -10,7 +10,7 @@ import java.util.concurrent.ConcurrentMap;
  */
 
 public class UserModelTest {
-
+    /*
     //Also tests getUser since the code for that test would be redundant
     @Test
     public void testLoadUsers(){
@@ -47,6 +47,7 @@ public class UserModelTest {
         assertEquals(map1.get("1"),user1);
         assertEquals(map1.get("2"),user2);
     }
+    */
 
 
 }

@@ -1,5 +1,6 @@
 package ca.ualberta.cmput301w17t09.mood9.mood9;
 
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.support.v7.widget.LinearLayoutCompat;
 import android.util.Log;
@@ -8,6 +9,7 @@ import com.searchly.jestdroid.DroidClientConfig;
 import com.searchly.jestdroid.JestClientFactory;
 import com.searchly.jestdroid.JestDroidClient;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -24,12 +26,13 @@ import io.searchbox.indices.CreateIndex;
 import io.searchbox.indices.DeleteIndex;
 import io.searchbox.indices.mapping.PutMapping;
 
+import static android.content.Context.MODE_PRIVATE;
+
 
 public class ElasticSearchMOodController {
     private static JestDroidClient client;
     private static String ElasticSearchServer = "http://cmput301.softwareprocess.es:8080";
     private static String index_name = "cmput301w17t09";
-    private static String test_index_name = "test_" + index_name;
     private static String mood_type = "mood9";
     private static String user_type = "user9";
 
@@ -45,11 +48,9 @@ public class ElasticSearchMOodController {
             try{
                 JestResult result = client.execute(deleteIndex);
                 if (result.isSucceeded()) {
-                    int x = 1;
                 }
 
             } catch (Exception e) {
-                String test = e.getMessage();
                 Log.i("Error", e.getMessage());
             }
 
@@ -70,13 +71,76 @@ public class ElasticSearchMOodController {
         }
     }
 
-    public static class AddMoodsTask extends AsyncTask<Mood, Void, Void> {
+    public static class AddMoodsTask extends AsyncTask<Void, Void, Void> {
 
-        @Override
-        protected Void doInBackground(Mood... moods) {
+        private ArrayList<Mood> Moods;
+
+        public AddMoodsTask(ArrayList<Mood> moodList) {
+            Moods = new ArrayList<Mood>();
+            Moods = moodList;
+        }
+
+        protected void DeleteMoods(ArrayList<Mood> moods) {
             verifySettings();
 
             for (Mood mood : moods) {
+                try {
+                    String id = mood.getId();
+                    JestResult result = client.execute(new Delete.Builder(id).index(index_name).type(mood_type).build());
+                } catch (Exception e) {
+                    Log.i("Error", "Elastic Search failed to delete");
+                }
+            }
+        }
+
+        protected ArrayList<Mood> GetMoods(String...searchParameters) {
+            verifySettings();
+
+            ArrayList<Mood> moods = new ArrayList<Mood>();
+            String query = "{\n" +
+                    "    \"query\": {\n" +
+                    "        \"query_string\" : {\n" +
+                    "            \"fields\" : [\"user_id\"],\n" +
+                    "            \"query\" : \"" + searchParameters[0] + "\"\n" +
+                    "        }\n" +
+                    "    }\n" +
+                    "}";
+
+            if (searchParameters[0].equals("")){
+                query = "";
+            }
+
+            Search search = new Search.Builder(query)
+                    .addIndex(index_name)
+                    .addType(mood_type)
+                    .build();
+
+            try {
+                SearchResult result = client.execute(search);
+                if (result.isSucceeded()){
+                    List<Mood> foundMoods = result.getSourceAsObjectList(Mood.class);
+                    moods.addAll(foundMoods);
+                }
+            }
+            catch (Exception e) {
+                Log.i("Error", "Something went wrong when we tried to communicate with the elasticsearch server!");
+            }
+
+            return moods;
+        }
+
+        @Override
+        protected Void doInBackground(Void... v) {
+            verifySettings();
+
+            // Get moods online
+            ArrayList<Mood> OnlineMood = GetMoods(Moods.get(0).getUser_id());
+
+            // Delete those moods
+            DeleteMoods(OnlineMood);
+
+            // Add new updated moods from Offline soure
+            for (Mood mood: Moods) {
                 Index index = new Index.Builder(mood).index(index_name).type(mood_type).build();
 
                 try {
@@ -116,39 +180,50 @@ public class ElasticSearchMOodController {
     /**
      * This only filters by user_id
      */
-    public static class GetMoodsTask extends AsyncTask<String, Void, ArrayList<Mood>> {
+    public static class GetMoodsTask extends AsyncTask<Void, Void, ArrayList<Mood>> {
+
+        private ArrayList<String> User_IDs;
+
+        public GetMoodsTask(ArrayList<String> user_ids) {
+            User_IDs = new ArrayList<String>();
+            User_IDs = user_ids;
+        }
+
         @Override
-        protected ArrayList<Mood> doInBackground(String...searchParameters) {
+        protected ArrayList<Mood> doInBackground(Void...v) {
             verifySettings();
 
             ArrayList<Mood> moods = new ArrayList<Mood>();
-            String query = "{\n" +
-                    "    \"query\": {\n" +
-                    "        \"query_string\" : {\n" +
-                    "            \"fields\" : [\"user_id\"],\n" +
-                    "            \"query\" : \"" + searchParameters[0] + "\"\n" +
-                    "        }\n" +
-                    "    }\n" +
-                    "}";
 
-            if (searchParameters[0].equals("")){
-                query = "";
-            }
+            for (String user_id : User_IDs) {
+                String query = "{\n" +
+                        "    \"query\": {\n" +
+                        "        \"query_string\" : {\n" +
+                        "            \"fields\" : [\"user_id\"],\n" +
+                        "            \"query\" : \"" + user_id + "\"\n" +
+                        "        }\n" +
+                        "    }\n" +
+                        "}";
 
-            Search search = new Search.Builder(query)
-                    .addIndex(index_name)
-                    .addType(mood_type)
-                    .build();
-
-            try {
-                SearchResult result = client.execute(search);
-                if (result.isSucceeded()){
-                    List<Mood> foundMoods = result.getSourceAsObjectList(Mood.class);
-                    moods.addAll(foundMoods);
+                if (user_id.equals("")){
+                    query = "";
                 }
-            }
-            catch (Exception e) {
-                Log.i("Error", "Something went wrong when we tried to communicate with the elasticsearch server!");
+
+                Search search = new Search.Builder(query)
+                        .addIndex(index_name)
+                        .addType(mood_type)
+                        .build();
+
+                try {
+                    SearchResult result = client.execute(search);
+                    if (result.isSucceeded()){
+                        List<Mood> foundMoods = result.getSourceAsObjectList(Mood.class);
+                        moods.addAll(foundMoods);
+                    }
+                }
+                catch (Exception e) {
+                    Log.i("Error", "Something went wrong when we tried to communicate with the elasticsearch server!");
+                }
             }
 
             return moods;
