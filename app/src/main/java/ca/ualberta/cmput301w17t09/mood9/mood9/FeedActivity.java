@@ -92,11 +92,9 @@ public class FeedActivity extends AppCompatActivity
         moodListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                //for list item clicked
-                Intent editMoodIntent = new Intent(FeedActivity.this, AddMoodActivity.class);
-                editMoodIntent.putExtra("editCheck", 1);
-                editMoodIntent.putExtra("moodIndex", position);
-                startActivityForResult(editMoodIntent, 1);
+                Intent viewMoodIntent = new Intent(FeedActivity.this, MoodViewActivity.class);
+                viewMoodIntent.putExtra("moodIndex", position);
+                startActivityForResult(viewMoodIntent, 1);
             }
         });
     }
