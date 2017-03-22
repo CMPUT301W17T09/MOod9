@@ -249,7 +249,26 @@ public class FeedActivity extends AppCompatActivity
     private String queryConverter(String query) {
         // Convert user queries into usable id search queries
         String queryConverted = query;
-        mApplication.getSocialSituationModel().getSocialSituations();
+        //mApplication.getSocialSituationModel().getSocialSituations();
+        ArrayList<Mood> universalMoods = mApplication.getMoodModel().getUniversalMoods();
+        ArrayList<String> names = new ArrayList<String>();
+        for (Mood item : universalMoods) {
+            String currentName = UserModel.getUserProfile(item.getUser_id()).getName();
+            if (names.size() > 0) {
+                int old = 0;
+                for (int i = 0; i < names.size(); i++) {
+                    if (currentName == names.get(i)) {
+                        old = 1;
+                        break;
+                    }
+                }
+                if (old == 0) {
+                    names.add(currentName);
+                }
+            } else {
+                names.add(currentName);
+            }
+        }
 
         for (Map.Entry<String, SocialSituation> entry : mApplication.getSocialSituationModel().getSocialSituations().entrySet()) {
             if (entry.getValue().getName().toLowerCase().contains(query.toLowerCase()) || entry.getValue().getDescription().toLowerCase().contains(query.toLowerCase())) {
@@ -260,6 +279,12 @@ public class FeedActivity extends AppCompatActivity
         for (Map.Entry<String, Emotion> entry: mApplication.getEmotionModel().getEmotions().entrySet()) {
             if (entry.getValue().getName().toLowerCase().contains(query.toLowerCase()) || entry.getValue().getDescription().toLowerCase().contains(query.toLowerCase())) {
                 queryConverted = "emotionId:"+entry.getValue().getId();
+                return queryConverted;
+            }
+        }
+        for (String name : names) {
+            if (name.toLowerCase().contains(query.toLowerCase())) {
+                queryConverted = "user_id:"+UserModel.getUserID(name).getId();
                 return queryConverted;
             }
         }

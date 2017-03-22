@@ -133,15 +133,21 @@ public class ElasticSearchMOodController {
                         "    }\n" +
                         "}";
             } else {
-                query = "{\n" +
+                /*query = "{\n" +
                         "   \"query\": {\n" +
                         "       \"query_string\" : {\n" +
                         "           \"query\" : \"" + searchParameters[0] + "\"\n" +
                         "       }\n" +
                         "   }\n" +
+                        "}";*/
+                query = "{\n" +
+                        "   \"size\" : 200,\n" +
+                        "   \"query\" : {\n" +
+                        "    \"match_all\" : {}\n" +
+                        "  }\n" +
                         "}";
             }
-            if (searchParameters[0].equals("")){
+            if (searchParameters[0].equals("") && toField == 1){
                 query = "";
             }
 

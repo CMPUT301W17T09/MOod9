@@ -162,7 +162,17 @@ fos.close();
 
     public ArrayList<Mood> getUniversalMoods() {
         setMoodsArray();
-        return moods;
+        ElasticSearchMOodController.SearchMoodsTask searchMoodsTask = new ElasticSearchMOodController.SearchMoodsTask();
+        searchMoodsTask.execute("");
+        ArrayList<Mood> returnarr = new ArrayList<Mood>();
+
+        try {
+            returnarr = searchMoodsTask.get();
+        } catch (Exception e) {
+            System.out.println("Count not find moods");
+        }
+        return returnarr;
+        //return moods;
     }
 
     public ArrayList<Mood> getMoodsNear(Double latitude, Double longitude) {
