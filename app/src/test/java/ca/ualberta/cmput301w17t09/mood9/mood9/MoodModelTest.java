@@ -5,8 +5,6 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 import java.util.Date;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
 /**
  * Created by Rohit on 2017-02-22.
@@ -43,11 +41,11 @@ public class MoodModelTest {
         ins.addMood(m2);
         ins.addMood(m3);
         m1.setLatitude(88.0);
-        m1.setLongitutde(90.0);
+        m1.setLongitude(90.0);
         ins.updateMood(m1);
         double x = m1.getLatitude();
         assertTrue(m1.getLatitude()==88.0);
-        assertTrue(m1.getLongitutde()==90.0);
+        assertTrue(m1.getLongitude()==90.0);
 
 
     }

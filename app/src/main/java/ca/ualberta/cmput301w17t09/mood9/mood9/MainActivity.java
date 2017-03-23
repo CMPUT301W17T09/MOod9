@@ -26,11 +26,11 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         Button goButton = (Button) findViewById(R.id.go);
-        EditText usernameField = (EditText) findViewById(R.id.username_field);
+        final EditText usernameField = (EditText) findViewById(R.id.username_field);
 
 
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
+        final SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        final SharedPreferences.Editor editor = sharedPreferences.edit();
         String name = sharedPreferences.getString("username", null);
 
         //If the name is not null, then the user has already choosen a name, the app will go straight to the FeedActivity

@@ -5,6 +5,8 @@ import android.util.Log;
 import com.searchly.jestdroid.DroidClientConfig;
 import com.searchly.jestdroid.JestClientFactory;
 import com.searchly.jestdroid.JestDroidClient;
+
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 import io.searchbox.client.JestResult;
@@ -101,6 +103,65 @@ public class ElasticSearchMOodController {
                 }
             }
             return null;
+        }
+    }
+
+    public static class SearchMoodsTask extends AsyncTask<String, Void, ArrayList<Mood>> {
+        @Override
+        protected ArrayList<Mood> doInBackground(String...searchParameters) {
+            verifySettings();
+
+            int toField = 0;
+            String field = "";
+            String fieldQuery = "";
+            if (searchParameters[0].indexOf(':') > -1) {
+                toField = 1;
+                field = searchParameters[0].substring(0, searchParameters[0].indexOf(':'));
+                fieldQuery = searchParameters[0].substring(searchParameters[0].indexOf(':')+1);
+            } else {
+                toField = 0;
+            }
+            ArrayList<Mood> moods = new ArrayList<Mood>();
+            String query;
+            if (toField == 1) {
+                query = "{\n" +
+                        "    \"query\": {\n" +
+                        "        \"query_string\" : {\n" +
+                        "            \"fields\" : [\""+field+"\"],\n" +
+                        "            \"query\" : \"" + fieldQuery + "\"\n" +
+                        "        }\n" +
+                        "    }\n" +
+                        "}";
+            } else {
+                query = "{\n" +
+                        "   \"query\": {\n" +
+                        "       \"query_string\" : {\n" +
+                        "           \"query\" : \"" + searchParameters[0] + "\"\n" +
+                        "       }\n" +
+                        "   }\n" +
+                        "}";
+            }
+            if (searchParameters[0].equals("")){
+                query = "";
+            }
+
+            Search search = new Search.Builder(query)
+                    .addIndex(index_name)
+                    .addType(mood_type)
+                    .build();
+
+            try {
+                SearchResult result = client.execute(search);
+                if (result.isSucceeded()){
+                    List<Mood> foundsMoods = result.getSourceAsObjectList(Mood.class);
+                    moods.addAll(foundsMoods);
+                }
+            }
+            catch (Exception e) {
+                Log.i("Error", "Something went wrong when we tried to communicate with the elasticsearch server!");
+            }
+
+            return moods;
         }
     }
 

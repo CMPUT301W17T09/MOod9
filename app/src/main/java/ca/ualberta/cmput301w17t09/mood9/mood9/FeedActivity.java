@@ -1,12 +1,17 @@
 package ca.ualberta.cmput301w17t09.mood9.mood9;
 
+import android.app.SearchManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.view.MenuItemCompat;
+import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.SearchView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -25,21 +30,27 @@ import org.apache.commons.lang3.ObjectUtils;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.Map;
 
 /**
  * Originally created by :
  * Modified by cdkushni on 3/5/17 and 3/8/17 to implement MoodListAdapter and data bundle receipt from addMood. Also made to inflate layout to a listview in the feed.
  * Modified by cdkushni on 3/10/17 to access the global application for global Models, changed over to using resource files for emotions and social situations,
  * started updating MoodModel along with linkedList of moods
+ * Modified by cdkushni on 3/18/17 to incorporate a expandable search action bar item to search queries in elastic search
+ * Modified by cdkushni on 3/20/17 to return search queries to main feed and load it into the display adapter, also encapsulated default mood load for easy reloads
+ * Also, kept using moodLinkedList so that we can use the linkedList as a displayer that can be cleared when searching without affecting the moodModel which holds the default moods
+ * Fixed some bugs with shared preferences that came up upon new accounts after a clear data
+ * Disabled editing mood events while searching. Instead clicking on a mood will bring up a dialog window with username, trigger and social description.
+ * Modified by cdkushni on 3/20/17 to start a new function that will take input queries and convert it to usable id queries
  */
 public class FeedActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     private MoodListAdapter moodListAdapter;
     private LinkedList<Mood> moodLinkedList;
-    //private ArrayList<Integer> emoteImages; // {R.drawable.anger, R.drawable.confusion, R.drawable.happiness, R.drawable.sadness, R.drawable.shame, R.drawable.surpise}
-    //private ArrayList<String> userNameList; //{"Anger","Confusion","Happiness","Sadness","Shame","Surprise"}
-    //private ArrayList<String> dateList;
+    private Mood9Application mApplication;
+    private int searching;
     Context context;
 
 
@@ -73,17 +84,12 @@ public class FeedActivity extends AppCompatActivity
 
         // set up list view adapter
         context = this;
-        Mood9Application mApplication = (Mood9Application) getApplicationContext();
+        mApplication = (Mood9Application) getApplicationContext();
         moodLinkedList = mApplication.getMoodLinkedList();
+        searching = 0;
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        String username = sharedPreferences.getString("username", null);
-        String userId = sharedPreferences.getString("user_id", null);
-//        String userId = UserModel.getUserID(userName).getId();
-        ArrayList<Mood> temp = mApplication.getMoodModel().getMoodByUser(userId);
-        //LOADING FROM ELASTIC SEARCH
-        for (int i = 0; i < temp.size(); i++) {
-            moodLinkedList.add(temp.get(i));
-        }
+        ArrayList<Mood> reloadedMoods = getCurrentUserMoods(sharedPreferences);
+        populateFromMoodLoad(reloadedMoods);
 
         ListView moodListView = (ListView) findViewById(R.id.moodList);
         moodListAdapter = new MoodListAdapter(this, moodLinkedList, mApplication);
@@ -92,9 +98,28 @@ public class FeedActivity extends AppCompatActivity
         moodListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent viewMoodIntent = new Intent(FeedActivity.this, MoodViewActivity.class);
-                viewMoodIntent.putExtra("moodIndex", position);
-                startActivityForResult(viewMoodIntent, 1);
+                //for list item clicked
+                if (searching == 0) {
+                    Intent editMoodIntent = new Intent(FeedActivity.this, AddMoodActivity.class);
+                    editMoodIntent.putExtra("editCheck", 1);
+                    editMoodIntent.putExtra("moodIndex", position);
+                    startActivityForResult(editMoodIntent, 1);
+                } else {
+                    // TODO: open up a detail view of mood data
+                    String trigger = moodLinkedList.get(position).getTrigger();
+                    String socialSit = mApplication.getSocialSituationModel().getSocialSituation(moodLinkedList.get(position).getSocialSituationId()).getDescription();
+                    AlertDialog.Builder detailBuild = new AlertDialog.Builder(context)
+                            .setTitle(UserModel.getUserProfile(moodLinkedList.get(position).getUser_id()).getName())
+                            .setMessage(trigger + "\n" + socialSit)
+                            .setNeutralButton("Ok", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.cancel();
+                                }
+                            });
+                    AlertDialog detailDialog = detailBuild.create();
+                    detailDialog.show();
+                }
             }
         });
     }
@@ -113,7 +138,47 @@ public class FeedActivity extends AppCompatActivity
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_feed, menu);
-        return true;
+        MenuItem searchItem = menu.findItem(R.id.search);
+        SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
+        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        if (null != searchView) {
+            searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+            searchView.setIconifiedByDefault(true);
+        }
+        SearchView.OnQueryTextListener queryTextListener = new SearchView.OnQueryTextListener() {
+            public boolean onQueryTextChange(String newText) {
+                // this is your adapter that will be filtered
+                return true;
+            }
+            public boolean onQueryTextSubmit(String query) {
+                searching = 1;
+                String returnConversion = queryConverter(query);
+                // TODO: move this call to the queryConverter so that you can grab multiple possible queries in one search, so query every time something is found and add to list
+                ArrayList<Mood> search = mApplication.getMoodModel().getMoodsByQuery(returnConversion);
+                moodLinkedList.clear();
+                mApplication.getMoodModel().getCachedMoods().clear();
+                populateFromMoodLoad(search);
+                moodListAdapter.notifyDataSetChanged();
+                return true;
+            }
+        };
+        searchView.setOnQueryTextListener(queryTextListener);
+
+        searchView.setOnCloseListener(new SearchView.OnCloseListener() {
+            @Override
+            public boolean onClose() {
+                moodLinkedList.clear();
+                mApplication.getMoodModel().getCachedMoods().clear();
+                SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+                ArrayList<Mood> reloadedMoods = getCurrentUserMoods(sharedPreferences);
+                populateFromMoodLoad(reloadedMoods);
+                moodListAdapter.notifyDataSetChanged();
+                searching = 0;
+                return false;
+            }
+        });
+
+        return super.onCreateOptionsMenu(menu);
     }
 
     @Override
@@ -147,6 +212,7 @@ public class FeedActivity extends AppCompatActivity
 
         } else if (id == R.id.near_me) {
             Intent mapIntent = new Intent(this, MapsActivity.class);
+            mapIntent.putExtra("moodList", moodLinkedList);
             startActivity(mapIntent);
         } else if (id == R.id.profile) {
             Intent profileIntent = new Intent(this, ProfileActivity.class);
@@ -165,6 +231,40 @@ public class FeedActivity extends AppCompatActivity
         Intent addMoodIntent = new Intent(this, AddMoodActivity.class);
         addMoodIntent.putExtra("editCheck", 0);
         startActivityForResult(addMoodIntent, 0);
+    }
+    private ArrayList<Mood> getCurrentUserMoods(SharedPreferences sharedPreferences) {
+        String userName = sharedPreferences.getString("username", "test");
+        String userId = UserModel.getUserID(userName).getId();
+        ArrayList<Mood> reloadedMoods = mApplication.getMoodModel().getMoodByUser(userId);
+        return reloadedMoods;
+    }
+
+    private void populateFromMoodLoad(ArrayList<Mood> newMoods) {
+        //LOADING FROM ELASTIC SEARCH
+        for (int i = 0; i < newMoods.size(); i++) {
+            moodLinkedList.add(newMoods.get(i));
+            mApplication.getMoodModel().getCachedMoods().add(newMoods.get(i));
+        }
+    }
+    private String queryConverter(String query) {
+        // Convert user queries into usable id search queries
+        String queryConverted = query;
+        mApplication.getSocialSituationModel().getSocialSituations();
+
+        for (Map.Entry<String, SocialSituation> entry : mApplication.getSocialSituationModel().getSocialSituations().entrySet()) {
+            if (entry.getValue().getName().toLowerCase().contains(query.toLowerCase()) || entry.getValue().getDescription().toLowerCase().contains(query.toLowerCase())) {
+                queryConverted = "socialSituationId:"+entry.getValue().getId();
+                return queryConverted;
+            }
+        }
+        for (Map.Entry<String, Emotion> entry: mApplication.getEmotionModel().getEmotions().entrySet()) {
+            if (entry.getValue().getName().toLowerCase().contains(query.toLowerCase()) || entry.getValue().getDescription().toLowerCase().contains(query.toLowerCase())) {
+                queryConverted = "emotionId:"+entry.getValue().getId();
+                return queryConverted;
+            }
+        }
+
+        return queryConverted;
     }
 
     private int getIndexOfMoodID(String moodId) {
@@ -188,8 +288,6 @@ public class FeedActivity extends AppCompatActivity
 
             TextView username = (TextView)view.findViewById(R.id.username);
             username.setTypeface(null, Typeface.BOLD);
-
-            //TODO: Get rid of text view and move all display functionality over to linearlayout
             //ArrayList<Mood> temp = mApplication.getMoodModel().getUniversalMoods();
             moodListAdapter.notifyDataSetChanged();
 

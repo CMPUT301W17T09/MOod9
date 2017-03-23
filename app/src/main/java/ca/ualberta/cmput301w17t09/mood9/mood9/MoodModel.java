@@ -66,6 +66,10 @@ fos.close();
      * }
      */
 
+    public ArrayList<Mood> getCachedMoods() {
+        return moods;
+    }
+
     public void setMoodsArray() {
         // First load all moods on elastic search
 //        try {
@@ -105,6 +109,18 @@ fos.close();
         }
         moods = finalarr2;
         saveListToFile();
+    }
+    public ArrayList<Mood> getMoodsByQuery(String query) {
+        ElasticSearchMOodController.SearchMoodsTask searchMoodsTask = new ElasticSearchMOodController.SearchMoodsTask();
+        searchMoodsTask.execute(query);
+        ArrayList<Mood> returnarr = new ArrayList<Mood>();
+
+        try {
+            returnarr = searchMoodsTask.get();
+        } catch (Exception e) {
+            System.out.println("Count not find moods");
+        }
+        return returnarr;
     }
 
     public ArrayList<Mood> getMoodByUser(String userid) {
@@ -177,6 +193,7 @@ fos.close();
     public void addMood(Mood mood) {
         ElasticSearchMOodController.AddMoodsTask addMoodsTask = new ElasticSearchMOodController.AddMoodsTask();
         addMoodsTask.execute(mood); // add to elastic search
+        moods.add(mood);
 
         /*
         Gson gson = new Gson();
@@ -200,6 +217,7 @@ fos.close();
     public void deleteMood(Mood mood) {
         ElasticSearchMOodController.DeleteMoodTask deleteMoodTask = new ElasticSearchMOodController.DeleteMoodTask();
         deleteMoodTask.execute(mood);
+        moods.remove(mood);
 
         /*
         Gson gson = new Gson();
