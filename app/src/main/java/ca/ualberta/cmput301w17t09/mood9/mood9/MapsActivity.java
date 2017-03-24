@@ -88,6 +88,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     Emotion emotion = em.getEmotion(tempMood.getEmotionId());
                     String emotionName = emotion.getName();
                     int iconNumber = getResources().getIdentifier(emotionName.toLowerCase().trim(), "drawable", getPackageName());
+                    String test = tempMood.getId();
                     Marker tempMarker = mMap.addMarker(new MarkerOptions().title(tempMood.getId()).position(tempCord).icon(BitmapDescriptorFactory.fromBitmap(makeSmallerIcon(iconNumber))));
                     markers.add(tempMarker);
                 }
@@ -107,21 +108,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         markers.add(timmies);
         markers.add(new_test);
 
-        //TODO Need to get the list of moods and if they have a location put it on the map.
-
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
-                //TODO Instead of a toast, show the MOod that was created in this location.
                 Intent viewMood = new Intent(MapsActivity.this, MoodViewActivity.class);
-                for(int i = 0; i < moodList.size(); i++){
-                    Log.d("Mood ID", moodList.get(i).getUser_id());
-//                    if(mood.getId().equals(marker.getTitle())){
-//                        viewMood.putExtra("moodIndex", moodList.indexOf(mood));
-//                        startActivity(viewMood);
-//                    }
-                }
-
+                viewMood.putExtra("moodIndex", -1);
+                viewMood.putExtra("moodID", marker.getTitle());
+                startActivity(viewMood);
                 return false;
             }
         });

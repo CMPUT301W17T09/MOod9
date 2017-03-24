@@ -27,7 +27,21 @@ public class MoodViewActivity extends AppCompatActivity {
 
         int position = getIntent().getExtras().getInt("moodIndex");
         Mood9Application mApplication = (Mood9Application) getApplication();
-        Mood mood = mApplication.getMoodLinkedList().get(position);
+        Mood mood = null;
+
+        if(position == -1){
+            String moodId = getIntent().getStringExtra("moodID");
+            System.out.print(moodId);
+            for (Mood eachmood: mApplication.getMoodLinkedList()) {
+                if(eachmood.getId().equals(moodId)){
+                    mood = eachmood;
+                }
+            }
+        }
+        else{
+            mood = mApplication.getMoodLinkedList().get(position);
+        }
+
         SocialSituationModel socialSituationModel = mApplication.getSocialSituationModel();
         EmotionModel emotionModel = mApplication.getEmotionModel();
         SocialSituation ss = socialSituationModel.getSocialSituation(mood.getSocialSituationId());
