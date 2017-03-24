@@ -83,7 +83,15 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                    Manifest.permission.ACCESS_FINE_LOCATION)) {
+                ActivityCompat.requestPermissions(AddMoodActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_PERMISSION_FINE);
+            } else {
+                //Request the location permission.
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_PERMISSION_FINE);
+            }
+        }
 
 
         mApplication = (Mood9Application)getApplicationContext();
@@ -280,11 +288,15 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
                 String newDate = dateFormat.format(curDate);
                 if (editCheckB.getInt("editCheck", -1) == 1) {
                     try {
-                        returnMood.setEmotionId(String.valueOf(emotionId));
                         returnMood.setDate(newDate);
                         returnMood.setEmotionId(String.valueOf(emotionId));
                         returnMood.setSocialSituationId(String.valueOf(socialId));
                         returnMood.setTrigger(trigger.getText().toString());
+                        returnMood.setLatitude(latitude);
+                        returnMood.setLongitude(longitude);
+                        if (imageString != null) {
+                            returnMood.setImage(imageString);
+                        }
                         mApplication.getMoodLinkedList().set(oldMoodIndex, returnMood);
 
                         mApplication.getMoodModel().updateMood(returnMood);
