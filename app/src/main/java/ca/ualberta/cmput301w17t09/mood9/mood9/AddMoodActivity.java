@@ -300,7 +300,7 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
                         mApplication.getMoodLinkedList().set(oldMoodIndex, returnMood);
 
                         mApplication.getMoodModel().updateMood(returnMood);
-                        mApplication.getMoodModel().getCurrentUserMoods().set(oldMoodIndex, returnMood);
+                        mApplication.getMoodLinkedList().set(oldMoodIndex, returnMood);
                         finish();
                     } catch (Exception e) {
                         e.printStackTrace();

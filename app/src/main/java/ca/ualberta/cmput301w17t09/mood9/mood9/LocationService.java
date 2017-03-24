@@ -50,7 +50,6 @@ public class LocationService implements LocationListener {
     }
 
     private Location getLocation() {
-
         try {
             locationManager = (LocationManager) mContext
                     .getSystemService(Context.LOCATION_SERVICE);
@@ -112,7 +111,7 @@ public class LocationService implements LocationListener {
                             }
                         }
                     } catch (SecurityException e) {
-
+                        getLocation();
                     }
                 }
             }
