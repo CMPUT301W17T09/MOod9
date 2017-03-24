@@ -26,15 +26,6 @@ public class Mood implements Serializable {
     private String imageTriggerId;
     private String date;
 
-    public String getImage() {
-        return image;
-    }
-
-    public void setImage(String image) {
-        this.image = image;
-    }
-
-    private String image;
     private String user_id;
     private String image;
 

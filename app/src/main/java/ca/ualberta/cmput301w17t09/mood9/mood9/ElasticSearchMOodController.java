@@ -413,7 +413,8 @@ public class ElasticSearchMOodController {
                         "    \"properties\": {\n" +
                         "      \"id\": {\"type\": \"string\", \"store\" : \"yes\"},\n" +
                         "      \"name\": {\"type\": \"string\", \"store\" : \"yes\"},\n" +
-                        "      \"followees\" : { \"type\": \"string\", \"store\" : \"yes\" , \"index\":\"not_analyzed\" }\n" +
+                        "      \"followees\" : { \"type\": \"string\", \"store\" : \"yes\" , \"index\":\"not_analyzed\" },\n" +
+                        "      \"requests\" : { \"type\": \"string\", \"store\" : \"yes\" , \"index\":\"not_analyzed\" }\n" +
                         "    }\n" +
                         "  }\n" +
                         "}"
