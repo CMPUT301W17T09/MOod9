@@ -89,7 +89,7 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
 
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         String userName = sharedPreferences.getString("username", "test");
-        userId = UserModel.getUserID(userName).getId();
+        userId = UserModel.getUserID(userName);
 
         cameraImage  = (ImageView) findViewById(R.id.cameraImage);
         ImageButton cameraButton = (ImageButton) findViewById(R.id.cameraButton);
@@ -269,7 +269,7 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
                         mApplication.getMoodLinkedList().set(oldMoodIndex, returnMood);
 
                         mApplication.getMoodModel().updateMood(returnMood);
-                        mApplication.getMoodModel().getCachedMoods().set(oldMoodIndex, returnMood);
+                        mApplication.getMoodModel().getCurrentUserMoods().set(oldMoodIndex, returnMood);
                         finish();
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -278,7 +278,7 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
                 }
                 else {
                     // added emoticon parameter to Mood class to store the r.drawable of the selected emotion
-                    returnMood = new Mood(latitude, longitude, trigger.getText().toString(), String.valueOf(emotionId), String.valueOf(socialId), imageTriggerId, new Date(), userId);
+                    returnMood = new Mood(latitude, longitude, trigger.getText().toString(), String.valueOf(emotionId), String.valueOf(socialId), imageTriggerId, curDate, userId, "");
                     returnMood.setEmotionId(String.valueOf(emotionId));
                     returnMood.setSocialSituationId(String.valueOf(socialId));
 

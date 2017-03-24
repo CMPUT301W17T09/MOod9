@@ -1,14 +1,21 @@
 package ca.ualberta.cmput301w17t09.mood9.mood9;
 
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
+import android.support.v7.widget.LinearLayoutCompat;
 import android.util.Log;
+
 import com.searchly.jestdroid.DroidClientConfig;
 import com.searchly.jestdroid.JestClientFactory;
 import com.searchly.jestdroid.JestDroidClient;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 import io.searchbox.client.JestResult;
 import io.searchbox.core.Delete;
 import io.searchbox.core.DocumentResult;
@@ -21,9 +28,12 @@ import io.searchbox.indices.CreateIndex;
 import io.searchbox.indices.DeleteIndex;
 import io.searchbox.indices.mapping.PutMapping;
 
+import static android.content.Context.MODE_PRIVATE;
+
 
 public class ElasticSearchMOodController {
     private static JestDroidClient client;
+    private static String ElasticSearchServer = "http://cmput301.softwareprocess.es:8080";
     private static String index_name = "cmput301w17t09";
     private static String mood_type = "mood9";
     private static String user_type = "user9";
@@ -40,11 +50,9 @@ public class ElasticSearchMOodController {
             try{
                 JestResult result = client.execute(deleteIndex);
                 if (result.isSucceeded()) {
-                    int x = 1;
                 }
 
             } catch (Exception e) {
-                String test = e.getMessage();
                 Log.i("Error", e.getMessage());
             }
 
@@ -65,36 +73,19 @@ public class ElasticSearchMOodController {
         }
     }
 
-    public static class AddMoodsTask extends AsyncTask<Mood, Void, Void> {
+    public static class AddMoodsTask extends AsyncTask<Void, Void, Void> {
 
-        @Override
-        protected Void doInBackground(Mood... moods) {
+        private ArrayList<Mood> Moods;
+
+        public AddMoodsTask(ArrayList<Mood> moodList) {
+            Moods = new ArrayList<Mood>();
+            Moods = moodList;
+        }
+
+        protected void DeleteMoods(ArrayList<Mood> moods) {
             verifySettings();
 
             for (Mood mood : moods) {
-                Index index = new Index.Builder(mood).index(index_name).type(mood_type).build();
-
-                try {
-                    DocumentResult result = client.execute(index);
-                    if (result.isSucceeded()){
-                        String id = result.getId();
-                        mood.setId(result.getId());
-                    }
-                }
-                catch (Exception e) {
-                    Log.i("Error", "The application failed to build and send the tweets");
-                }
-            }
-            return null;
-        }
-    }
-
-    public static class DeleteMoodTask extends AsyncTask<Mood, Void, Void> {
-        @Override
-        protected Void doInBackground(Mood...deletedMoods) {
-            verifySettings();
-
-            for (Mood mood : deletedMoods) {
                 try {
                     String id = mood.getId();
                     JestResult result = client.execute(new Delete.Builder(id).index(index_name).type(mood_type).build());
@@ -102,81 +93,9 @@ public class ElasticSearchMOodController {
                     Log.i("Error", "Elastic Search failed to delete");
                 }
             }
-            return null;
         }
-    }
 
-    public static class SearchMoodsTask extends AsyncTask<String, Void, ArrayList<Mood>> {
-        @Override
-        protected ArrayList<Mood> doInBackground(String...searchParameters) {
-            verifySettings();
-
-            int toField = 0;
-            String field = "";
-            String fieldQuery = "";
-            if (searchParameters[0].indexOf(':') > -1) {
-                toField = 1;
-                field = searchParameters[0].substring(0, searchParameters[0].indexOf(':'));
-                fieldQuery = searchParameters[0].substring(searchParameters[0].indexOf(':')+1);
-            } else {
-                toField = 0;
-            }
-            ArrayList<Mood> moods = new ArrayList<Mood>();
-            String query;
-            if (toField == 1) {
-                query = "{\n" +
-                        "    \"query\": {\n" +
-                        "        \"query_string\" : {\n" +
-                        "            \"fields\" : [\""+field+"\"],\n" +
-                        "            \"query\" : \"" + fieldQuery + "\"\n" +
-                        "        }\n" +
-                        "    }\n" +
-                        "}";
-            } else {
-                /*query = "{\n" +
-                        "   \"query\": {\n" +
-                        "       \"query_string\" : {\n" +
-                        "           \"query\" : \"" + searchParameters[0] + "\"\n" +
-                        "       }\n" +
-                        "   }\n" +
-                        "}";*/
-                query = "{\n" +
-                        "   \"size\" : 200,\n" +
-                        "   \"query\" : {\n" +
-                        "    \"match_all\" : {}\n" +
-                        "  }\n" +
-                        "}";
-            }
-            if (searchParameters[0].equals("") && toField == 1){
-                query = "";
-            }
-
-            Search search = new Search.Builder(query)
-                    .addIndex(index_name)
-                    .addType(mood_type)
-                    .build();
-
-            try {
-                SearchResult result = client.execute(search);
-                if (result.isSucceeded()){
-                    List<Mood> foundsMoods = result.getSourceAsObjectList(Mood.class);
-                    moods.addAll(foundsMoods);
-                }
-            }
-            catch (Exception e) {
-                Log.i("Error", "Something went wrong when we tried to communicate with the elasticsearch server!");
-            }
-
-            return moods;
-        }
-    }
-
-    /**
-     * This only filters by user_id
-     */
-    public static class GetMoodsTask extends AsyncTask<String, Void, ArrayList<Mood>> {
-        @Override
-        protected ArrayList<Mood> doInBackground(String...searchParameters) {
+        protected ArrayList<Mood> GetMoods(String...searchParameters) {
             verifySettings();
 
             ArrayList<Mood> moods = new ArrayList<Mood>();
@@ -211,12 +130,117 @@ public class ElasticSearchMOodController {
 
             return moods;
         }
+
+        @Override
+        protected Void doInBackground(Void... v) {
+            verifySettings();
+
+            // Get moods online
+            ArrayList<Mood> OnlineMood = GetMoods(Moods.get(0).getUser_id());
+
+            // Delete those moods
+            DeleteMoods(OnlineMood);
+
+            // Add new updated moods from Offline soure
+            for (Mood mood: Moods) {
+                Index index = new Index.Builder(mood).index(index_name).type(mood_type).build();
+
+                try {
+                    DocumentResult result = client.execute(index);
+                    System.out.println(result.toString());
+                    if (result.isSucceeded()){
+                        System.out.println("PUSH");
+                        String id = result.getId();
+                        mood.setId(result.getId());
+                    }
+                }
+                catch (Exception e) {
+                    Log.i("Error", "The application failed to build and send the tweets");
+                }
+            }
+            return null;
+        }
+    }
+
+    public static class DeleteMoodTask extends AsyncTask<Mood, Void, Void> {
+        @Override
+        protected Void doInBackground(Mood...deletedMoods) {
+            verifySettings();
+
+            for (Mood mood : deletedMoods) {
+                try {
+                    String id = mood.getId();
+                    JestResult result = client.execute(new Delete.Builder(id).index(index_name).type(mood_type).build());
+                } catch (Exception e) {
+                    Log.i("Error", "Elastic Search failed to delete");
+                }
+            }
+            return null;
+        }
+    }
+
+    /**
+     * This only filters by user_id
+     */
+    public static class GetMoodsTask extends AsyncTask<Void, Void, ArrayList<Mood>> {
+
+        private HashMap<String, String> query_params;
+
+        public GetMoodsTask(HashMap<String, String> qp) {
+            query_params = qp;
+        }
+
+        @Override
+        protected ArrayList<Mood> doInBackground(Void...v) {
+            verifySettings();
+
+            ArrayList<Mood> moods = new ArrayList<Mood>();
+
+            for ( HashMap.Entry<String, String> entry : query_params.entrySet() ) {
+                String query = "{\n" +
+                        "   \"size\" : 200,\n" +
+                        "   \"query\": {\n" +
+                        "        \"query_string\" : {\n" +
+                        "            \"fields\" : [\"" + entry.getKey() + "\"],\n" +
+                        "            \"query\" : \"" + entry.getValue() + "\"\n" +
+                        "        }\n" +
+                        "    }\n" +
+                        "}";
+
+                if (entry.getKey() == ""){
+                    query = "{\n" +
+                            "   \"size\" : 200,\n" +
+                            "   \"query\" : {\n" +
+                            "    \"match_all\" : {}\n" +
+                            "  }\n" +
+                            "}";
+                }
+
+                Search search = new Search.Builder(query)
+                        .addIndex(index_name)
+                        .addType(mood_type)
+                        .build();
+
+                try {
+                    SearchResult result = client.execute(search);
+                    if (result.isSucceeded()){
+                        List<Mood> foundMoods = result.getSourceAsObjectList(Mood.class);
+                        moods.addAll(foundMoods);
+                    }
+                }
+                catch (Exception e) {
+                    Log.i("Error", "Something went wrong when we tried to communicate with the elasticsearch server!");
+                }
+                Log.d("ESTEST3", "Inside Loop");
+            }
+            Log.d("ESTEST2", "Inside async task");
+            return moods;
+        }
     }
 
     public static void verifySettings() {
         if (client == null) {
-            String elasticSearchServer = "http://cmput301.softwareprocess.es:8080";
-            DroidClientConfig.Builder builder = new DroidClientConfig.Builder(elasticSearchServer);
+            DroidClientConfig.Builder builder = new DroidClientConfig.Builder(ElasticSearchServer);
             DroidClientConfig config = builder.build();
 
             JestClientFactory factory = new JestClientFactory();
@@ -288,12 +312,12 @@ public class ElasticSearchMOodController {
         }
     }
 
-    public static class GetUsersTaskName extends AsyncTask<String, Void, User> {
+    public static class GetUsersTaskName extends AsyncTask<String, Void, ArrayList<User>> {
         @Override
-        protected User doInBackground(String...params) {
+        protected ArrayList<User> doInBackground(String...params) {
             verifySettings();
 
-            User user = new User("");
+            ArrayList<User> user_list = new ArrayList<User>();
 
             String query = "{\n" +
                     "    \"query\": {\n" +
@@ -305,7 +329,12 @@ public class ElasticSearchMOodController {
                     "}";
 
             if (params[0].equals("")){
-                query = "";
+                query = "{\n" +
+                        "   \"size\" : 200,\n" +
+                        "   \"query\" : {\n" +
+                        "    \"match_all\" : {}\n" +
+                        "  }\n" +
+                        "}";
             }
 
             Search search = new Search.Builder(query)
@@ -316,14 +345,15 @@ public class ElasticSearchMOodController {
             try {
                 SearchResult result = client.execute(search);
                 if (result.isSucceeded()){
-                    user = result.getSourceAsObject(User.class);
+                    List<User> foundUser = result.getSourceAsObjectList(User.class);
+                    user_list.addAll(foundUser);
                 }
             }
             catch (Exception e) {
                 Log.i("Error", "Something went wrong when we tried to communicate with the elasticsearch server!");
             }
 
-            return user;
+            return user_list;
         }
     }
 
@@ -355,23 +385,22 @@ public class ElasticSearchMOodController {
         @Override
         protected String doInBackground(User...users) {
             verifySettings();
-
+            String id = "";
             for (User user : users) {
                 Index index = new Index.Builder(user).index(index_name).type(user_type).build();
 
                 try {
                     DocumentResult result = client.execute(index);
                     if (result.isSucceeded()){
-                        String id = result.getId();
+                        id = result.getId();
                         user.setId(result.getId());
                     }
                 }
                 catch (Exception e) {
                     Log.i("Error", "The application failed to build and send the tweets");
                 }
-                return user.getId();
             }
-            return null;
+            return id;
         }
     }
 
@@ -429,6 +458,10 @@ public class ElasticSearchMOodController {
                         "        \"store\": \"yes\"\n" +
                         "      },\n" +
                         "      \"socialSituationId\": {\n" +
+                        "        \"type\": \"string\",\n" +
+                        "        \"store\": \"yes\"\n" +
+                        "      },\n" +
+                        "      \"image\": {\n" +
                         "        \"type\": \"string\",\n" +
                         "        \"store\": \"yes\"\n" +
                         "      },\n" +

@@ -1,5 +1,7 @@
 package ca.ualberta.cmput301w17t09.mood9.mood9;
 
+import java.util.ArrayList;
+
 /**
  * Created by dannick on 2/22/17.
  */
@@ -15,19 +17,19 @@ public class UserModel {
         ElasticSearchMOodController.GetUsersTaskName getUsersTask = new ElasticSearchMOodController.GetUsersTaskName();
         getUsersTask.execute(username);
 
-        User user = new User("");
+        ArrayList<User> users = new ArrayList<User>();
 
         try {
-            user = getUsersTask.get();
+            users = getUsersTask.get();
         } catch (Exception e) {
 
         }
 
         // If user already exists, return null
-        if (user != null)
+        if (users.size() != 0)
             return null;
         else {
-            user = new User(username);
+            User user = new User(username);
             ElasticSearchMOodController.AddUsersTask addUsersTask = new ElasticSearchMOodController.AddUsersTask();
             String id = null;
             try {
@@ -35,7 +37,6 @@ public class UserModel {
             } catch (Exception e){ return null;}
 
             return id;
-
         }
     }
 
@@ -54,19 +55,37 @@ public class UserModel {
         return user;
     }
 
-    public static User getUserID(String username) {
+    public static ArrayList<String> getAllUsers() {
         ElasticSearchMOodController.GetUsersTaskName getUsersTaskName = new ElasticSearchMOodController.GetUsersTaskName();
-        getUsersTaskName.execute(username);
+        getUsersTaskName.execute("");
 
-        User user = new User("");
+        ArrayList<User> users = new ArrayList<User>();
+        ArrayList<String> user_names = new ArrayList<String>();
 
         try {
-            user = getUsersTaskName.get();
+            users = getUsersTaskName.get();
         } catch (Exception e) {
 
         }
 
-        return user;
+        for (User user : users)
+            user_names.add(user.getName());
+
+        return user_names;
     }
 
+    public static String getUserID(String username) {
+        ElasticSearchMOodController.GetUsersTaskName getUsersTaskName = new ElasticSearchMOodController.GetUsersTaskName();
+        getUsersTaskName.execute(username);
+
+        ArrayList<User> users = new ArrayList<User>();
+
+        try {
+            users = getUsersTaskName.get();
+        } catch (Exception e) {
+
+        }
+
+        return users.get(0).getId();
+    }
 }

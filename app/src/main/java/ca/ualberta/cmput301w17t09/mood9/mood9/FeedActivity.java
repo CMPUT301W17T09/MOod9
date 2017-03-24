@@ -29,6 +29,7 @@ import android.widget.TextView;
 import org.apache.commons.lang3.ObjectUtils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
@@ -58,6 +59,7 @@ public class FeedActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_feed);
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -87,9 +89,6 @@ public class FeedActivity extends AppCompatActivity
         mApplication = (Mood9Application) getApplicationContext();
         moodLinkedList = mApplication.getMoodLinkedList();
         searching = 0;
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        ArrayList<Mood> reloadedMoods = getCurrentUserMoods(sharedPreferences);
-        populateFromMoodLoad(reloadedMoods);
 
         ListView moodListView = (ListView) findViewById(R.id.moodList);
         moodListAdapter = new MoodListAdapter(this, moodLinkedList, mApplication);
@@ -154,10 +153,11 @@ public class FeedActivity extends AppCompatActivity
                 searching = 1;
                 String returnConversion = queryConverter(query);
                 // TODO: move this call to the queryConverter so that you can grab multiple possible queries in one search, so query every time something is found and add to list
-                ArrayList<Mood> search = mApplication.getMoodModel().getMoodsByQuery(returnConversion);
+                HashMap<String, String> queryHash = new HashMap<>();
+                queryHash.put(returnConversion.substring(0,returnConversion.indexOf(':')), returnConversion.substring(returnConversion.indexOf(':')+1));
                 moodLinkedList.clear();
-                mApplication.getMoodModel().getCachedMoods().clear();
-                populateFromMoodLoad(search);
+                ArrayList<Mood> reloadedMoods = mApplication.getMoodModel().getUniversalUserMoods(queryHash);
+                populateFromMoodLoad(reloadedMoods);
                 moodListAdapter.notifyDataSetChanged();
                 return true;
             }
@@ -168,9 +168,8 @@ public class FeedActivity extends AppCompatActivity
             @Override
             public boolean onClose() {
                 moodLinkedList.clear();
-                mApplication.getMoodModel().getCachedMoods().clear();
-                SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-                ArrayList<Mood> reloadedMoods = getCurrentUserMoods(sharedPreferences);
+                mApplication.getMoodModel().getCurrentUserMoods().clear();
+                ArrayList<Mood> reloadedMoods = mApplication.getMoodModel().getCurrentUserMoods();
                 populateFromMoodLoad(reloadedMoods);
                 moodListAdapter.notifyDataSetChanged();
                 searching = 0;
@@ -232,26 +231,20 @@ public class FeedActivity extends AppCompatActivity
         addMoodIntent.putExtra("editCheck", 0);
         startActivityForResult(addMoodIntent, 0);
     }
-    private ArrayList<Mood> getCurrentUserMoods(SharedPreferences sharedPreferences) {
-        String userName = sharedPreferences.getString("username", "test");
-        String userId = UserModel.getUserID(userName).getId();
-        ArrayList<Mood> reloadedMoods = mApplication.getMoodModel().getMoodByUser(userId);
-        return reloadedMoods;
-    }
 
     private void populateFromMoodLoad(ArrayList<Mood> newMoods) {
         //LOADING FROM ELASTIC SEARCH
         for (int i = 0; i < newMoods.size(); i++) {
             moodLinkedList.add(newMoods.get(i));
-            mApplication.getMoodModel().getCachedMoods().add(newMoods.get(i));
+            //mApplication.getMoodModel().getCurrentUserMoods().add(newMoods.get(i)); don't need to add since this isn't our moodss
         }
     }
     private String queryConverter(String query) {
         // Convert user queries into usable id search queries
         String queryConverted = query;
-        //mApplication.getSocialSituationModel().getSocialSituations();
-        ArrayList<Mood> universalMoods = mApplication.getMoodModel().getUniversalMoods();
+        ArrayList<Mood> universalMoods = mApplication.getMoodModel().getUniversalUserMoods(null);
         ArrayList<String> names = new ArrayList<String>();
+        names = UserModel.getAllUsers();/*
         for (Mood item : universalMoods) {
             String currentName = UserModel.getUserProfile(item.getUser_id()).getName();
             if (names.size() > 0) {
@@ -268,7 +261,7 @@ public class FeedActivity extends AppCompatActivity
             } else {
                 names.add(currentName);
             }
-        }
+        }*/
 
         for (Map.Entry<String, SocialSituation> entry : mApplication.getSocialSituationModel().getSocialSituations().entrySet()) {
             if (entry.getValue().getName().toLowerCase().contains(query.toLowerCase()) || entry.getValue().getDescription().toLowerCase().contains(query.toLowerCase())) {
@@ -284,7 +277,7 @@ public class FeedActivity extends AppCompatActivity
         }
         for (String name : names) {
             if (name.toLowerCase().contains(query.toLowerCase())) {
-                queryConverted = "user_id:"+UserModel.getUserID(name).getId();
+                queryConverted = "user_id:"+UserModel.getUserID(name);
                 return queryConverted;
             }
         }
@@ -313,7 +306,6 @@ public class FeedActivity extends AppCompatActivity
 
             TextView username = (TextView)view.findViewById(R.id.username);
             username.setTypeface(null, Typeface.BOLD);
-            //ArrayList<Mood> temp = mApplication.getMoodModel().getUniversalMoods();
             moodListAdapter.notifyDataSetChanged();
 
         } else {

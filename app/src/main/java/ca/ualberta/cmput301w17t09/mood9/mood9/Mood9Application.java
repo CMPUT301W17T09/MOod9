@@ -16,7 +16,7 @@ import java.util.LinkedList;
 public class Mood9Application extends Application {
     private EmotionModel emotionModel;
     private SocialSituationModel socialSituationModel;
-    private MoodModel moodModel;
+    private UpdatedMoodModel moodModel;
     private LinkedList<Mood> moodLinkedList;
 
     public EmotionModel getEmotionModel() {
@@ -27,7 +27,7 @@ public class Mood9Application extends Application {
         return socialSituationModel;
     }
 
-    public MoodModel getMoodModel() {
+    public UpdatedMoodModel getMoodModel() {
         return moodModel;
     }
 
@@ -50,7 +50,7 @@ public class Mood9Application extends Application {
         InputStream socialSituationsStream = this.getResources().openRawResource(getResources().getIdentifier("social_situations","raw",getPackageName()));
         this.emotionModel = new EmotionModel(emotionsStream);
         this.socialSituationModel = new SocialSituationModel(socialSituationsStream);
-        this.moodModel = new MoodModel();
+        this.moodModel = new UpdatedMoodModel(this);
         this.moodLinkedList = new LinkedList<Mood>();
     }
 }
