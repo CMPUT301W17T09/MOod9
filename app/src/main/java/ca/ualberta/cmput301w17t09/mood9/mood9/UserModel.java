@@ -55,6 +55,11 @@ public class UserModel {
         return user;
     }
 
+    public static void updateUser(User user) {
+        ElasticSearchMOodController.AddUsersTask addUsersTask = new ElasticSearchMOodController.AddUsersTask();
+        addUsersTask.execute(user);
+    }
+
     public static ArrayList<String> getAllUsers() {
         ElasticSearchMOodController.GetUsersTaskName getUsersTaskName = new ElasticSearchMOodController.GetUsersTaskName();
         getUsersTaskName.execute("");
