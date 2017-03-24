@@ -88,6 +88,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     Emotion emotion = em.getEmotion(tempMood.getEmotionId());
                     String emotionName = emotion.getName();
                     int iconNumber = getResources().getIdentifier(emotionName.toLowerCase().trim(), "drawable", getPackageName());
+//                  TODO This is the problem here. GetId is returning null so I cannot set the title properly.
                     String test = tempMood.getId();
                     Marker tempMarker = mMap.addMarker(new MarkerOptions().title(tempMood.getId()).position(tempCord).icon(BitmapDescriptorFactory.fromBitmap(makeSmallerIcon(iconNumber))));
                     markers.add(tempMarker);

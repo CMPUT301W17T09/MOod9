@@ -31,10 +31,11 @@ public class MoodViewActivity extends AppCompatActivity {
 
         if(position == -1){
             String moodId = getIntent().getStringExtra("moodID");
-            System.out.print(moodId);
-            for (Mood eachmood: mApplication.getMoodLinkedList()) {
-                if(eachmood.getId().equals(moodId)){
-                    mood = eachmood;
+            if (moodId != null) {
+                for (Mood eachmood : mApplication.getMoodLinkedList()) {
+                    if (eachmood.getId().equals(moodId)) {
+                        mood = eachmood;
+                    }
                 }
             }
         }
