@@ -144,7 +144,10 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
             socialSpinner.setAdapter(socialSpinnerAdapter);
             socialSpinner.setSelection(position);
             trigger.setText(returnMood.getTrigger());
-            txtDate.setText(returnMood.getDate().toString());
+
+            String myFormat = "yyyy-MM-dd";
+            SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.US);
+            txtDate.setText(sdf.format(curDate));
 
             //TODO: need to figure out how to reload saved map details
         }
@@ -220,20 +223,12 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
 
                                 if (dayOfMonth < mDay && year == mYear && monthOfYear == mMonth)
                                     view.updateDate(mYear,mMonth,mDay);
-                                String strMonth = String.format("%02d", monthOfYear+1);
-                                String strDay = String.format("%02d", dayOfMonth);
-                                String value = (year + "-" + strMonth + "-" + strDay);
 
-                                txtDate.setText(value);
-                                String myFormat = "yyyy-MM-dd";
-                                SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.US);
-                                try {
-                                    curDate = sdf.parse(value);
-                                } catch (ParseException e) {
-                                    e.printStackTrace();
-                                }
+                                Calendar c = Calendar.getInstance();
+                                c.set(year, monthOfYear, dayOfMonth);
 
-
+                                txtDate.setText(String.format("%1$tY-%1$tm-%1$td", c));
+                                curDate = c.getTime();
 
                             }
                         }, mYear, mMonth, mDay);
