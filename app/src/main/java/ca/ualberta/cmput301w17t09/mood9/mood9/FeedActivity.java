@@ -82,23 +82,20 @@ public class FeedActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
 
-        //This changes the title of the toolbar - need to change according to feed shown
-        toolbar.setTitle(R.string.universal_feed);
+        //This changes the title of the toolbar to the default of universal
+        setFeedName("universal");
 
         // set up list view adapter
         context = this;
         mApplication = (Mood9Application) getApplicationContext();
         moodLinkedList = mApplication.getMoodLinkedList();
-        searching = 0;
-        ArrayList<Mood> temp = mApplication.getMoodModel().getUniversalUserMoods(null);
-        //LOADING FROM ELASTIC SEARCH
-        for (int i = 0; i < temp.size(); i++) {
-            moodLinkedList.add(temp.get(i));
-        }
 
         ListView moodListView = (ListView) findViewById(R.id.moodList);
         moodListAdapter = new MoodListAdapter(this, moodLinkedList, mApplication);
         moodListView.setAdapter(moodListAdapter);
+        searching = 0;
+        populateFromMoodLoad(mApplication.getMoodModel().getUniversalUserMoods(null));
+
 
         moodListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -218,10 +215,16 @@ public class FeedActivity extends AppCompatActivity
 
         if (id == R.id.personal) {
             // Handle the camera action
+            setFeedName("personal");
+            moodLinkedList.clear();
+            ArrayList<Mood> temp = mApplication.getMoodModel().getCurrentUserMoods();
+            populateFromMoodLoad(temp);
         } else if (id == R.id.followed) {
-
+            setFeedName("followed");
         } else if (id == R.id.universal) {
-
+            setFeedName("universal");
+            ArrayList<Mood> temp = mApplication.getMoodModel().getUniversalUserMoods(null);
+            populateFromMoodLoad(temp);
         } else if (id == R.id.near_me) {
             Intent mapIntent = new Intent(this, MapsActivity.class);
             mapIntent.putExtra("moodList", moodLinkedList);
@@ -239,6 +242,17 @@ public class FeedActivity extends AppCompatActivity
         return true;
     }
 
+    private void setFeedName(String newName) {
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        if (newName == "universal")
+            toolbar.setTitle(R.string.universal_feed);
+        else if (newName == "personal")
+            toolbar.setTitle(R.string.personal_feed);
+        else if (newName == "followed")
+            toolbar.setTitle(R.string.followed_feed);
+        return;
+    }
+
     private void addMood() {
         Intent addMoodIntent = new Intent(this, AddMoodActivity.class);
         addMoodIntent.putExtra("editCheck", 0);
@@ -246,10 +260,12 @@ public class FeedActivity extends AppCompatActivity
     }
 
     private void populateFromMoodLoad(ArrayList<Mood> newMoods) {
+        moodLinkedList.clear();
         //LOADING FROM ELASTIC SEARCH
         for (int i = 0; i < newMoods.size(); i++) {
             moodLinkedList.add(newMoods.get(i));
         }
+        moodListAdapter.notifyDataSetChanged();
     }
     private String queryConverter(String query) {
         // Convert user queries into usable id search queries
