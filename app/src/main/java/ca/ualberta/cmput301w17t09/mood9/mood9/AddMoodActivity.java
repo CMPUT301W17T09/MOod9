@@ -25,6 +25,8 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -217,7 +219,7 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
                                 String value = (year + "-" + strMonth + "-" + strDay);
 
                                 txtDate.setText(value);
-                                String myFormat = "yyyy-MM-dd";
+                                String myFormat = "yyyy-MM-dd'T'HH:mm:ss";
                                 SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.US);
                                 try {
                                     curDate = sdf.parse(value);
@@ -259,6 +261,15 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
         save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                String myFormat = "yyyy-MM-dd'T'HH:mm:ss";
+                DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+                String newDate = dateFormat.format(curDate);
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+                try {
+                    Date d = sdf.parse(newDate);
+                } catch (ParseException ex) {
+                    // DO NOTHING
+                }
                 if (editCheckB.getInt("editCheck", -1) == 1) {
                     try {
                         returnMood.setEmotionId(String.valueOf(emotionId));
