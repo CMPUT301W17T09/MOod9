@@ -252,24 +252,7 @@ public class FeedActivity extends AppCompatActivity
         String queryConverted = query;
         ArrayList<Mood> universalMoods = mApplication.getMoodModel().getUniversalUserMoods(null);
         ArrayList<String> names = new ArrayList<String>();
-        names = UserModel.getAllUsers();/*
-        for (Mood item : universalMoods) {
-            String currentName = UserModel.getUserProfile(item.getUser_id()).getName();
-            if (names.size() > 0) {
-                int old = 0;
-                for (int i = 0; i < names.size(); i++) {
-                    if (currentName == names.get(i)) {
-                        old = 1;
-                        break;
-                    }
-                }
-                if (old == 0) {
-                    names.add(currentName);
-                }
-            } else {
-                names.add(currentName);
-            }
-        }*/
+        names = UserModel.getAllUsers();
 
         for (Map.Entry<String, SocialSituation> entry : mApplication.getSocialSituationModel()
                 .getSocialSituations().entrySet()) {
