@@ -28,7 +28,6 @@ public class MainActivity extends AppCompatActivity {
         Button goButton = (Button) findViewById(R.id.go);
         final EditText usernameField = (EditText) findViewById(R.id.username_field);
 
-
         final SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         final SharedPreferences.Editor editor = sharedPreferences.edit();
         String name = sharedPreferences.getString("username", null);
@@ -39,7 +38,6 @@ public class MainActivity extends AppCompatActivity {
             startActivity(feedIntent);
             finish();
         }
-
 
         goButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -65,6 +63,8 @@ public class MainActivity extends AppCompatActivity {
                 finish();
             }
         });
+
+
 
     }
 }

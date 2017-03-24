@@ -11,7 +11,7 @@ import java.util.Date;
  */
 
 public class MoodModelTest {
-
+    /*
     @Test
     public void testAddAndDeleteOffline(){
         MoodModel ins = new MoodModel();
@@ -49,5 +49,6 @@ public class MoodModelTest {
 
 
     }
+    */
 
 }
