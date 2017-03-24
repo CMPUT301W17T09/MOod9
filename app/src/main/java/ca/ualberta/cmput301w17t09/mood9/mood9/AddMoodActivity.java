@@ -278,7 +278,7 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
                 }
                 else {
                     // added emoticon parameter to Mood class to store the r.drawable of the selected emotion
-                    returnMood = new Mood(latitude, longitude, trigger.getText().toString(), String.valueOf(emotionId), String.valueOf(socialId), imageTriggerId, new Date(), userId);
+                    returnMood = new Mood(latitude, longitude, trigger.getText().toString(), String.valueOf(emotionId), String.valueOf(socialId), imageTriggerId, curDate, userId);
                     returnMood.setEmotionId(String.valueOf(emotionId));
                     returnMood.setSocialSituationId(String.valueOf(socialId));
 
