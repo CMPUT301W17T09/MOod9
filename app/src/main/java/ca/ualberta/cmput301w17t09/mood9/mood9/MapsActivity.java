@@ -1,6 +1,7 @@
 package ca.ualberta.cmput301w17t09.mood9.mood9;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
@@ -87,14 +88,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     Emotion emotion = em.getEmotion(tempMood.getEmotionId());
                     String emotionName = emotion.getName();
                     int iconNumber = getResources().getIdentifier(emotionName.toLowerCase().trim(), "drawable", getPackageName());
-                    Marker tempMarker = mMap.addMarker(new MarkerOptions().title(tempMood.getTrigger()).position(tempCord).icon(BitmapDescriptorFactory.fromBitmap(makeSmallerIcon(iconNumber))));
+//                  TODO This is the problem here. GetId is returning null so I cannot set the title properly.
+                    String test = tempMood.getId();
+                    Marker tempMarker = mMap.addMarker(new MarkerOptions().title(tempMood.getId()).position(tempCord).icon(BitmapDescriptorFactory.fromBitmap(makeSmallerIcon(iconNumber))));
                     markers.add(tempMarker);
                 }
             }
         }
-
-
-
 
 
         // Add a marker at tim hortons and move the camera
@@ -109,13 +109,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         markers.add(timmies);
         markers.add(new_test);
 
-        //TODO Need to get the list of moods and if they have a location put it on the map.
-
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
-                //TODO Instead of a toast, show the MOod that was created in this location.
-                Toast.makeText(MapsActivity.this, marker.getTitle(), Toast.LENGTH_SHORT).show();
+                Intent viewMood = new Intent(MapsActivity.this, MoodViewActivity.class);
+                viewMood.putExtra("moodIndex", -1);
+                viewMood.putExtra("moodID", marker.getTitle());
+                startActivity(viewMood);
                 return false;
             }
         });

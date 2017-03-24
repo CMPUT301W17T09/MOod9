@@ -36,6 +36,7 @@ public class Mood implements Serializable {
 
     private String image;
     private String user_id;
+    private String image;
 
     public Mood(Double latitude, Double longitude,
                 String trigger, String emotionId, String socialSituationId,
@@ -50,12 +51,19 @@ public class Mood implements Serializable {
         this.imageTriggerId = imageTriggerId;
         this.date = date;
         this.user_id = user_id;
+        this.image = image;
     }
 
     public Mood(){
 
     }
+    public void setImage(String image_s) {
+        this.image = image_s;
+    }
 
+    public String getImage() {
+        return this.image;
+    }
     public String getOfflineid() {
         return offlineid;
     }

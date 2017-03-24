@@ -14,6 +14,8 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Base64;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -27,6 +29,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.text.DateFormat;
+import java.io.ByteArrayOutputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -34,6 +37,8 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
+
+import static android.R.attr.bitmap;
 
 /**
  * Originally created by Fady
@@ -61,8 +66,10 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
 
     private int mYear, mMonth, mDay;
 
+
     ImageView cameraImage;
     Bitmap imageBitmap = null;
+    String imageString;
 
     int oldMoodIndex = 0;
     Mood returnMood;
@@ -139,7 +146,10 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
             socialSpinner.setAdapter(socialSpinnerAdapter);
             socialSpinner.setSelection(position);
             trigger.setText(returnMood.getTrigger());
-            txtDate.setText(returnMood.getDate().toString());
+
+            String myFormat = "yyyy-MM-dd";
+            SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.US);
+            txtDate.setText(sdf.format(curDate));
 
             //TODO: need to figure out how to reload saved map details
         }
@@ -228,7 +238,11 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
                                     e.printStackTrace();
                                 }
 
+                                Calendar c = Calendar.getInstance();
+                                c.set(year, monthOfYear, dayOfMonth);
 
+                                txtDate.setText(String.format("%1$tY-%1$tm-%1$td", c));
+                                curDate = c.getTime();
 
                             }
                         }, mYear, mMonth, mDay);
@@ -283,7 +297,12 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
                 }
                 else {
                     // added emoticon parameter to Mood class to store the r.drawable of the selected emotion
-                    returnMood = new Mood(latitude, longitude, trigger.getText().toString(), String.valueOf(emotionId), String.valueOf(socialId), imageTriggerId, newDate, userId, "");
+                    if (imageString == null){
+                        returnMood = new Mood(latitude, longitude, trigger.getText().toString(), String.valueOf(emotionId), String.valueOf(socialId), imageTriggerId, curDate, userId, null);
+                    }
+                    else{
+                        returnMood = new Mood(latitude, longitude, trigger.getText().toString(), String.valueOf(emotionId), String.valueOf(socialId), imageTriggerId, curDate, userId, imageString);
+                    }
                     returnMood.setEmotionId(String.valueOf(emotionId));
                     returnMood.setSocialSituationId(String.valueOf(socialId));
 
@@ -300,6 +319,12 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
         super.onActivityResult(requestCode, resultCode, data);
         imageBitmap = (Bitmap)data.getExtras().get("data");
         cameraImage.setImageBitmap(imageBitmap);
+
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        imageBitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
+        byte[] byteArray = byteArrayOutputStream .toByteArray();
+
+        imageString = Base64.encodeToString(byteArray, Base64.DEFAULT);
     }
 
     //Performing action onItemSelected and onNothing selected
