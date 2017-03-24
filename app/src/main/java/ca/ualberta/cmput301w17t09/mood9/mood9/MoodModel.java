@@ -42,6 +42,9 @@
 // * Added array size getter by cdkushni on 3/10/2017
 // * Redone by Rohit on 2017-03-08
 // * Created by dannick on 2/22/17.
+// */
+//
+///**
 // * The MoodModel includes functionality to add, and delete moods and the ability to synchronize
 // * with elastic search
 // */
@@ -82,6 +85,29 @@
 //        ArrayList<Mood> fileMoods = readFromAdded(); //Last set of universal moods PLUS any offline moods
 //        ArrayList<Mood> finalarr = new ArrayList<Mood>();  //
 //        ArrayList<Mood> finalarr2 = new ArrayList<Mood>();
+//    File ADDEDNAME;
+//    File DELETEDNAME;
+//
+//    public MoodModel(File f1,File f2){
+//        this.ADDEDNAME = f1;
+//        this.DELETEDNAME = f2;
+//    }
+//
+//    public void setMoodsArray() {
+//        ElasticSearchMOodController.GetMoodsTask getMoodsTask = new ElasticSearchMOodController.GetMoodsTask();
+//        getMoodsTask.execute("");
+//        ArrayList<Mood> elasticmoods = new ArrayList<Mood>();
+//        try {
+//          elasticmoods = getMoodsTask.get(); // All moods from elastic search
+//       } catch (Exception e) {
+//           Log.i("Error", "Can't get moods from ElasticSearch");
+//       }
+//        //Mood m1 = new Mood(12.22,13.22,"Trigger","3","Fsun","222",new Date(12-12-2016),"10");
+//        ArrayList<Mood> deleteMoods = readFromDeleted(); //all moods from deleted file
+//        ArrayList<Mood> fileMoods = readFromAdded(); //Last set of universal moods PLUS any offline moods
+//        ArrayList<Mood> finalarr = new ArrayList<Mood>();  //
+//        ArrayList<Mood> finalarr2 = new ArrayList<Mood>();
+//        finalarr.addAll(elasticmoods);
 //        finalarr.addAll(fileMoods); // final array contains all moods form elastic and add moods
 //        for (int i = 0; i < finalarr.size(); i++) {
 //            if (!finalarr2.contains(finalarr.get(i))) {
@@ -122,6 +148,7 @@
 //        }
 //        return returnarr;
 //    }*/
+//    }
 //
 //    public ArrayList<Mood> getMoodByUser(String userid) {
 //        ElasticSearchMOodController.GetMoodsTask getMoodsTask = new ElasticSearchMOodController.GetMoodsTask();
@@ -173,6 +200,7 @@
 //        }
 //        return returnarr;
 //        //return moods;
+//        return moods;
 //    }
 //
 //    public ArrayList<Mood> getMoodsNear(Double latitude, Double longitude) {
@@ -222,11 +250,13 @@
 //            System.out.println("File not found2");
 //        }
 //        setMoodsArray();*/
+//        setMoodsArray();
 //    }
 //
 //    public void deleteMood(Mood mood) {
 //        ElasticSearchMOodController.DeleteMoodTask deleteMoodTask = new ElasticSearchMOodController.DeleteMoodTask();
 //        deleteMoodTask.execute(mood);
+
 //        moods.remove(mood);
 //
 //        /*

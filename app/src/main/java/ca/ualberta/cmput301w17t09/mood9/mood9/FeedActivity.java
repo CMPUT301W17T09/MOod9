@@ -89,6 +89,14 @@ public class FeedActivity extends AppCompatActivity
         mApplication = (Mood9Application) getApplicationContext();
         moodLinkedList = mApplication.getMoodLinkedList();
         searching = 0;
+        SharedPreferences shPref = getApplicationContext().getSharedPreferences(getString(R.string.stored_name), MODE_PRIVATE);
+        String userName = shPref.getString("username", "test");
+        String userId = UserModel.getUserID(userName).getId();
+        ArrayList<Mood> temp = mApplication.getMoodModel().getCurrentUserMoods();
+        //LOADING FROM ELASTIC SEARCH
+        for (int i = 0; i < temp.size(); i++) {
+            moodLinkedList.add(temp.get(i));
+        }
 
         ListView moodListView = (ListView) findViewById(R.id.moodList);
         moodListAdapter = new MoodListAdapter(this, moodLinkedList, mApplication);

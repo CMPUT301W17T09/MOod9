@@ -52,9 +52,11 @@ public class Mood9Application extends Application {
         MoodDir.mkdir();
         File addedmoods = new File(MoodDir,"addedmoods.sav");
         File deletedmoods = new File(MoodDir,"deletedmoods.sav");
+        File currentMoods = new File(MoodDir, UpdatedMoodModel.FILENAME);
         try{
             Boolean created = addedmoods.createNewFile();
             Boolean created2 = deletedmoods.createNewFile();
+            Boolean created3 = currentMoods.createNewFile();
             Boolean myBool = created & created2;
             BufferedReader br = new BufferedReader(new FileReader(addedmoods));
             String line = null;

@@ -31,7 +31,7 @@ import java.util.HashMap;
 
 public class UpdatedMoodModel {
 
-    private String FILENAME = "personal_moods.sav";
+    public static String FILENAME = "personal_moods.sav";
     private ArrayList<Mood> moodList;
     Context mContext;
 
@@ -129,6 +129,9 @@ public class UpdatedMoodModel {
 
     private void saveInFile() {
         try {
+            File file = new File(FILENAME);
+            file.createNewFile();
+
             // Delete everything on file
             File file = new File(FILENAME);
             file.createNewFile();
