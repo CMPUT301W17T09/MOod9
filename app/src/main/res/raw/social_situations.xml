@@ -7,62 +7,17 @@
     </SocialSituation>
     <SocialSituation>
         <id>1</id>
-        <name>With the SO</name>
-        <description>Is it really a Sassy Officer</description>
+        <name>With one person</name>
+        <description>Party of two</description>
     </SocialSituation>
     <SocialSituation>
         <id>2</id>
-        <name>With Parents</name>
-        <description>Free food is always  nice</description>
+        <name>With two or more people</name>
+        <description>There is a party here</description>
     </SocialSituation>
     <SocialSituation>
         <id>3</id>
-        <name>At Work</name>
-        <description>Hard work is real work</description>
-    </SocialSituation>
-    <SocialSituation>
-        <id>4</id>
-        <name>In Class</name>
-        <description>Obviously I'm not paying attention</description>
-    </SocialSituation>
-    <SocialSituation>
-        <id>5</id>
-        <name>Just got dumped</name>
-        <description>Guess I could be a dumpster diver.</description>
-    </SocialSituation>
-    <SocialSituation>
-        <id>6</id>
-        <name>With the rebound chick</name>
-        <description>He shoots he scores!</description>
-    </SocialSituation>
-    <SocialSituation>
-        <id>7</id>
-        <name>The day after</name>
-        <description>I need advil.</description>
-    </SocialSituation>
-    <SocialSituation>
-        <id>8</id>
-        <name>At a baby shower</name>
-        <description>She's talking about babies...</description>
-    </SocialSituation>
-    <SocialSituation>
-        <id>9</id>
-        <name>Driving Home</name>
-        <description>Awkward baby talk...</description>
-    </SocialSituation>
-    <SocialSituation>
-        <id>10</id>
-        <name>Cruising</name>
-        <description>Looking for something to do...</description>
-    </SocialSituation>
-    <SocialSituation>
-        <id>11</id>
-        <name>Fighting with the SO</name>
-        <description>She's really a Sick Ostriche.</description>
-    </SocialSituation>
-    <SocialSituation>
-        <id>12</id>
-        <name>With Friends</name>
-        <description>Are they really my friends?</description>
+        <name>With a crowd</name>
+        <description>Too many people!</description>
     </SocialSituation>
 </SocialSituations>
