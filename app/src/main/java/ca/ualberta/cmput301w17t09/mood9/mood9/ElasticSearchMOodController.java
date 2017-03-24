@@ -470,8 +470,7 @@ public class ElasticSearchMOodController {
                         "        \"store\": \"yes\"\n" +
                         "      },\n" +
                         "      \"date\": {\n" +
-                        "        \"type\": \"date\",\n" +
-                        "        \"format\": \"yyyy-MM-dd'T'HH:mm:ss\",\n" +
+                        "        \"type\": \"string\",\n" +
                         "        \"store\": \"yes\"\n" +
                         "      },\n" +
                         "      \"user_id\": {\n" +

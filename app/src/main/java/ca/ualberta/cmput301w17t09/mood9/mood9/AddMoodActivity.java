@@ -33,6 +33,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Map;
+import java.util.TimeZone;
 
 /**
  * Originally created by Fady
@@ -261,19 +262,12 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
         save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String myFormat = "yyyy-MM-dd'T'HH:mm:ss";
                 DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
                 String newDate = dateFormat.format(curDate);
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-                try {
-                    Date d = sdf.parse(newDate);
-                } catch (ParseException ex) {
-                    // DO NOTHING
-                }
                 if (editCheckB.getInt("editCheck", -1) == 1) {
                     try {
                         returnMood.setEmotionId(String.valueOf(emotionId));
-                        returnMood.setDate(curDate);
+                        returnMood.setDate(newDate);
                         returnMood.setEmotionId(String.valueOf(emotionId));
                         returnMood.setSocialSituationId(String.valueOf(socialId));
                         returnMood.setTrigger(trigger.getText().toString());
@@ -289,7 +283,7 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
                 }
                 else {
                     // added emoticon parameter to Mood class to store the r.drawable of the selected emotion
-                    returnMood = new Mood(latitude, longitude, trigger.getText().toString(), String.valueOf(emotionId), String.valueOf(socialId), imageTriggerId, curDate, userId, "");
+                    returnMood = new Mood(latitude, longitude, trigger.getText().toString(), String.valueOf(emotionId), String.valueOf(socialId), imageTriggerId, newDate, userId, "");
                     returnMood.setEmotionId(String.valueOf(emotionId));
                     returnMood.setSocialSituationId(String.valueOf(socialId));
 
