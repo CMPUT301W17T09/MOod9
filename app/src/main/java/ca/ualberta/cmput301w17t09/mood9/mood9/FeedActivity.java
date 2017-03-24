@@ -99,27 +99,10 @@ public class FeedActivity extends AppCompatActivity
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 //for list item clicked
-                if (searching == 0) {
-                    Intent editMoodIntent = new Intent(FeedActivity.this, AddMoodActivity.class);
-                    editMoodIntent.putExtra("editCheck", 1);
-                    editMoodIntent.putExtra("moodIndex", position);
-                    startActivityForResult(editMoodIntent, 1);
-                } else {
-                    // TODO: open up a detail view of mood data
-                    String trigger = moodLinkedList.get(position).getTrigger();
-                    String socialSit = mApplication.getSocialSituationModel().getSocialSituation(moodLinkedList.get(position).getSocialSituationId()).getDescription();
-                    AlertDialog.Builder detailBuild = new AlertDialog.Builder(context)
-                            .setTitle(UserModel.getUserProfile(moodLinkedList.get(position).getUser_id()).getName())
-                            .setMessage(trigger + "\n" + socialSit)
-                            .setNeutralButton("Ok", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    dialog.cancel();
-                                }
-                            });
-                    AlertDialog detailDialog = detailBuild.create();
-                    detailDialog.show();
-                }
+
+                Intent viewMoodIntent = new Intent(FeedActivity.this, MoodViewActivity.class);
+                viewMoodIntent.putExtra("moodIndex", position);
+                startActivityForResult(viewMoodIntent, 1);
             }
         });
     }
