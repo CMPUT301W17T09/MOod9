@@ -11,6 +11,7 @@ import com.google.gson.stream.JsonReader;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -29,7 +30,7 @@ import java.util.ArrayList;
 
 public class UpdatedMoodModel {
 
-    private String FILENAME = "personal_moods.sav";
+    public static String FILENAME = "personal_moods.sav";
     private ArrayList<Mood> moodList;
     Context mContext;
 
@@ -122,6 +123,9 @@ public class UpdatedMoodModel {
 
     private void saveInFile() {
         try {
+            File file = new File(FILENAME);
+            file.createNewFile();
+
             // Delete everything on file
             new PrintWriter(FILENAME).close();
 

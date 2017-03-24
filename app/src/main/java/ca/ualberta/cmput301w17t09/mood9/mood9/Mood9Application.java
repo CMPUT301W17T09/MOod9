@@ -18,7 +18,7 @@ import java.util.LinkedList;
 public class Mood9Application extends Application {
     private EmotionModel emotionModel;
     private SocialSituationModel socialSituationModel;
-    private MoodModel moodModel;
+    private UpdatedMoodModel moodModel;
     private LinkedList<Mood> moodLinkedList;
 
     public EmotionModel getEmotionModel() {
@@ -29,7 +29,7 @@ public class Mood9Application extends Application {
         return socialSituationModel;
     }
 
-    public MoodModel getMoodModel() {
+    public UpdatedMoodModel getMoodModel() {
         return moodModel;
     }
 
@@ -50,9 +50,11 @@ public class Mood9Application extends Application {
         MoodDir.mkdir();
         File addedmoods = new File(MoodDir,"addedmoods.sav");
         File deletedmoods = new File(MoodDir,"deletedmoods.sav");
+        File currentMoods = new File(MoodDir, UpdatedMoodModel.FILENAME);
         try{
             Boolean created = addedmoods.createNewFile();
             Boolean created2 = deletedmoods.createNewFile();
+            Boolean created3 = currentMoods.createNewFile();
             Boolean myBool = created & created2;
             BufferedReader br = new BufferedReader(new FileReader(addedmoods));
             String line = null;
@@ -73,7 +75,7 @@ public class Mood9Application extends Application {
         InputStream socialSituationsStream = this.getResources().openRawResource(R.raw.social_situations);
         this.emotionModel = new EmotionModel(emotionsStream);
         this.socialSituationModel = new SocialSituationModel(socialSituationsStream);
-        this.moodModel = new MoodModel(addedmoods,deletedmoods);
+        this.moodModel = new UpdatedMoodModel(this);
         this.moodLinkedList = new LinkedList<Mood>();
     }
 }
