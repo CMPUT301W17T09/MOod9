@@ -14,10 +14,13 @@ public class User {
     private String id;
     private String name;
     private ArrayList<String> followees;
+    public ArrayList<String> requests;
 
     public User(String name) {
         this.name = name;
         this.followees = new ArrayList<String>();
+        this.requests = new ArrayList<String>();
+
     }
 
     public String getId() {
@@ -46,6 +49,14 @@ public class User {
 
     public ArrayList<String> getFollowees() {
         return this.followees;
+    }
+
+    public ArrayList<String> getRequests() {
+        return requests;
+    }
+
+    public void addToRequests(String request) {
+        requests.add(request);
     }
 
 }

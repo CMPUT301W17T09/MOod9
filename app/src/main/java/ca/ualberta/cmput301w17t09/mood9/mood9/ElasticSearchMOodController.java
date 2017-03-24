@@ -249,20 +249,6 @@ public class ElasticSearchMOodController {
 
             // Already created and ready to use
             // Create a new index, and mapping for our purpose
-
-            /*
-            try {
-                JestResult result = client.execute(new CreateIndex.Builder(index_name).build());
-
-                if (result.isSucceeded()) {
-                    createMOodMapping();
-                    createUserMapping();
-                }
-
-            } catch (Exception e) {
-                Log.i("Error", "Can't create new index or mapping");
-            }
-            */
         }
     }
 
