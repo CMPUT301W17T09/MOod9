@@ -130,6 +130,10 @@ public class UpdatedMoodModel {
     private void saveInFile() {
         try {
             // Delete everything on file
+            File file = new File(FILENAME);
+            file.createNewFile();
+
+
             new PrintWriter(FILENAME).close();
 
             // Write new array to file
