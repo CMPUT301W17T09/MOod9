@@ -26,10 +26,11 @@ public class Mood implements Serializable {
     private String imageTriggerId;
     private Date date;
     private String user_id;
+    private String image;
 
     public Mood(Double latitude, Double longitude,
                 String trigger, String emotionId, String socialSituationId,
-                String imageTriggerId, Date date,String user_id) {
+                String imageTriggerId, Date date, String user_id, String image) {
         //http://stackoverflow.com/questions/1389736/how-do-i-create-a-unique-id-in-java
         this.offlineid = UUID.randomUUID().toString();
         this.latitude = latitude;
@@ -40,12 +41,22 @@ public class Mood implements Serializable {
         this.imageTriggerId = imageTriggerId;
         this.date = date;
         this.user_id = user_id;
+        this.image = image;
     }
 
 
     public Mood(){
 
     }
+
+    public void setImage(String image_s) {
+        this.image = image_s;
+    }
+
+    public String getImage() {
+        return this.image;
+    }
+
     public String getOfflineid() {
         return offlineid;
     }

@@ -94,45 +94,57 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:background="@color/colorPrimary"
+            android:background="@color/colorWhite"
             tools:layout_editor_absoluteX="8dp"
             tools:layout_editor_absoluteY="8dp"
             android:layout_marginTop="10dp"
             android:padding="15dp"
             >
+
+            <TextView
+                android:textColor="@color/colorBlack"
+                android:id="@+id/textView5"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Trigger:" />
+
             <TextView
                 android:id="@+id/trigger"
                 android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
-                android:layout_weight="1"
-                android:text="Trigger"
-                android:textColor="@color/colorWhite"
-                android:textSize="18sp"
-                android:textStyle="bold"
+                android:layout_height="wrap_content"
                 android:gravity="center"
-                android:layout_marginRight="15dp"/>
+                android:text="Trigger"
+                android:textColor="@color/colorBlack"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
         </LinearLayout>
         <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:background="@color/colorPrimary"
+            android:background="@color/colorWhite"
             tools:layout_editor_absoluteX="8dp"
             tools:layout_editor_absoluteY="8dp"
             android:layout_marginTop="10dp"
             android:padding="15dp"
             >
             <TextView
+                android:textColor="@color/colorBlack"
+                android:id="@+id/textView6"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Social Situation:  " />
+
+            <TextView
+                android:paddingLeft="10dp"
                 android:id="@+id/social_situation"
-                android:layout_width="fill_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="fill_parent"
-                android:layout_weight="1"
                 android:text="Social Situation"
-                android:textColor="@color/colorWhite"
+                android:textColor="@color/colorBlack"
                 android:textSize="18sp"
-                android:textStyle="bold"
-                android:gravity="center"
-                android:layout_marginRight="15dp"/>
+                android:textStyle="bold" />
         </LinearLayout>
 
     </LinearLayout>

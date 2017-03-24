@@ -426,6 +426,10 @@ public class ElasticSearchMOodController {
                         "        \"type\": \"string\",\n" +
                         "        \"store\": \"yes\"\n" +
                         "      },\n" +
+                        "      \"image\": {\n" +
+                        "        \"type\": \"string\",\n" +
+                        "        \"store\": \"yes\"\n" +
+                        "      },\n" +
                         "      \"imageTriggerId\": {\n" +
                         "        \"type\": \"string\",\n" +
                         "        \"store\": \"yes\"\n" +
