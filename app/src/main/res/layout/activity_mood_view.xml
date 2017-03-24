@@ -109,10 +109,10 @@
                 android:text="Trigger:" />
 
             <TextView
+                android:paddingLeft="10dp"
                 android:id="@+id/trigger"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center"
                 android:text="Trigger"
                 android:textColor="@color/colorBlack"
                 android:textSize="18sp"
@@ -146,6 +146,14 @@
                 android:textSize="18sp"
                 android:textStyle="bold" />
         </LinearLayout>
+
+        <ImageView
+            android:id="@+id/viewMoodImage"
+            android:layout_width="156dp"
+            android:layout_height="132dp"
+            app:srcCompat="@android:drawable/ic_menu_report_image"
+            tools:layout_editor_absoluteX="0dp"
+            tools:layout_editor_absoluteY="283dp" />
 
     </LinearLayout>
 

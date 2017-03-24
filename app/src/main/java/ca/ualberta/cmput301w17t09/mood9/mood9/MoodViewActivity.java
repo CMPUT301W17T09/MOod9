@@ -3,10 +3,14 @@ package ca.ualberta.cmput301w17t09.mood9.mood9;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
+import android.media.Image;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -35,8 +39,10 @@ public class MoodViewActivity extends AppCompatActivity {
         TextView username = (TextView) findViewById(R.id.username);
         TextView trigger = (TextView) findViewById(R.id.trigger);
         TextView social_situation = (TextView) findViewById(R.id.social_situation);
+        ImageView viewMoodImage = (ImageView) findViewById(R.id.viewMoodImage);
 
         int resID = getResources().getIdentifier(e.getName().toLowerCase().trim() , "drawable", getPackageName());
+        viewMoodImage.setImageBitmap(StringToBitMap(mood.getImage()));
         emoticon.setImageResource(resID);
         emotion.setText(e.getName());
         social_situation.setText(ss.getName());
@@ -60,6 +66,20 @@ public class MoodViewActivity extends AppCompatActivity {
             });
         } else {
             edit.setVisibility(View.INVISIBLE);
+        }
+    }
+
+
+    //http://androidtrainningcenter.blogspot.in/2012/03/how-to-convert-string-to-bitmap-and.html
+    //Found on March 23, 2017
+    public Bitmap StringToBitMap(String encodedString){
+        try{
+            byte [] encodeByte= Base64.decode(encodedString,Base64.DEFAULT);
+            Bitmap bitmap= BitmapFactory.decodeByteArray(encodeByte, 0, encodeByte.length);
+            return bitmap;
+        }catch(Exception e){
+            e.getMessage();
+            return null;
         }
     }
 
