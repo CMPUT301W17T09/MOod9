@@ -146,7 +146,7 @@ public class ElasticSearchMOodController {
                 Index index = new Index.Builder(mood).index(index_name).type(mood_type).build();
 
                 try {
-                    DocumentResult result = client.execute(index);
+                    DocumentResult result = client.execute(index); // TODO: this always fails when adding new moods
                     System.out.println(result.toString());
                     if (result.isSucceeded()){
                         System.out.println("PUSH");

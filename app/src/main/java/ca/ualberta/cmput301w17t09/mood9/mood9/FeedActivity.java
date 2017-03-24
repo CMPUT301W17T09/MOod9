@@ -73,7 +73,8 @@ public class FeedActivity extends AppCompatActivity
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+                this, drawer, toolbar, R.string.navigation_drawer_open,
+                R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
@@ -89,10 +90,7 @@ public class FeedActivity extends AppCompatActivity
         mApplication = (Mood9Application) getApplicationContext();
         moodLinkedList = mApplication.getMoodLinkedList();
         searching = 0;
-        SharedPreferences shPref = getApplicationContext().getSharedPreferences(getString(R.string.stored_name), MODE_PRIVATE);
-        String userName = shPref.getString("username", "test");
-        String userId = UserModel.getUserID(userName).getId();
-        ArrayList<Mood> temp = mApplication.getMoodModel().getCurrentUserMoods();
+        ArrayList<Mood> temp = mApplication.getMoodModel().getUniversalUserMoods(null);
         //LOADING FROM ELASTIC SEARCH
         for (int i = 0; i < temp.size(); i++) {
             moodLinkedList.add(temp.get(i));
@@ -114,9 +112,12 @@ public class FeedActivity extends AppCompatActivity
                 } else {
                     // TODO: open up a detail view of mood data
                     String trigger = moodLinkedList.get(position).getTrigger();
-                    String socialSit = mApplication.getSocialSituationModel().getSocialSituation(moodLinkedList.get(position).getSocialSituationId()).getDescription();
+                    String socialSit = mApplication.getSocialSituationModel()
+                            .getSocialSituation(moodLinkedList.get(position).getSocialSituationId())
+                            .getDescription();
                     AlertDialog.Builder detailBuild = new AlertDialog.Builder(context)
-                            .setTitle(UserModel.getUserProfile(moodLinkedList.get(position).getUser_id()).getName())
+                            .setTitle(UserModel.getUserProfile(moodLinkedList.get(position)
+                                    .getUser_id()).getName())
                             .setMessage(trigger + "\n" + socialSit)
                             .setNeutralButton("Ok", new DialogInterface.OnClickListener() {
                                 @Override
@@ -160,11 +161,15 @@ public class FeedActivity extends AppCompatActivity
             public boolean onQueryTextSubmit(String query) {
                 searching = 1;
                 String returnConversion = queryConverter(query);
-                // TODO: move this call to the queryConverter so that you can grab multiple possible queries in one search, so query every time something is found and add to list
+                // TODO: move this call to the queryConverter so that you
+                // TODO: can grab multiple possible queries in one search,
+                // TODO: so query every time something is found and add to list
                 HashMap<String, String> queryHash = new HashMap<>();
-                queryHash.put(returnConversion.substring(0,returnConversion.indexOf(':')), returnConversion.substring(returnConversion.indexOf(':')+1));
+                queryHash.put(returnConversion.substring(0,returnConversion.indexOf(':')),
+                        returnConversion.substring(returnConversion.indexOf(':')+1));
                 moodLinkedList.clear();
-                ArrayList<Mood> reloadedMoods = mApplication.getMoodModel().getUniversalUserMoods(queryHash);
+                ArrayList<Mood> reloadedMoods = mApplication.getMoodModel()
+                        .getUniversalUserMoods(queryHash);
                 populateFromMoodLoad(reloadedMoods);
                 moodListAdapter.notifyDataSetChanged();
                 return true;
@@ -244,7 +249,6 @@ public class FeedActivity extends AppCompatActivity
         //LOADING FROM ELASTIC SEARCH
         for (int i = 0; i < newMoods.size(); i++) {
             moodLinkedList.add(newMoods.get(i));
-            //mApplication.getMoodModel().getCurrentUserMoods().add(newMoods.get(i)); don't need to add since this isn't our moodss
         }
     }
     private String queryConverter(String query) {
@@ -271,14 +275,20 @@ public class FeedActivity extends AppCompatActivity
             }
         }*/
 
-        for (Map.Entry<String, SocialSituation> entry : mApplication.getSocialSituationModel().getSocialSituations().entrySet()) {
-            if (entry.getValue().getName().toLowerCase().contains(query.toLowerCase()) || entry.getValue().getDescription().toLowerCase().contains(query.toLowerCase())) {
+        for (Map.Entry<String, SocialSituation> entry : mApplication.getSocialSituationModel()
+                .getSocialSituations().entrySet()) {
+            if (entry.getValue().getName().toLowerCase()
+                    .contains(query.toLowerCase()) || entry.getValue().getDescription()
+                    .toLowerCase().contains(query.toLowerCase())) {
                 queryConverted = "socialSituationId:"+entry.getValue().getId();
                 return queryConverted;
             }
         }
-        for (Map.Entry<String, Emotion> entry: mApplication.getEmotionModel().getEmotions().entrySet()) {
-            if (entry.getValue().getName().toLowerCase().contains(query.toLowerCase()) || entry.getValue().getDescription().toLowerCase().contains(query.toLowerCase())) {
+        for (Map.Entry<String, Emotion> entry: mApplication.getEmotionModel()
+                .getEmotions().entrySet()) {
+            if (entry.getValue().getName().toLowerCase()
+                    .contains(query.toLowerCase()) || entry.getValue().getDescription()
+                    .toLowerCase().contains(query.toLowerCase())) {
                 queryConverted = "emotionId:"+entry.getValue().getId();
                 return queryConverted;
             }
@@ -289,19 +299,9 @@ public class FeedActivity extends AppCompatActivity
                 return queryConverted;
             }
         }
+        queryConverted = "trigger:"+query;
 
         return queryConverted;
-    }
-
-    private int getIndexOfMoodID(String moodId) {
-        int targetId = Integer.parseInt(moodId);
-        for (int i = 0; i < moodLinkedList.size(); i++) {
-            int currentId = Integer.parseInt(moodLinkedList.get(i).getId());
-            if (currentId == targetId) {
-                return i;
-            }
-        }
-        return -1;
     }
 
     // Code Documentation found here: https://developer.android.com/reference/android/app/Activity.html
@@ -309,7 +309,8 @@ public class FeedActivity extends AppCompatActivity
         // requestcode 0 is from adding a new mood
         if (requestCode == 0) {
 
-            LayoutInflater inflater = (LayoutInflater)this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            LayoutInflater inflater = (LayoutInflater)this
+                    .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             View view = inflater.inflate(R.layout.fragment_mood,null);
 
             TextView username = (TextView)view.findViewById(R.id.username);

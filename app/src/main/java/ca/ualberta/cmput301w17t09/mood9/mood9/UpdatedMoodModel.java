@@ -33,6 +33,7 @@ public class UpdatedMoodModel {
 
     public static String FILENAME = "personal_moods.sav";
     private ArrayList<Mood> moodList;
+    File CURRENTMOODS = new File("personal_moods.sav");
     Context mContext;
 
     /***
@@ -48,8 +49,10 @@ public class UpdatedMoodModel {
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 
-    public UpdatedMoodModel(Context context) {
+    public UpdatedMoodModel(Context context, File file) {
         this.mContext = context;
+        this.CURRENTMOODS = file;
+        this.moodList = new ArrayList<Mood>();
         loadFromFile();
     }
 
@@ -111,13 +114,14 @@ public class UpdatedMoodModel {
     private void loadFromFile() {
 
         try {
-            JsonReader br = new JsonReader(new FileReader(FILENAME));
+            JsonReader br = new JsonReader(new FileReader(CURRENTMOODS));
 
             Gson gson = new Gson();
 
             Type listType = new TypeToken<ArrayList<Mood>>() {}.getType();
             moodList = new ArrayList<Mood>();
             moodList = gson.fromJson(br, listType);
+            if (moodList == null) moodList = new ArrayList<Mood>();
 
         }   catch (FileNotFoundException e) {
             moodList = new ArrayList<Mood>();
@@ -129,18 +133,16 @@ public class UpdatedMoodModel {
 
     private void saveInFile() {
         try {
-            File file = new File(FILENAME);
-            file.createNewFile();
 
             // Delete everything on file
-            File file = new File(FILENAME);
-            file.createNewFile();
+//            File file = new File(FILENAME);
+//            file.createNewFile();
 
 
-            new PrintWriter(FILENAME).close();
+            new PrintWriter(CURRENTMOODS).close();
 
             // Write new array to file
-            BufferedWriter buffWriter = new BufferedWriter(new FileWriter(FILENAME, true));
+            BufferedWriter buffWriter = new BufferedWriter(new FileWriter(CURRENTMOODS, true));
 
             Gson gson = new Gson();
             Type type = new TypeToken<ArrayList<Mood>>() {}.getType();
