@@ -7,8 +7,6 @@
     tools:context="ca.ualberta.cmput301w17t09.mood9.mood9.ProfileActivity"
     tools:layout_editor_absoluteY="81dp"
     tools:layout_editor_absoluteX="0dp">
-
-
     <TextView
         android:textSize="30sp"
         android:textColor="@color/colorBlack"
@@ -19,14 +17,6 @@
         android:layout_alignParentStart="true"
         android:layout_marginStart="19dp" />
 
-    <ListView
-        android:id="@+id/followees"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_alignStart="@+id/profile_name"
-        android:layout_below="@+id/profile_name"
-        android:layout_marginTop="18dp" />
-
     <TextView
         android:textColor="@color/colorBlack"
         android:id="@+id/textView7"
@@ -35,4 +25,35 @@
         android:layout_alignStart="@+id/followees"
         android:layout_below="@+id/profile_name"
         android:text="Followees:" />
+
+    <ListView
+        android:id="@+id/followees"
+        android:layout_width="match_parent"
+        android:layout_height="250dp"
+        android:layout_alignStart="@+id/profile_name"
+        android:layout_below="@+id/textView7"
+        android:layout_marginTop="18dp"
+        android:layout_weight="0.5" />
+
+    <TextView
+        android:textColor="@color/colorBlack"
+        android:id="@+id/textView8"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignStart="@+id/followees"
+        android:layout_below="@+id/followees"
+        android:text="Follow requests:" />
+
+    <ListView
+        android:id="@+id/requests"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignStart="@+id/profile_name"
+        android:layout_below="@+id/textView8"
+        android:layout_weight="0.5"
+        android:layout_marginTop="18dp" />
+
+
+
 </RelativeLayout>
+

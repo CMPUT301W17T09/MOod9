@@ -14,8 +14,10 @@ import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.w3c.dom.Text;
 
@@ -66,9 +68,13 @@ public class MoodViewActivity extends AppCompatActivity {
         username.setText(UserModel.getUserProfile(mood.getUser_id()).getName());
 
         Button edit = (Button) findViewById(R.id.edit);
+        ImageButton follow = (ImageButton) findViewById(R.id.follow);
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         String user_id = sharedPreferences.getString("user_id", "TESTER IN MAIN");
+        User current = UserModel.getUserProfile(mood.getUser_id());
         if (mood.getUser_id().equals(user_id)) {
+            follow.setVisibility(View.GONE);
+            System.out.println("asdsd");
             edit.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -81,6 +87,32 @@ public class MoodViewActivity extends AppCompatActivity {
             });
         } else {
             edit.setVisibility(View.INVISIBLE);
+            follow.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick (View v){
+                    int duration = Toast.LENGTH_SHORT;
+                    Context context = getApplicationContext();
+                    //If you are already following the user
+                    if(current.getFollowees().contains(UserModel.getUserProfile(user_id))){
+                        Toast toast2 = Toast.makeText(context, "You are already following this user!", duration);
+                        toast2.show();
+                    }
+                    else {
+                        if(current.getRequests().contains(user_id)){
+                            Toast toast3 = Toast.makeText(context, "Request already sent!", duration);
+                            toast3.show();
+                        }
+                        else {
+                            current.addToRequests(user_id);
+                            CharSequence text = "Follow request sent!";
+                            Toast toast = Toast.makeText(context, text, duration);
+                            toast.show();
+                            UserModel.updateUser(current);
+                        }
+                    }
+                }
+            });
+
         }
     }
 
