@@ -93,7 +93,8 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
         if (editCheck == 1) {
             setContentView(R.layout.activity_edit_mood);
             oldMoodIndex = editCheckB.getInt("moodIndex");
-        } else {
+        }
+        else {
             setContentView(R.layout.activity_add_mood);
         }
 

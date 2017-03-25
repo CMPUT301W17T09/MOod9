@@ -88,9 +88,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     Emotion emotion = em.getEmotion(tempMood.getEmotionId());
                     String emotionName = emotion.getName();
                     int iconNumber = getResources().getIdentifier(emotionName.toLowerCase().trim(), "drawable", getPackageName());
-//                  TODO This is the problem here. GetId is returning null so I cannot set the title properly.
-                    String test = tempMood.getId();
-                    Marker tempMarker = mMap.addMarker(new MarkerOptions().title(tempMood.getId()).position(tempCord).icon(BitmapDescriptorFactory.fromBitmap(makeSmallerIcon(iconNumber))));
+                    String test = Integer.toString(i);
+                    Marker tempMarker = mMap.addMarker(new MarkerOptions().title(Integer.toString(i+1)).position(tempCord).icon(BitmapDescriptorFactory.fromBitmap(makeSmallerIcon(iconNumber))));
                     markers.add(tempMarker);
                 }
             }
@@ -112,9 +111,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
+                marker.hideInfoWindow();
                 Intent viewMood = new Intent(MapsActivity.this, MoodViewActivity.class);
-                viewMood.putExtra("moodIndex", -1);
-                viewMood.putExtra("moodID", marker.getTitle());
+                viewMood.putExtra("moodIndex", Integer.getInteger(marker.getTitle()));
                 startActivity(viewMood);
                 return false;
             }
