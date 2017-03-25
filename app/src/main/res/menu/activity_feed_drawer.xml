@@ -20,7 +20,7 @@
             android:title="@string/near_me" />
     </group>
 
-    <item android:title="Communcation">
+    <item android:title="Communication">
         <menu>
             <item
                 android:id="@+id/profile"
@@ -30,6 +30,10 @@
                 android:id="@+id/about"
                 android:icon="@drawable/ic_lightbulb"
                 android:title="@string/about" />
+            <item
+                android:id="@+id/stats"
+                android:icon="@drawable/ic_stats"
+                android:title="@string/stats" />
         </menu>
     </item>
 <!--TODO change the buttons and icons to do as we wish-->

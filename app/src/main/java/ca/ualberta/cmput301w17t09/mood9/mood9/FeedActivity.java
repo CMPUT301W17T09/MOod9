@@ -215,6 +215,9 @@ public class FeedActivity extends AppCompatActivity
         } else if (id == R.id.about) {
             Intent aboutIntent = new Intent(this, AboutActivity.class);
             startActivity(aboutIntent);
+        } else if (id == R.id.stats) {
+            Intent statsActivity = new Intent(this, StatsActivity.class);
+            startActivity(statsActivity);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

@@ -48,7 +48,8 @@
             android:label="@string/title_activity_maps" />
         <activity android:name=".AboutActivity" />
         <activity android:name=".ProfileActivity" />
-        <activity android:name=".MoodViewActivity"></activity>
+        <activity android:name=".MoodViewActivity" />
+        <activity android:name=".StatsActivity"></activity>
     </application>
 
 </manifest>
