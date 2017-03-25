@@ -88,8 +88,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     Emotion emotion = em.getEmotion(tempMood.getEmotionId());
                     String emotionName = emotion.getName();
                     int iconNumber = getResources().getIdentifier(emotionName.toLowerCase().trim(), "drawable", getPackageName());
-                    String test = Integer.toString(i);
-                    Marker tempMarker = mMap.addMarker(new MarkerOptions().title(Integer.toString(i+1)).position(tempCord).icon(BitmapDescriptorFactory.fromBitmap(makeSmallerIcon(iconNumber))));
+                    Marker tempMarker = mMap.addMarker(new MarkerOptions().title(Integer.toString(i)).position(tempCord).icon(BitmapDescriptorFactory.fromBitmap(makeSmallerIcon(iconNumber))));
                     markers.add(tempMarker);
                 }
             }
@@ -113,7 +112,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             public boolean onMarkerClick(Marker marker) {
                 marker.hideInfoWindow();
                 Intent viewMood = new Intent(MapsActivity.this, MoodViewActivity.class);
-                viewMood.putExtra("moodIndex", Integer.getInteger(marker.getTitle()));
+                viewMood.putExtra("moodIndex", Integer.valueOf(marker.getTitle()));
                 startActivity(viewMood);
                 return false;
             }
