@@ -21,4 +21,8 @@
                                 Alberta.</string>
     <string name="stored_name">username</string>
     <string name="stored_id">user_id</string>
+    <string name="Decline">Decline</string>
+    <string name="Accept">Accept</string>
+    <string name="Cancel">Cancel</string>
+
 </resources>
