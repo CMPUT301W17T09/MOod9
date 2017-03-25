@@ -131,17 +131,7 @@ public class ElasticSearchMOodController {
             return moods;
         }
 
-        @Override
-        protected Void doInBackground(Void... v) {
-            verifySettings();
-
-            // Get moods online
-            ArrayList<Mood> OnlineMood = GetMoods(Moods.get(0).getUser_id());
-
-            // Delete those moods
-            DeleteMoods(OnlineMood);
-
-            // Add new updated moods from Offline soure
+        protected void addNewMoods() {
             for (Mood mood: Moods) {
                 Index index = new Index.Builder(mood).index(index_name).type(mood_type).build();
 
@@ -158,6 +148,21 @@ public class ElasticSearchMOodController {
                     Log.i("Error", "The application failed to build and send the tweets");
                 }
             }
+        }
+
+        @Override
+        protected Void doInBackground(Void... v) {
+            verifySettings();
+
+            // Get moods online
+            ArrayList<Mood> OnlineMood = GetMoods(Moods.get(0).getUser_id());
+
+            // Delete those moods
+            DeleteMoods(OnlineMood);
+
+            // Add new updated moods from Offline soure
+            addNewMoods();
+
             return null;
         }
     }

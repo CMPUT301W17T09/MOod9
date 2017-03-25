@@ -1,16 +1,20 @@
 package ca.ualberta.cmput301w17t09.mood9.mood9;
 
+import android.Manifest;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 
+import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.provider.Settings;
 
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.widget.Toast;
 /**
@@ -46,7 +50,6 @@ public class LocationService implements LocationListener {
     }
 
     private Location getLocation() {
-
         try {
             locationManager = (LocationManager) mContext
                     .getSystemService(Context.LOCATION_SERVICE);
@@ -108,7 +111,7 @@ public class LocationService implements LocationListener {
                             }
                         }
                     } catch (SecurityException e) {
-
+                        getLocation();
                     }
                 }
             }
