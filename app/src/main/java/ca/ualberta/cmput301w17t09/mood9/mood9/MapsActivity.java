@@ -97,15 +97,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         // Add a marker at tim hortons and move the camera
         LatLng timmiesCord = new LatLng(53.526599, -113.524596);
-        Marker timmies = mMap.addMarker(new MarkerOptions().title("Tim Horton").position(timmiesCord).icon(BitmapDescriptorFactory.fromBitmap(makeSmallerIcon(R.drawable.anger))));
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(timmiesCord, 10));
-
-
-        LatLng test_cord = new LatLng(53.52611, -113.524596);
-        Marker new_test = mMap.addMarker(new MarkerOptions().title("Test Marker").position(test_cord).icon(BitmapDescriptorFactory.fromBitmap(makeSmallerIcon(R.drawable.happiness))));
-
-        markers.add(timmies);
-        markers.add(new_test);
 
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
