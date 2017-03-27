@@ -69,8 +69,7 @@ public class MoodListAdapter extends BaseAdapter{
         holder.timetv=(TextView) rowView.findViewById(R.id.time);
         holder.img=(ImageView) rowView.findViewById(R.id.imageView);
 
-        LinkedList<Mood> temp = mApplication.getMoodLinkedList();
-        holder.idtv.setText(UserModel.getUserProfile(temp.get(position).getUser_id()).getName());
+        holder.idtv.setText(UserModel.getUserProfile(moodList.get(position).getUser_id()).getName());
         holder.timetv.setText(moodList.get(position).getDate().toString());
         String imgNameBuilder = mApplication.getEmotionModel().getEmotion(moodList.get(position).getEmotionId()).getName().toLowerCase() + ".png";
         holder.img.setImageResource(context.getResources().getIdentifier(imgNameBuilder.substring(0, imgNameBuilder.lastIndexOf(".")), "drawable", context.getPackageName()));

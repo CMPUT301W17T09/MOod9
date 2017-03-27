@@ -28,7 +28,14 @@ import android.widget.TextView;
 
 import org.apache.commons.lang3.ObjectUtils;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
@@ -51,7 +58,7 @@ public class FeedActivity extends AppCompatActivity
     private MoodListAdapter moodListAdapter;
     private LinkedList<Mood> moodLinkedList;
     private Mood9Application mApplication;
-    private int searching;
+    private LinkedList<Mood> preSortList;
     Context context;
 
 
@@ -90,11 +97,11 @@ public class FeedActivity extends AppCompatActivity
         context = this;
         mApplication = (Mood9Application) getApplicationContext();
         moodLinkedList = mApplication.getMoodLinkedList();
+        preSortList = new LinkedList<>();
 
         ListView moodListView = (ListView) findViewById(R.id.moodList);
         moodListAdapter = new MoodListAdapter(this, moodLinkedList, mApplication);
         moodListView.setAdapter(moodListAdapter);
-        searching = 0;
         populateFromMoodLoad(mApplication.getMoodModel().getUniversalUserMoods(null));
 
 
@@ -136,7 +143,6 @@ public class FeedActivity extends AppCompatActivity
                 return true;
             }
             public boolean onQueryTextSubmit(String query) {
-                searching = 1;
                 String returnConversion = queryConverter(query);
                 // TODO: move this call to the queryConverter so that you
                 // TODO: can grab multiple possible queries in one search,
@@ -148,6 +154,8 @@ public class FeedActivity extends AppCompatActivity
                 ArrayList<Mood> reloadedMoods = mApplication.getMoodModel()
                         .getUniversalUserMoods(queryHash);
                 populateFromMoodLoad(reloadedMoods);
+                preSortList.clear();
+                preSortList.addAll(moodLinkedList);
                 moodListAdapter.notifyDataSetChanged();
                 return true;
             }
@@ -157,12 +165,16 @@ public class FeedActivity extends AppCompatActivity
         searchView.setOnCloseListener(new SearchView.OnCloseListener() {
             @Override
             public boolean onClose() {
+                Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
                 moodLinkedList.clear();
-                mApplication.getMoodModel().getCurrentUserMoods().clear();
-                ArrayList<Mood> reloadedMoods = mApplication.getMoodModel().getCurrentUserMoods();
+                ArrayList<Mood> reloadedMoods;
+                if (toolbar.getTitle() == "personal") // TODO: implement if toolbar is on follows here
+                    reloadedMoods = mApplication.getMoodModel().getCurrentUserMoods();
+                else
+                    reloadedMoods = mApplication.getMoodModel().getUniversalUserMoods(null);
                 populateFromMoodLoad(reloadedMoods);
+                preSortList.clear();
                 moodListAdapter.notifyDataSetChanged();
-                searching = 0;
                 return false;
             }
         });
@@ -181,6 +193,16 @@ public class FeedActivity extends AppCompatActivity
         if (id == R.id.search) {
             //TODO Add functionality to the search button
             return true;
+        } else if (id == R.id.sort_last_day) { // TODO: need to be able to sort and resort without reloading the list we are sorting
+            setMoodsByDate("day");
+        } else if (id == R.id.sort_last_week) {
+            setMoodsByDate("week");
+        } else if (id == R.id.sort_last_month) {
+            setMoodsByDate("month");
+        } else if (id == R.id.sort_last_year) {
+            setMoodsByDate("year");
+        } else if (id == R.id.sort_forever) {
+            sortDisplayByDate();
         }
 
         return super.onOptionsItemSelected(item);
@@ -196,11 +218,11 @@ public class FeedActivity extends AppCompatActivity
         if (id == R.id.personal) {
             // Handle the camera action
             setFeedName("personal");
-            moodLinkedList.clear();
             ArrayList<Mood> temp = mApplication.getMoodModel().getCurrentUserMoods();
             populateFromMoodLoad(temp);
         } else if (id == R.id.followed) {
             setFeedName("followed");
+            moodLinkedList.clear();
         } else if (id == R.id.universal) {
             setFeedName("universal");
             ArrayList<Mood> temp = mApplication.getMoodModel().getUniversalUserMoods(null);
@@ -234,6 +256,65 @@ public class FeedActivity extends AppCompatActivity
         else if (newName == "followed")
             toolbar.setTitle(R.string.followed_feed);
         return;
+    }
+    private void setMoodsByDate(String range) {
+        moodLinkedList.clear();
+        if (preSortList.size() > 0) { // this string of conditions sets it up so that the original list of moods is reloaded for resorting
+            moodLinkedList.addAll(preSortList);
+        } else {
+            Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+            if (toolbar.getTitle() == "universal") {
+                moodLinkedList.addAll(mApplication.getMoodModel().getUniversalUserMoods(null));
+            } else if (toolbar.getTitle() == "personal") {
+                moodLinkedList.addAll(mApplication.getMoodModel().getCurrentUserMoods());
+            } // TODO: else get follower moods
+        }
+        sortDisplayByDate();
+        Date target = new Date();
+        Calendar cal = Calendar.getInstance();
+        if (range == "day") {
+            cal.add(Calendar.DATE, -1);
+            target = cal.getTime();
+        } else if (range == "week") {
+            cal.add(Calendar.DATE, -7);
+            target = cal.getTime();
+        } else if (range == "month") {
+            cal.add(Calendar.MONTH, -1);
+            target = cal.getTime();
+        } else if (range == "year") {
+            cal.add(Calendar.YEAR, -1);
+            target = cal.getTime();
+        }
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+        LinkedList<Mood> temp = new LinkedList<>();
+        for (Mood entry : moodLinkedList) {
+            try {
+                if (dateFormat.parse(entry.getDate()).after(target)) {
+                    temp.add(entry);
+                }
+            } catch (ParseException e) {
+                // PARSE FAILED
+            }
+        }
+        moodLinkedList.clear();
+        moodLinkedList.addAll(temp);
+        moodListAdapter.notifyDataSetChanged();
+    }
+
+    private void sortDisplayByDate() {
+        Collections.sort(moodLinkedList, new Comparator<Mood>(){
+            DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+            @Override
+            public int compare(Mood mood1, Mood mood2){
+                try {
+                    return dateFormat.parse(mood2.getDate()).compareTo(dateFormat.parse(mood1.getDate()));
+                } catch (ParseException e) {
+                    // PARSE FAILED
+                }
+                return 0;
+            }
+        });
+        moodListAdapter.notifyDataSetChanged();
     }
 
     private void addMood() {

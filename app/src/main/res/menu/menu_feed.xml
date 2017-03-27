@@ -11,11 +11,36 @@
         app:actionViewClass="android.support.v7.widget.SearchView"
         ></item>
     <item
-        android:icon="@drawable/side_nav_bar"
         android:id="@+id/sort"
+        android:icon="@android:drawable/ic_menu_sort_by_size"
         android:title="Sort"
-        app:showAsAction="collapseActionView"
-        ></item>
+        app:showAsAction="always">
+        <menu>
+            <item
+                android:id="@+id/filter_lead"
+                android:title="Filter" />
+            <item
+                android:id="@+id/sort_title"
+                android:checkable="false"
+                android:enabled="false"
+                android:title="Sort By:" />
+            <item
+                android:id="@+id/sort_last_day"
+                android:title="Last Day" />
+            <item
+                android:id="@+id/sort_last_week"
+                android:title="Last Week" />
+            <item
+                android:id="@+id/sort_last_month"
+                android:title="Last Month" />
+            <item
+                android:id="@+id/sort_last_year"
+                android:title="Last Year" />
+            <item
+                android:id="@+id/sort_forever"
+                android:title="Forever" />
+        </menu>
+    </item>
 
 </menu>
 
