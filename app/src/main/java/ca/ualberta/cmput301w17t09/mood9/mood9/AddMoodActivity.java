@@ -48,6 +48,7 @@ import static android.R.attr.bitmap;
  * Modified by cdkushni on 3/20/17, fixed some bugs with shared preferences that came up whenever a new account was made and implemented a new version of the location
  * service, not tested yet.
  * Modified by cdkushni on 3/20/17 gps location grabbing is now working, network location grabbing is still not working for whatever reason.
+ * Encapsulated some parts from the on create function to make it a bit cleaner
  */
 public class AddMoodActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener{
 
@@ -83,16 +84,8 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
-                    Manifest.permission.ACCESS_FINE_LOCATION)) {
-                ActivityCompat.requestPermissions(AddMoodActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_PERMISSION_FINE);
-            } else {
-                //Request the location permission.
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_PERMISSION_FINE);
-            }
-        }
 
+        checkLocationPermissions();
 
         mApplication = (Mood9Application)getApplicationContext();
         Intent thisIntent = getIntent();
@@ -120,67 +113,8 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
         Button calendar = (Button) findViewById(R.id.calendar);
         final TextView txtDate = (TextView) findViewById(R.id.curDate);
 
-        emoticons = new int[mApplication.getEmotionModel().getEmotions().size()];
-        emotions = new String[mApplication.getEmotionModel().getEmotions().size()];
-        for (Map.Entry<String, Emotion> entry : mApplication.getEmotionModel().getEmotions().entrySet()) {
-            //String imgNameBuilder = entry.getValue().getName().toLowerCase() + ".png";
-            String imgNameBuilder = entry.getValue().getImageName();
-            emoticons[Integer.parseInt(entry.getKey())] = getResources().getIdentifier(imgNameBuilder.substring(0, imgNameBuilder.lastIndexOf(".")), "drawable", getPackageName());
-            emotions[Integer.parseInt(entry.getKey())] = entry.getValue().getName();
-        }
-        socials = new String[mApplication.getSocialSituationModel().getSocialSituations().entrySet().size()];
-
-        for (Map.Entry<String, SocialSituation> entry : mApplication.getSocialSituationModel().getSocialSituations().entrySet()) {
-            socials[Integer.parseInt(entry.getKey())] = entry.getValue().getName();
-        }
-
-        EmotionsSpinnerAdapter emotionsSpinnerAdapter = new EmotionsSpinnerAdapter(getApplicationContext(), emoticons, emotions);
-
-        ArrayAdapter<String> socialSpinnerAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, socials);
-        if (editCheck == 1) {
-            returnMood = mApplication.getMoodLinkedList().get(oldMoodIndex);
-            int position = 0;
-            for (Map.Entry<String, Emotion> entry : mApplication.getEmotionModel().getEmotions().entrySet()) {
-                if (entry.getValue().getName().equals(mApplication.getEmotionModel().getEmotion(returnMood.getEmotionId()).getName())) {
-                    position = Integer.parseInt(entry.getKey());
-                }
-            }
-            emotionsSpinner.setAdapter(emotionsSpinnerAdapter);
-            emotionsSpinner.setSelection(position);
-            for (Map.Entry<String, SocialSituation> entry : mApplication.getSocialSituationModel().getSocialSituations().entrySet()) {
-                if (entry.getValue().getName().equals(mApplication.getSocialSituationModel().getSocialSituation(returnMood.getSocialSituationId()).getName())) {
-                    position = Integer.parseInt(entry.getKey());
-                }
-            }
-            socialSpinner.setAdapter(socialSpinnerAdapter);
-            socialSpinner.setSelection(position);
-            trigger.setText(returnMood.getTrigger());
-
-            String myFormat = "yyyy-MM-dd";
-            SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.US);
-            txtDate.setText(sdf.format(curDate));
-
-            //TODO: need to figure out how to reload saved map details
-        }
-        else {
-            emotionsSpinner.setAdapter(emotionsSpinnerAdapter);
-            socialSpinner.setAdapter(socialSpinnerAdapter);
-        }
-        emotionsSpinner.setOnItemSelectedListener(this);
-        socialSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                //Toast.makeText(getApplicationContext(), socials[position], Toast.LENGTH_SHORT).show();
-                socialId = position;
-                selectedSocial = socials[position];
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-                socialId = 0;
-                selectedSocial = socials[0];
-            }
-        });
+        spinnerDateInit();
+        spinnerInit(editCheck, trigger, txtDate, emotionsSpinner, socialSpinner);
 
         addLocation.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -193,7 +127,7 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
             }
         });
 
-        calendar.setOnClickListener(new View.OnClickListener() {
+        calendar.setOnClickListener(new View.OnClickListener() { // TODO: replace this datepicker code with more concise code like dannicks
             @Override
             public void onClick(View v) {
                 AlertDialog alert = new AlertDialog.Builder(AddMoodActivity.this).create();
@@ -251,7 +185,7 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
                                 c.set(year, monthOfYear, dayOfMonth);
 
                                 txtDate.setText(String.format("%1$tY-%1$tm-%1$td", c));
-                                curDate = c.getTime();
+                                curDate = c.getTime(); //TODO: Need to replace this with a more concise version like dannick has.
 
                             }
                         }, mYear, mMonth, mDay);
@@ -311,10 +245,14 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
                 else {
                     // added emoticon parameter to Mood class to store the r.drawable of the selected emotion
                     if (imageString == null){
-                        returnMood = new Mood(latitude, longitude, trigger.getText().toString(), String.valueOf(emotionId), String.valueOf(socialId), imageTriggerId, newDate, userId, null);
+                        returnMood = new Mood(latitude, longitude, trigger.getText().toString(),
+                                String.valueOf(emotionId), String.valueOf(socialId),
+                                imageTriggerId, newDate, userId, null);
                     }
                     else{
-                        returnMood = new Mood(latitude, longitude, trigger.getText().toString(), String.valueOf(emotionId), String.valueOf(socialId), imageTriggerId, newDate, userId, imageString);
+                        returnMood = new Mood(latitude, longitude, trigger.getText().toString(),
+                                String.valueOf(emotionId), String.valueOf(socialId),
+                                imageTriggerId, newDate, userId, imageString);
                     }
                     returnMood.setEmotionId(String.valueOf(emotionId));
                     returnMood.setSocialSituationId(String.valueOf(socialId));
@@ -359,6 +297,101 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
     @Override
     public void onNothingSelected(AdapterView<?> arg0) {
         // TODO Auto-generated method stub
+    }
+
+    private void checkLocationPermissions() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission
+                .ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                    Manifest.permission.ACCESS_FINE_LOCATION)) {
+                ActivityCompat.requestPermissions(AddMoodActivity.this,
+                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                        REQUEST_PERMISSION_FINE);
+            } else {
+                //Request the location permission.
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission
+                        .ACCESS_FINE_LOCATION}, REQUEST_PERMISSION_FINE);
+            }
+        }
+    }
+
+    private void spinnerDateInit() {
+        emoticons = new int[mApplication.getEmotionModel().getEmotions().size()];
+        emotions = new String[mApplication.getEmotionModel().getEmotions().size()];
+        for (Map.Entry<String, Emotion> entry : mApplication.getEmotionModel()
+                .getEmotions().entrySet()) {
+            //String imgNameBuilder = entry.getValue().getName().toLowerCase() + ".png";
+            String imgNameBuilder = entry.getValue().getImageName();
+            emoticons[Integer.parseInt(entry.getKey())] = getResources()
+                    .getIdentifier(imgNameBuilder.substring(0,
+                            imgNameBuilder.lastIndexOf(".")), "drawable", getPackageName());
+            emotions[Integer.parseInt(entry.getKey())] = entry.getValue().getName();
+        }
+        socials = new String[mApplication.getSocialSituationModel().getSocialSituations()
+                .entrySet().size()];
+
+        for (Map.Entry<String, SocialSituation> entry : mApplication.getSocialSituationModel()
+                .getSocialSituations().entrySet()) {
+            socials[Integer.parseInt(entry.getKey())] = entry.getValue().getName();
+        }
+    }
+
+    private void spinnerInit(int editCheck, EditText trigger, TextView txtDate,
+                             Spinner emotionsSpinner, Spinner socialSpinner) {
+        EmotionsSpinnerAdapter emotionsSpinnerAdapter = new EmotionsSpinnerAdapter
+                (getApplicationContext(), emoticons, emotions);
+
+        ArrayAdapter<String> socialSpinnerAdapter = new ArrayAdapter<String>
+                (this, android.R.layout.simple_spinner_dropdown_item, socials);
+        if (editCheck == 1) {
+            returnMood = mApplication.getMoodLinkedList().get(oldMoodIndex);
+            int position = 0;
+            for (Map.Entry<String, Emotion> entry : mApplication.getEmotionModel()
+                    .getEmotions().entrySet()) {
+                if (entry.getValue().getName().equals(mApplication.getEmotionModel()
+                        .getEmotion(returnMood.getEmotionId()).getName())) {
+                    position = Integer.parseInt(entry.getKey());
+                }
+            }
+            emotionsSpinner.setAdapter(emotionsSpinnerAdapter);
+            emotionsSpinner.setSelection(position);
+            for (Map.Entry<String, SocialSituation> entry : mApplication
+                    .getSocialSituationModel().getSocialSituations().entrySet()) {
+                if (entry.getValue().getName().equals(mApplication
+                        .getSocialSituationModel()
+                        .getSocialSituation(returnMood.getSocialSituationId()).getName())) {
+                    position = Integer.parseInt(entry.getKey());
+                }
+            }
+            socialSpinner.setAdapter(socialSpinnerAdapter);
+            socialSpinner.setSelection(position);
+            trigger.setText(returnMood.getTrigger());
+
+            String myFormat = "yyyy-MM-dd";
+            SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.US);
+            txtDate.setText(sdf.format(curDate));
+
+            //TODO: need to figure out how to reload saved map details
+        }
+        else {
+            emotionsSpinner.setAdapter(emotionsSpinnerAdapter);
+            socialSpinner.setAdapter(socialSpinnerAdapter);
+        }
+        emotionsSpinner.setOnItemSelectedListener(this);
+        socialSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                //Toast.makeText(getApplicationContext(), socials[position], Toast.LENGTH_SHORT).show();
+                socialId = position;
+                selectedSocial = socials[position];
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                socialId = 0;
+                selectedSocial = socials[0];
+            }
+        });
     }
 }
 
