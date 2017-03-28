@@ -5,5 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="ca.ualberta.cmput301w17t09.mood9.mood9.StatsActivity">
-
+    <com.github.mikephil.charting.charts.PieChart
+        android:id="@+id/emotion_chart"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
 </ScrollView>

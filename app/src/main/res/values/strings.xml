@@ -34,7 +34,4 @@
 
     <string name="stored_name">username</string>
     <string name="stored_id">user_id</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
