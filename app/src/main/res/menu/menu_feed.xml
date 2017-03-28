@@ -18,7 +18,16 @@
         <menu>
             <item
                 android:id="@+id/filter_lead"
-                android:title="Filter" />
+                android:title="Filter" >
+                <menu>
+                    <item
+                        android:id="@+id/filter_emotions"
+                        android:title="Emotions" />
+                    <item
+                        android:id="@+id/filter_socials"
+                        android:title="Social Situations" />
+                </menu>
+            </item>
             <item
                 android:id="@+id/sort_title"
                 android:checkable="false"

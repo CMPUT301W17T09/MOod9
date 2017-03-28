@@ -142,17 +142,8 @@ public class FeedActivity extends AppCompatActivity
                 // this is your adapter that will be filtered
                 return true;
             }
-            public boolean onQueryTextSubmit(String query) {
-                String returnConversion = queryConverter(query);
-                // TODO: move this call to the queryConverter so that you
-                // TODO: can grab multiple possible queries in one search,
-                // TODO: so query every time something is found and add to list
-                HashMap<String, String> queryHash = new HashMap<>();
-                queryHash.put(returnConversion.substring(0,returnConversion.indexOf(':')),
-                        returnConversion.substring(returnConversion.indexOf(':')+1));
-                moodLinkedList.clear();
-                ArrayList<Mood> reloadedMoods = mApplication.getMoodModel()
-                        .getUniversalUserMoods(queryHash);
+            public boolean onQueryTextSubmit(String query) { // TODO: search should only search based on what feed you are in
+                ArrayList<Mood> reloadedMoods = universalQuery(query);
                 populateFromMoodLoad(reloadedMoods);
                 preSortList.clear();
                 preSortList.addAll(moodLinkedList);
@@ -168,7 +159,7 @@ public class FeedActivity extends AppCompatActivity
                 Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
                 moodLinkedList.clear();
                 ArrayList<Mood> reloadedMoods;
-                if (toolbar.getTitle() == "personal") // TODO: implement if toolbar is on follows here
+                if (toolbar.getTitle().toString().compareTo("Personal Feed") == 0) // TODO: implement if toolbar is on follows here
                     reloadedMoods = mApplication.getMoodModel().getCurrentUserMoods();
                 else
                     reloadedMoods = mApplication.getMoodModel().getUniversalUserMoods(null);
@@ -202,10 +193,121 @@ public class FeedActivity extends AppCompatActivity
         } else if (id == R.id.sort_last_year) {
             setMoodsByDate("year");
         } else if (id == R.id.sort_forever) {
+            preSortListUpdate();
             sortDisplayByDate();
+        } else if (id == R.id.filter_emotions) {
+            openFilterDialog("emotions");
+        } else if (id == R.id.filter_socials) {
+            openFilterDialog("socials");
         }
 
         return super.onOptionsItemSelected(item);
+    }
+    private ArrayList<Mood> personalQuery(String query) {
+        String returnConversion = queryConverter(query);
+        ArrayList<Mood> reloadedMoods = new ArrayList<>();
+        if (returnConversion.substring(0, returnConversion.indexOf(':')).compareTo("emotionId") == 0) {
+            for (Mood mood : moodLinkedList) {
+                if (mood.getEmotionId().compareTo(returnConversion.substring(returnConversion.indexOf(':')+1)) == 0) {
+                    reloadedMoods.add(mood);
+                }
+            }
+        } else if (returnConversion.substring(0, returnConversion.indexOf(':')).compareTo("socialSituationId") == 0) {
+            for (Mood mood : moodLinkedList) {
+                if (mood.getSocialSituationId().compareTo(returnConversion.substring(returnConversion.indexOf(':') + 1)) == 0) {
+                    reloadedMoods.add(mood);
+                }
+            }
+        } else if (returnConversion.substring(0, returnConversion.indexOf(':')).compareTo("user_id") == 0) {
+            for (Mood mood : moodLinkedList) {
+                if (mood.getUser_id().compareTo(returnConversion.substring(returnConversion.indexOf(':') + 1)) == 0) {
+                    reloadedMoods.add(mood);
+                }
+            }
+        } else if (returnConversion.substring(0, returnConversion.indexOf(':')).compareTo("trigger") == 0) {
+            for (Mood mood : moodLinkedList) {
+                if (mood.getTrigger().compareTo(returnConversion.substring(returnConversion.indexOf(':') + 1)) == 0) {
+                    reloadedMoods.add(mood);
+                }
+            }
+        }
+        return reloadedMoods;
+    }
+
+    private ArrayList<Mood> universalQuery(String query) {
+        String returnConversion = queryConverter(query);
+        // TODO: move this call to the queryConverter so that you
+        // TODO: can grab multiple possible queries in one search,
+        // TODO: so query every time something is found and add to list
+        HashMap<String, String> queryHash = new HashMap<>();
+        queryHash.put(returnConversion.substring(0,returnConversion.indexOf(':')),
+                returnConversion.substring(returnConversion.indexOf(':')+1));
+        moodLinkedList.clear();
+        ArrayList<Mood> reloadedMoods = mApplication.getMoodModel()
+                .getUniversalUserMoods(queryHash);
+        return reloadedMoods;
+    }
+
+    private void openFilterDialog(String filterType) {
+        final String[] items = checkBoxDateInit(filterType);
+        final ArrayList<String> selectedItems = new ArrayList();
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setTitle("Select Filter Parameters")
+                .setMultiChoiceItems(items, null, new DialogInterface.OnMultiChoiceClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which, boolean isChecked) {
+                        if (isChecked) {
+                            selectedItems.add(items[which]);
+                        } else if (selectedItems.contains(items[which])) {
+                            selectedItems.remove(selectedItems.indexOf(items[which]));
+                        }
+                    }
+                }).setPositiveButton("Filter", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // SAVE SELECTED ITEMS AND QUERY HERE
+                        ArrayList<Mood> reloadedMoods = new ArrayList<Mood>();
+                        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+                        if (toolbar.getTitle().toString().compareTo("Universal Feed") == 0) {
+                            for (int i = 0; i < selectedItems.size(); i++) {
+                                reloadedMoods.addAll(universalQuery(selectedItems.get(i)));
+                            }
+                        } else { // We are in the personal feed so lets just search in the list, deal with followers later.
+                            for (int i = 0; i < selectedItems.size(); i++) {
+                                reloadedMoods.addAll(personalQuery(selectedItems.get(i))); // check this over, may need to fix reloading of prefilter personal list
+                            }
+                        }
+                        populateFromMoodLoad(reloadedMoods);
+                        preSortList.clear();
+                        preSortList.addAll(moodLinkedList);
+                        moodListAdapter.notifyDataSetChanged();
+                    }
+                }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // CANCELED SO BACK OUT
+                    }
+                }).create();
+        dialog.show();
+    }
+
+    private String[] checkBoxDateInit(String dateType) {
+        String[] checkBoxItems = new String[0];
+        if (dateType.compareTo("emotions") == 0) {
+            checkBoxItems = new String[mApplication.getEmotionModel().getEmotions().size()];
+            for (Map.Entry<String, Emotion> entry : mApplication.getEmotionModel()
+                    .getEmotions().entrySet()) {
+                checkBoxItems[Integer.parseInt(entry.getKey())] = entry.getValue().getName();
+            }
+        } else if (dateType.compareTo("socials") == 0) {
+            checkBoxItems = new String[mApplication.getSocialSituationModel()
+                    .getSocialSituations().entrySet().size()];
+            for (Map.Entry<String, SocialSituation> entry : mApplication.getSocialSituationModel()
+                    .getSocialSituations().entrySet()) {
+                checkBoxItems[Integer.parseInt(entry.getKey())] = entry.getValue().getName();
+            }
+        }
+        return checkBoxItems;
     }
 
 
@@ -257,18 +359,23 @@ public class FeedActivity extends AppCompatActivity
             toolbar.setTitle(R.string.followed_feed);
         return;
     }
-    private void setMoodsByDate(String range) {
+
+    private void preSortListUpdate() {
         moodLinkedList.clear();
         if (preSortList.size() > 0) { // this string of conditions sets it up so that the original list of moods is reloaded for resorting
             moodLinkedList.addAll(preSortList);
         } else {
             Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-            if (toolbar.getTitle() == "universal") {
+            String title = toolbar.getTitle().toString();
+            if (title.compareTo("Universal Feed") == 0) {
                 moodLinkedList.addAll(mApplication.getMoodModel().getUniversalUserMoods(null));
-            } else if (toolbar.getTitle() == "personal") {
+            } else if (title.compareTo("Personal Feed") == 0) {
                 moodLinkedList.addAll(mApplication.getMoodModel().getCurrentUserMoods());
             } // TODO: else get follower moods
         }
+    }
+    private void setMoodsByDate(String range) {
+        preSortListUpdate();
         sortDisplayByDate();
         Date target = new Date();
         Calendar cal = Calendar.getInstance();
