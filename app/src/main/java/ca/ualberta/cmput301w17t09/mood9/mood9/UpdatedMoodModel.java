@@ -70,10 +70,18 @@ public class UpdatedMoodModel {
 
     public void updateMood(Mood mood) {
         for (Mood m : moodList) {
-            if (m.getId().equals(mood.getId())) {
-                moodList.remove(m);
-                moodList.add(mood);
-                break;
+            if (m.getId() == null) {
+                if (m == mood) {
+                    moodList.remove(m);
+                    moodList.add(mood);
+                    break;
+                }
+            } else {
+                if (m.getId().equals(mood.getId())) {
+                    moodList.remove(m);
+                    moodList.add(mood);
+                    break;
+                }
             }
         }
         saveInFile();
