@@ -2,6 +2,7 @@ package ca.ualberta.cmput301w17t09.mood9.mood9;
 
 import android.Manifest;
 import android.app.DatePickerDialog;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -10,6 +11,8 @@ import android.graphics.Bitmap;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -39,6 +42,8 @@ import java.util.Map;
 import java.util.TimeZone;
 
 import static android.R.attr.bitmap;
+import static android.R.attr.datePickerDialogTheme;
+import static android.R.attr.targetActivity;
 
 /**
  * Originally created by Fady
@@ -60,7 +65,7 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
     int socialId = 0;
     double latitude = 0.0;
     double longitude = 0.0;
-    Date curDate = new Date();
+    static Date curDate = new Date();
     String imageTriggerId = "N/A";
     String selectedEmotion = "Anger";
     String userId = "newUser";
@@ -130,68 +135,8 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
         calendar.setOnClickListener(new View.OnClickListener() { // TODO: replace this datepicker code with more concise code like dannicks
             @Override
             public void onClick(View v) {
-                AlertDialog alert = new AlertDialog.Builder(AddMoodActivity.this).create();
-                // Date Field code taken from http://stackoverflow.com/questions/39051210/how-to-give-input-date-field-for-registration-form-in-android
-                final Calendar myCalendar = Calendar.getInstance();
-                final DatePickerDialog.OnDateSetListener date = new DatePickerDialog.OnDateSetListener() {
-                    @Override
-                    public void onDateSet(DatePicker view, int year, int month, int day) {
-                        myCalendar.set(Calendar.YEAR, year);
-                        myCalendar.set(Calendar.MONTH, month);
-                        myCalendar.set(Calendar.DAY_OF_MONTH, day);
-                        String myFormat = "yyyy-MM-dd";
-                        SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.US);
-
-                        //String value1 = sdf.format(myCalendar.getTime());
-                    }
-                };
-                final Calendar c = Calendar.getInstance();
-
-                mYear = c.get(Calendar.YEAR);
-                mMonth = c.get(Calendar.MONTH);
-                mDay = c.get(Calendar.DAY_OF_MONTH);
-                // Launch Date Picker Dialog
-                DatePickerDialog dpd = new DatePickerDialog(AddMoodActivity.this, android.R.style.Theme_Holo_Panel,
-                        new DatePickerDialog.OnDateSetListener() {
-
-                            @Override
-                            public void onDateSet(DatePicker view, int year,
-                                                  int monthOfYear, int dayOfMonth) {
-                                // Display Selected date in textbox
-
-
-                                if (year < mYear)
-                                    view.updateDate(mYear,mMonth,mDay);
-
-                                if (monthOfYear < mMonth && year == mYear)
-                                    view.updateDate(mYear,mMonth,mDay);
-
-                                if (dayOfMonth < mDay && year == mYear && monthOfYear == mMonth)
-                                    view.updateDate(mYear,mMonth,mDay);
-                                String strMonth = String.format("%02d", monthOfYear+1);
-                                String strDay = String.format("%02d", dayOfMonth);
-                                String value = (year + "-" + strMonth + "-" + strDay);
-
-                                txtDate.setText(value);
-                                String myFormat = "yyyy-MM-dd'T'HH:mm:ss";
-                                SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.US);
-                                try {
-                                    curDate = sdf.parse(value);
-                                } catch (ParseException e) {
-                                    e.printStackTrace();
-                                }
-
-                                Calendar c = Calendar.getInstance();
-                                c.set(year, monthOfYear, dayOfMonth);
-
-                                txtDate.setText(String.format("%1$tY-%1$tm-%1$td", c));
-                                curDate = c.getTime(); //TODO: Need to replace this with a more concise version like dannick has.
-
-                            }
-                        }, mYear, mMonth, mDay);
-
-                dpd.getDatePicker().setMinDate(1973);
-                dpd.show();
+                DialogFragment newFragment = new DatePickerFragment();
+                newFragment.show(getSupportFragmentManager(), "DatePicker");
             }
         });
 
@@ -260,10 +205,46 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
                         finish();
                     }
                 } else {
-                    // TODO: MAKE A TOAST SAYING TRIGGER WASN'T THE RIGHT FORMAT
+                    Toast.makeText(getApplicationContext(),
+                            "Trigger must be of maximum 20 characters and no more than 3 words",
+                            Toast.LENGTH_LONG).show();
                 }
             }
         });
+    }
+
+    // https://developer.android.com/guide/topics/ui/controls/pickers.html
+    // Accessed 2017-01-29
+    public static class DatePickerFragment extends DialogFragment
+            implements DatePickerDialog.OnDateSetListener {
+
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            // Use the current date as the default date in the picker
+            final Calendar c = Calendar.getInstance();
+            int year = c.get(Calendar.YEAR);
+            int month = c.get(Calendar.MONTH);
+            int day = c.get(Calendar.DAY_OF_MONTH);
+
+            // Create a new instance of DatePickerDialog and return it
+            //return new DatePickerDialog(getActivity(), this, year, month, day);
+            DatePickerDialog datePickerDialog = new DatePickerDialog(getActivity(),
+                    android.R.style.Theme_Holo_Panel, this, year, month, day);
+            return datePickerDialog;
+        }
+
+        public void onDateSet(DatePicker view, int year, int month, int day) {
+            Calendar c = Calendar.getInstance();
+            c.set(year, month, day);
+            curDate = c.getTime();
+            AddMoodActivity thisActivity = (AddMoodActivity) getActivity();
+            thisActivity.setDateText(String.format("%1$tY-%1$tm-%1$td", c));
+        }
+    }
+
+    public void setDateText(String text){
+        TextView dateEditText = (TextView) findViewById(R.id.curDate);
+        dateEditText.setText(text);
     }
 
     private int triggerVerify(String triggerText) {
