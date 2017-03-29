@@ -26,6 +26,9 @@
                     <item
                         android:id="@+id/filter_socials"
                         android:title="Social Situations" />
+                    <item
+                        android:id="@+id/filter_clear"
+                        android:title="Clear Filters" />
                 </menu>
             </item>
             <item

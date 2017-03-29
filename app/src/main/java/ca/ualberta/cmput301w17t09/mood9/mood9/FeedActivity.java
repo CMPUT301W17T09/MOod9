@@ -143,7 +143,13 @@ public class FeedActivity extends AppCompatActivity
                 return true;
             }
             public boolean onQueryTextSubmit(String query) { // TODO: search should only search based on what feed you are in
-                ArrayList<Mood> reloadedMoods = universalQuery(query);
+                Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+                ArrayList<Mood> reloadedMoods = new ArrayList<>();
+                if (toolbar.getTitle().toString().compareTo("Universal Feed") == 0) {
+                    reloadedMoods = universalQuery(query);
+                } else if (toolbar.getTitle().toString().compareTo("Personal Feed") == 0) {
+                    reloadedMoods = currentFeedQuery(query);
+                }
                 populateFromMoodLoad(reloadedMoods);
                 preSortList.clear();
                 preSortList.addAll(moodLinkedList);
@@ -193,17 +199,20 @@ public class FeedActivity extends AppCompatActivity
         } else if (id == R.id.sort_last_year) {
             setMoodsByDate("year");
         } else if (id == R.id.sort_forever) {
-            preSortListUpdate();
+            updateFromPreSortList();
             sortDisplayByDate();
         } else if (id == R.id.filter_emotions) {
             openFilterDialog("emotions");
         } else if (id == R.id.filter_socials) {
             openFilterDialog("socials");
+        } else if (id == R.id.filter_clear) {
+            updateFromPreSortList();
+            moodListAdapter.notifyDataSetChanged();
         }
 
         return super.onOptionsItemSelected(item);
     }
-    private ArrayList<Mood> personalQuery(String query) {
+    private ArrayList<Mood> currentFeedQuery(String query) {
         String returnConversion = queryConverter(query);
         ArrayList<Mood> reloadedMoods = new ArrayList<>();
         if (returnConversion.substring(0, returnConversion.indexOf(':')).compareTo("emotionId") == 0) {
@@ -269,17 +278,28 @@ public class FeedActivity extends AppCompatActivity
                         ArrayList<Mood> reloadedMoods = new ArrayList<Mood>();
                         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
                         if (toolbar.getTitle().toString().compareTo("Universal Feed") == 0) {
-                            for (int i = 0; i < selectedItems.size(); i++) {
-                                reloadedMoods.addAll(universalQuery(selectedItems.get(i)));
+                            if (preSortList.size() == 0) {
+                                moodLinkedList.clear();
+                                moodLinkedList.addAll(mApplication.getMoodModel().getUniversalUserMoods(null));
+                            } else {
+                                // we have done a search and should thus filter the searched results
+                                moodLinkedList.clear();
+                                moodLinkedList.addAll(preSortList);
                             }
                         } else { // We are in the personal feed so lets just search in the list, deal with followers later.
-                            for (int i = 0; i < selectedItems.size(); i++) {
-                                reloadedMoods.addAll(personalQuery(selectedItems.get(i))); // check this over, may need to fix reloading of prefilter personal list
+                            if (preSortList.size() == 0) {
+                                moodLinkedList.clear();
+                                moodLinkedList.addAll(mApplication.getMoodModel().getCurrentUserMoods());
+                            } else {
+                                // we have done a search and should thus filter the searched results
+                                moodLinkedList.clear();
+                                moodLinkedList.addAll(preSortList);
                             }
                         }
+                        for (int i = 0; i < selectedItems.size(); i++) {
+                            reloadedMoods.addAll(currentFeedQuery(selectedItems.get(i))); // check this over, may need to fix reloading of prefilter personal list
+                        }
                         populateFromMoodLoad(reloadedMoods);
-                        preSortList.clear();
-                        preSortList.addAll(moodLinkedList);
                         moodListAdapter.notifyDataSetChanged();
                     }
                 }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -360,7 +380,7 @@ public class FeedActivity extends AppCompatActivity
         return;
     }
 
-    private void preSortListUpdate() {
+    private void updateFromPreSortList() {
         moodLinkedList.clear();
         if (preSortList.size() > 0) { // this string of conditions sets it up so that the original list of moods is reloaded for resorting
             moodLinkedList.addAll(preSortList);
@@ -375,7 +395,7 @@ public class FeedActivity extends AppCompatActivity
         }
     }
     private void setMoodsByDate(String range) {
-        preSortListUpdate();
+        updateFromPreSortList();
         sortDisplayByDate();
         Date target = new Date();
         Calendar cal = Calendar.getInstance();

@@ -221,47 +221,59 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
             public void onClick(View v) {
                 DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
                 String newDate = dateFormat.format(curDate);
-                if (editCheckB.getInt("editCheck", -1) == 1) {
-                    try {
-                        returnMood.setDate(newDate);
+                if (triggerVerify(trigger.getText().toString()) == 1) {
+                    if (editCheckB.getInt("editCheck", -1) == 1) {
+                        try {
+                            returnMood.setDate(newDate);
+                            returnMood.setEmotionId(String.valueOf(emotionId));
+                            returnMood.setSocialSituationId(String.valueOf(socialId));
+                            returnMood.setTrigger(trigger.getText().toString());
+                            returnMood.setLatitude(latitude);
+                            returnMood.setLongitude(longitude);
+                            if (imageString != null) {
+                                returnMood.setImage(imageString);
+                            }
+                            mApplication.getMoodLinkedList().set(oldMoodIndex, returnMood);
+
+                            mApplication.getMoodModel().updateMood(returnMood);
+                            finish();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            finish();
+                        }
+                    } else {
+                        // added emoticon parameter to Mood class to store the r.drawable of the selected emotion
+                        if (imageString == null) {
+                            returnMood = new Mood(latitude, longitude, trigger.getText().toString(),
+                                    String.valueOf(emotionId), String.valueOf(socialId),
+                                    imageTriggerId, newDate, userId, null);
+                        } else {
+                            returnMood = new Mood(latitude, longitude, trigger.getText().toString(),
+                                    String.valueOf(emotionId), String.valueOf(socialId),
+                                    imageTriggerId, newDate, userId, imageString);
+                        }
                         returnMood.setEmotionId(String.valueOf(emotionId));
                         returnMood.setSocialSituationId(String.valueOf(socialId));
-                        returnMood.setTrigger(trigger.getText().toString());
-                        returnMood.setLatitude(latitude);
-                        returnMood.setLongitude(longitude);
-                        if (imageString != null) {
-                            returnMood.setImage(imageString);
-                        }
-                        mApplication.getMoodLinkedList().set(oldMoodIndex, returnMood);
 
-                        mApplication.getMoodModel().updateMood(returnMood);
-                        finish();
-                    } catch (Exception e) {
-                        e.printStackTrace();
+                        mApplication.getMoodLinkedList().add(returnMood);
+                        mApplication.getMoodModel().addMood(returnMood);
                         finish();
                     }
-                }
-                else {
-                    // added emoticon parameter to Mood class to store the r.drawable of the selected emotion
-                    if (imageString == null){
-                        returnMood = new Mood(latitude, longitude, trigger.getText().toString(),
-                                String.valueOf(emotionId), String.valueOf(socialId),
-                                imageTriggerId, newDate, userId, null);
-                    }
-                    else{
-                        returnMood = new Mood(latitude, longitude, trigger.getText().toString(),
-                                String.valueOf(emotionId), String.valueOf(socialId),
-                                imageTriggerId, newDate, userId, imageString);
-                    }
-                    returnMood.setEmotionId(String.valueOf(emotionId));
-                    returnMood.setSocialSituationId(String.valueOf(socialId));
-
-                    mApplication.getMoodLinkedList().add(returnMood);
-                    mApplication.getMoodModel().addMood(returnMood);
-                    finish();
+                } else {
+                    // TODO: MAKE A TOAST SAYING TRIGGER WASN'T THE RIGHT FORMAT
                 }
             }
         });
+    }
+
+    private int triggerVerify(String triggerText) {
+        if (triggerText.length() > 20) {
+            return 0;
+        }
+        if (triggerText.split(" ").length > 3) {
+            return 0;
+        }
+        return 1;
     }
 
     @Override
