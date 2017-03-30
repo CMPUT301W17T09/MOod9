@@ -19,21 +19,21 @@
         <id>2</id>
         <name>Disgust</name>
         <description>Puke puddles everywhere...</description>
-        <color>#ffff00</color>
+        <color>#a3c00f</color>
         <image>disgust.png</image>
     </Emotion>
     <Emotion>
         <id>3</id>
         <name>Fear</name>
         <description>Is there a monster in the closest?</description>
-        <color>#ffffff</color>
+        <color>#3c0000</color>
         <image>fear.png</image>
     </Emotion>
     <Emotion>
         <id>4</id>
         <name>Happiness</name>
         <description>Squirrel!</description>
-        <color>#ffffff</color>
+        <color>#ffff00</color>
         <image>happiness.png</image>
     </Emotion>
     <Emotion>

@@ -60,7 +60,6 @@ public class StatsActivity extends AppCompatActivity {
         SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.US);
 
         ScatterChart chart = (ScatterChart) findViewById(R.id.time_chart);
-        ScatterDataSet scatterDataSet;
         List<String> yLabels = new ArrayList<>();
         List<Entry> entries = new ArrayList<>();
         moods.sort(new MoodDateCompartor());
@@ -76,15 +75,20 @@ public class StatsActivity extends AppCompatActivity {
             e.setY(Float.parseFloat(mood.getEmotionId()));
             entries.add(e);
         }
-        scatterDataSet = new ScatterDataSet(entries, "Moods");
+        ScatterDataSet scatterDataSet = new ScatterDataSet(entries, "Moods");
+        scatterDataSet.setDrawValues(false);
         XAxis xAxis = chart.getXAxis();
         YAxis yAxis = chart.getAxisLeft();
         xAxis.setValueFormatter(new DateAxisValueFormatter());
         yAxis.setValueFormatter(new EmotionAxisFormatter());
+        chart.getAxisRight().setDrawLabels(false);
 
-
+        scatterDataSet.setColor(ColorTemplate.rgb("#000000")); // Black
         ScatterData scatterData = new ScatterData(scatterDataSet);
         chart.setData(scatterData);
+        chart.getDescription().setText("Emotion Timeline");
+        chart.getDescription().setTextSize(9f);
+        chart.setViewPortOffsets(-10f, 0f, -10f, 0f);
         chart.notifyDataSetChanged();
         chart.invalidate();
 
@@ -149,19 +153,24 @@ public class StatsActivity extends AppCompatActivity {
         for(String s: ekeys){
             Float f = emotionHistogram.get(s);
             if (f == null){
-                f = (float) 0;
+                continue;
             }
             PieEntry pe = new PieEntry(f/hl);
             pe.setLabel(emotions.get(s).getName());
             entries.add(pe);
 
-            colors.add(ColorTemplate.rgb(emotions.get(s).getColor()));
+            String cs = emotions.get(s).getColor();
+            colors.add(ColorTemplate.rgb(cs));
         }
         PieDataSet dataSet = new PieDataSet(entries, "Emotions");
         dataSet.setSliceSpace(Float.valueOf(5));
         dataSet.setColors(colors);
+        dataSet.setDrawValues(false);
         PieData pieData = new PieData(dataSet);
+        chart.setDrawSliceText(false);
         chart.setData(pieData);
+        chart.getDescription().setText("Emotion Circle");
+        chart.getDescription().setTextSize(9f);
         chart.notifyDataSetChanged();
         chart.invalidate();
     }
