@@ -20,7 +20,6 @@ import com.github.mikephil.charting.utils.ColorTemplate;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
@@ -69,8 +68,7 @@ public class StatsActivity extends AppCompatActivity {
             Entry e = new Entry();
             Date d = null;
             try {
-                sdf.parse(mood.getDate());
-
+                d = sdf.parse(mood.getDate());
             } catch (ParseException re) {
                 throw new RuntimeException();
             }
@@ -150,6 +148,9 @@ public class StatsActivity extends AppCompatActivity {
 
         for(String s: ekeys){
             Float f = emotionHistogram.get(s);
+            if (f == null){
+                f = (float) 0;
+            }
             PieEntry pe = new PieEntry(f/hl);
             pe.setLabel(emotions.get(s).getName());
             entries.add(pe);
