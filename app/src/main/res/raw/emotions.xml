@@ -7,6 +7,7 @@
         <description>You did not just kick a puppy!</description>
         <color>#ff0000</color>
         <image>anger.png</image>
+        <statsmessage>It seems like you're pretty angry, maybe you need some MOod0.</statsmessage>
     </Emotion>
     <Emotion>
         <id>1</id>
@@ -14,6 +15,7 @@
         <description>What way is up?</description>
         <color>#31696c</color>
         <image>confusion.png</image>
+        <statsmessage>May we recommend MOod1 or was it MOod231232 to help with your confusion.</statsmessage>
     </Emotion>
     <Emotion>
         <id>2</id>
@@ -21,6 +23,7 @@
         <description>Puke puddles everywhere...</description>
         <color>#a3c00f</color>
         <image>disgust.png</image>
+        <statsmessage>MOod2 should help you keep your supper down.</statsmessage>
     </Emotion>
     <Emotion>
         <id>3</id>
@@ -28,6 +31,7 @@
         <description>Is there a monster in the closest?</description>
         <color>#3c0000</color>
         <image>fear.png</image>
+        <statsmessage>We recommend our MOod3 pill. It should help keep your monsters under control</statsmessage>
     </Emotion>
     <Emotion>
         <id>4</id>
@@ -35,6 +39,7 @@
         <description>Squirrel!</description>
         <color>#ffff00</color>
         <image>happiness.png</image>
+        <statsmessage>What can we say. You're great.</statsmessage>
     </Emotion>
     <Emotion>
         <id>5</id>
@@ -42,6 +47,7 @@
         <description>My puppy got run over by a car.</description>
         <color>#000eb4</color>
         <image>sadness.png</image>
+        <statsmessage>Depression isn't easy. Have some MOod5 it'll pick you right up</statsmessage>
     </Emotion>
     <Emotion>
         <id>6</id>
@@ -49,6 +55,7 @@
         <description>Oh no not again.</description>
         <color>#c8b7b7</color>
         <image>shame.png</image>
+        <statsmessage>Unfortunately we cannot recommend our MOod6 it does not meet our safety standards</statsmessage>
     </Emotion>
     <Emotion>
         <id>7</id>
@@ -56,5 +63,6 @@
         <description>A present for me?</description>
         <color>#53e4e6</color>
         <image>surprise.png</image>
+        <statsmessage>Close your eyes. We have a surprise for you.</statsmessage>
     </Emotion>
 </Emotions>

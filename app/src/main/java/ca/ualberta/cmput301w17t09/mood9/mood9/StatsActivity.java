@@ -2,6 +2,8 @@ package ca.ualberta.cmput301w17t09.mood9.mood9;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.charts.ScatterChart;
@@ -25,6 +27,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -53,6 +56,28 @@ public class StatsActivity extends AppCompatActivity {
         updateEmotionChart(emotionHistogram);
         updateTimelineChart(moods);
 
+        // http://stackoverflow.com/questions/5911174/finding-key-associated-with-max-value-in-a-java-map
+        // Accessed 2017-03-29
+        Map.Entry<String, Float> maxEntry = null;
+        for (Map.Entry<String, Float> entry : emotionHistogram.entrySet())
+        {
+            if (maxEntry == null || entry.getValue().compareTo(maxEntry.getValue()) > 0)
+            {
+                maxEntry = entry;
+            }
+        }
+
+        Emotion e = emotions.get(maxEntry.getKey());
+
+
+        ImageView emoticon = (ImageView) findViewById(R.id.emotion_image);
+        TextView emotion = (TextView) findViewById(R.id.emotion_name);
+        TextView statsmessage = (TextView) findViewById(R.id.emotion_statsmessage);
+
+        int resID = getResources().getIdentifier(e.getName().toLowerCase().trim() , "drawable", getPackageName());
+        emoticon.setImageResource(resID);
+        emotion.setText(e.getName());
+        statsmessage.setText(e.getStatsMessage());
     }
 
     private void updateTimelineChart(ArrayList<Mood> moods){

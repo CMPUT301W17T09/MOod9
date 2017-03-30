@@ -12,6 +12,7 @@ public class Emotion {
     private String color;
     private String description;
     private String imageName;
+    private String statsMessage;
 
     public Emotion(){
 
@@ -63,5 +64,13 @@ public class Emotion {
 
     public String getImageName() {
         return imageName;
+    }
+
+    public String getStatsMessage() {
+        return statsMessage;
+    }
+
+    public void setStatsMessage(String statsMessage) {
+        this.statsMessage = statsMessage;
     }
 }

@@ -34,4 +34,5 @@
 
     <string name="stored_name">username</string>
     <string name="stored_id">user_id</string>
+    <string name="max_emotion">You are mostly feeling:</string>
 </resources>

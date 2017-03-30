@@ -76,6 +76,9 @@ public class EmotionModel {
                 e.setImageName(element.getElementsByTagName("image")
                         .item(0)
                         .getTextContent());
+                e.setStatsMessage(element.getElementsByTagName("statsmessage")
+                        .item(0)
+                        .getTextContent());
             }
             emotions.put(e.getId(), e);
         }
