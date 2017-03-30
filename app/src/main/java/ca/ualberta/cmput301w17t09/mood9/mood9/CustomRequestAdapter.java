@@ -66,11 +66,12 @@ public class CustomRequestAdapter extends BaseAdapter implements ListAdapter {
                 //user's requests,notify array adapter
                 User current1 = UserModel.getUserProfile(current_user);
                 User second = UserModel.getUserProfile(UserModel.getUserID(request_list.get(position)));
-                current1.addFollowee(second); //current user is now following second
-                second.removeFromRequests(current1.getId());
+                second.addFollowee(current1); //second user is following current user
+                current1.removeFromRequests(second.getId());
+                UserModel.updateUser(current1);
+                UserModel.updateUser(second);
                 request_list.remove(position);
                 notifyDataSetChanged();
-
             }
         });
 
@@ -80,8 +81,10 @@ public class CustomRequestAdapter extends BaseAdapter implements ListAdapter {
             public void onClick(View v){
                 User second = UserModel.getUserProfile(UserModel.getUserID(request_list.get(position)));
                 User current1 = UserModel.getUserProfile(current_user);
-                second.removeFromRequests(current1.getId());
+                current1.removeFromRequests(second.getId());
                 request_list.remove(position);
+                UserModel.updateUser(current1);
+                UserModel.updateUser(second);
                 notifyDataSetChanged();
             }
         });

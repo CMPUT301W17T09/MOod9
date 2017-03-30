@@ -42,7 +42,6 @@ public class ProfileActivity extends AppCompatActivity {
             User requested = UserModel.getUserProfile(id);
             request_list.add(requested.getName());
         }
-        System.out.println(user_id);
         CustomRequestAdapter req_adapter = new CustomRequestAdapter(request_list,this,user_id);
 
         //Profile now displays list of users the user is following
@@ -55,5 +54,7 @@ public class ProfileActivity extends AppCompatActivity {
 
             }
         });
+        System.out.println(current_user.getFollowees());
     }
+
 }
