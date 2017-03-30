@@ -61,9 +61,9 @@ public class StatsActivity extends AppCompatActivity {
         SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.US);
 
         ScatterChart chart = (ScatterChart) findViewById(R.id.time_chart);
-        ScatterDataSet scatterDataSet = new ScatterDataSet();
+        ScatterDataSet scatterDataSet;
         List<String> yLabels = new ArrayList<>();
-
+        List<Entry> entries = new ArrayList<>();
         moods.sort(new MoodDateCompartor());
         for(Mood mood: moods) {
             Entry e = new Entry();
@@ -76,10 +76,9 @@ public class StatsActivity extends AppCompatActivity {
             }
             e.setX(d.getTime());
             e.setY(Float.parseFloat(mood.getEmotionId()));
-            scatterDataSet.addEntry(e);
-
+            entries.add(e);
         }
-
+        scatterDataSet = new ScatterDataSet(entries, "Moods");
         XAxis xAxis = chart.getXAxis();
         YAxis yAxis = chart.getAxisLeft();
         xAxis.setValueFormatter(new DateAxisValueFormatter());
@@ -102,7 +101,6 @@ public class StatsActivity extends AppCompatActivity {
             return sdf.format(d);
         }
 
-        @Override
         public int getDecimalDigits(){return 0;}
     }
 
@@ -115,7 +113,6 @@ public class StatsActivity extends AppCompatActivity {
             return e.getName();
         }
 
-        @Override
         public int getDecimalDigits(){return 0;}
     }
 
