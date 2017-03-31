@@ -8,12 +8,14 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.graphics.BitmapCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -44,6 +46,8 @@ import java.util.TimeZone;
 import static android.R.attr.bitmap;
 import static android.R.attr.datePickerDialogTheme;
 import static android.R.attr.targetActivity;
+import static java.lang.Math.ceil;
+import static java.lang.Math.sqrt;
 
 /**
  * Originally created by Fady
@@ -265,8 +269,23 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
 
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         imageBitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
-        byte[] byteArray = byteArrayOutputStream .toByteArray();
+        byte[] byteArray = byteArrayOutputStream.toByteArray();
 
+        Bitmap compressedImage = null;
+        int maxImageSize = 65536;
+        int bitmapByteCount = BitmapCompat.getAllocationByteCount(imageBitmap);
+
+        if(bitmapByteCount > maxImageSize){
+            final BitmapFactory.Options options = new BitmapFactory.Options();
+            double compressionRatio = ((double)bitmapByteCount / (double)maxImageSize);
+            double compressionSize = sqrt(compressionRatio);
+            options.inSampleSize = (int) ceil(compressionSize);
+            compressedImage = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.length, options);
+        }
+
+        compressedImage.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
+
+        System.out.println(compressedImage.getAllocationByteCount());
         imageString = Base64.encodeToString(byteArray, Base64.DEFAULT);
     }
 
@@ -385,5 +404,6 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
             }
         });
     }
+
 }
 
