@@ -57,6 +57,16 @@ public class User {
 
     public void addToRequests(String request) {
         requests.add(request);
+
+    }
+    public void removeFromRequests(String user){
+        requests.remove(user);
+    }
+    public void clearRequestList(){
+        requests.clear();
+    }
+    public void clearFollList(){
+        followees.clear();
     }
 
 }

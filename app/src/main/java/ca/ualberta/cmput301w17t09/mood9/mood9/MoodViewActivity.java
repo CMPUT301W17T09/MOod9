@@ -58,9 +58,9 @@ public class MoodViewActivity extends AppCompatActivity {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         String user_id = sharedPreferences.getString("user_id", "TESTER IN MAIN");
         User current = UserModel.getUserProfile(mood.getUser_id());
+        User k_user = UserModel.getUserProfile(user_id);
         if (mood.getUser_id().equals(user_id)) {
             follow.setVisibility(View.GONE);
-            System.out.println("asdsd");
             edit.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -79,7 +79,7 @@ public class MoodViewActivity extends AppCompatActivity {
                     int duration = Toast.LENGTH_SHORT;
                     Context context = getApplicationContext();
                     //If you are already following the user
-                    if(current.getFollowees().contains(UserModel.getUserProfile(user_id))){
+                    if(k_user.getFollowees().contains(UserModel.getUserProfile(user_id))){
                         Toast toast2 = Toast.makeText(context, "You are already following this user!", duration);
                         toast2.show();
                     }
