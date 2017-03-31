@@ -59,7 +59,6 @@ public class FeedActivity extends AppCompatActivity
     private LinkedList<Mood> moodLinkedList;
     private Mood9Application mApplication;
     private LinkedList<Mood> preSortList;
-    Context context;
 
 
     @Override
@@ -94,7 +93,6 @@ public class FeedActivity extends AppCompatActivity
         setFeedName("universal");
 
         // set up list view adapter
-        context = this;
         mApplication = (Mood9Application) getApplicationContext();
         moodLinkedList = mApplication.getMoodLinkedList();
         preSortList = new LinkedList<>();
@@ -142,12 +140,12 @@ public class FeedActivity extends AppCompatActivity
                 // this is your adapter that will be filtered
                 return true;
             }
-            public boolean onQueryTextSubmit(String query) { // TODO: search should only search based on what feed you are in
+            public boolean onQueryTextSubmit(String query) {
                 Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
                 ArrayList<Mood> reloadedMoods = new ArrayList<>();
                 if (toolbar.getTitle().toString().compareTo("Universal Feed") == 0) {
                     reloadedMoods = universalQuery(query);
-                } else if (toolbar.getTitle().toString().compareTo("Personal Feed") == 0) {
+                } else { // Personal or Follower feed so all should be loaded
                     reloadedMoods = currentFeedQuery(query);
                 }
                 populateFromMoodLoad(reloadedMoods);
@@ -165,8 +163,10 @@ public class FeedActivity extends AppCompatActivity
                 Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
                 moodLinkedList.clear();
                 ArrayList<Mood> reloadedMoods;
-                if (toolbar.getTitle().toString().compareTo("Personal Feed") == 0) // TODO: implement if toolbar is on follows here
+                if (toolbar.getTitle().toString().compareTo("Personal Feed") == 0)
                     reloadedMoods = mApplication.getMoodModel().getCurrentUserMoods();
+                else if (toolbar.getTitle().toString().compareTo("Follower Feed") == 0)
+                    reloadedMoods = getFollowerMoods();
                 else
                     reloadedMoods = mApplication.getMoodModel().getUniversalUserMoods(null);
                 populateFromMoodLoad(reloadedMoods);
@@ -190,7 +190,7 @@ public class FeedActivity extends AppCompatActivity
         if (id == R.id.search) {
             //TODO Add functionality to the search button
             return true;
-        } else if (id == R.id.sort_last_day) { // TODO: need to be able to sort and resort without reloading the list we are sorting
+        } else if (id == R.id.sort_last_day) {
             setMoodsByDate("day");
         } else if (id == R.id.sort_last_week) {
             setMoodsByDate("week");
@@ -286,7 +286,16 @@ public class FeedActivity extends AppCompatActivity
                                 moodLinkedList.clear();
                                 moodLinkedList.addAll(preSortList);
                             }
-                        } else { // We are in the personal feed so lets just search in the list, deal with followers later.
+                        } else if (toolbar.getTitle().toString().compareTo("Follower Feed") == 0) {
+                            if (preSortList.size() == 0) {
+                                moodLinkedList.clear();
+                                moodLinkedList.addAll(getFollowerMoods());
+                            } else {
+                                // we have done a search and should thus filter the searched results
+                                moodLinkedList.clear();
+                                moodLinkedList.addAll(preSortList);
+                            }
+                        } else { // We are in the personal feed
                             if (preSortList.size() == 0) {
                                 moodLinkedList.clear();
                                 moodLinkedList.addAll(mApplication.getMoodModel().getCurrentUserMoods());
@@ -344,7 +353,7 @@ public class FeedActivity extends AppCompatActivity
             populateFromMoodLoad(temp);
         } else if (id == R.id.followed) {
             setFeedName("followed");
-            moodLinkedList.clear();
+            populateFromMoodLoad(getFollowerMoods());
         } else if (id == R.id.universal) {
             setFeedName("universal");
             ArrayList<Mood> temp = mApplication.getMoodModel().getUniversalUserMoods(null);
@@ -391,7 +400,9 @@ public class FeedActivity extends AppCompatActivity
                 moodLinkedList.addAll(mApplication.getMoodModel().getUniversalUserMoods(null));
             } else if (title.compareTo("Personal Feed") == 0) {
                 moodLinkedList.addAll(mApplication.getMoodModel().getCurrentUserMoods());
-            } // TODO: else get follower moods
+            } else if (title.compareTo("Follower Feed") == 0) {
+                moodLinkedList.addAll(getFollowerMoods());
+            }
         }
     }
     private void setMoodsByDate(String range) {
@@ -492,6 +503,22 @@ public class FeedActivity extends AppCompatActivity
         queryConverted = "trigger:"+query;
 
         return queryConverted;
+    }
+    private ArrayList<Mood> getFollowerMoods() {
+        ArrayList<Mood> FollowerMoods = new ArrayList<>();
+        HashMap<String, String> queryHash = new HashMap<>();
+        for (String Followee : getCurrentUser().getFollowees()) {
+            queryHash.put("user_id", Followee);
+            FollowerMoods.addAll(mApplication.getMoodModel().getUniversalUserMoods(queryHash));
+        }
+        return FollowerMoods;
+    }
+
+    private User getCurrentUser() {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        String userName = sharedPreferences.getString("username", "test");
+        User userProfile = UserModel.getUserProfile(UserModel.getUserID(userName));
+        return userProfile;
     }
 
     // Code Documentation found here: https://developer.android.com/reference/android/app/Activity.html

@@ -58,8 +58,11 @@ import static android.R.attr.targetActivity;
 public class AddMoodActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener{
 
     private Mood9Application mApplication;
-    Context addMContext = this;
     String[] emotions;
+    String[] socials;
+
+    Mood returnMood;
+    // replace these with just setting the return mood values as we go along
     int[] emoticons;
     int emotionId = 0;
     int socialId = 0;
@@ -70,19 +73,16 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
     String selectedEmotion = "Anger";
     String userId = "newUser";
 
-    private int mYear, mMonth, mDay;
-
-
     ImageView cameraImage;
     Bitmap imageBitmap = null;
     String imageString;
 
     int oldMoodIndex = 0;
-    Mood returnMood;
+
     int selectedEmote = R.drawable.anger;
     String selectedSocial = "N/A";
     Bundle editCheckB;
-    String[] socials;
+
     private static final int REQUEST_PERMISSION_FINE = 0;
     private LocationService locationService;
 
@@ -132,7 +132,7 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
             }
         });
 
-        calendar.setOnClickListener(new View.OnClickListener() { // TODO: replace this datepicker code with more concise code like dannicks
+        calendar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 DialogFragment newFragment = new DatePickerFragment();
@@ -361,9 +361,13 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
 
             String myFormat = "yyyy-MM-dd";
             SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.US);
-            txtDate.setText(sdf.format(curDate));
-
-            //TODO: need to figure out how to reload saved map details
+            try {
+                curDate = sdf.parse(returnMood.getDate());
+            } catch (Exception e) {
+                // FAILED TO GET OLD DATE
+                curDate = new Date();
+            }
+            txtDate.setText(returnMood.getDate().split("T")[0]);
         }
         else {
             emotionsSpinner.setAdapter(emotionsSpinnerAdapter);
