@@ -40,54 +40,54 @@ public class StatsActivity extends AppCompatActivity {
 
         getSupportActionBar().setTitle("My Stats");
 
-        Mood9Application mAppllication = (Mood9Application) getApplication();
-        emotions = mAppllication.getEmotionModel().getEmotions();
-        ArrayList<Mood> moods = mAppllication.getMoodModel().getCurrentUserMoods();
-        HashMap<String, Float> emotionHistogram = new HashMap<String, Float>();
-        for(Mood m : moods){
-            Float i = emotionHistogram.get(m.getEmotionId());
-            if(i == null){
-                i = Float.valueOf(1);
-            } else {
-                i = i + 1;
-            }
-            emotionHistogram.put(m.getEmotionId(), i);
-        }
-        updateEmotionChart(emotionHistogram);
-        updateTimelineChart(moods);
-
-        // http://stackoverflow.com/questions/5911174/finding-key-associated-with-max-value-in-a-java-map
-        // Accessed 2017-03-29
-        Map.Entry<String, Float> maxEntry = null;
-        for (Map.Entry<String, Float> entry : emotionHistogram.entrySet())
-        {
-            if (maxEntry == null || entry.getValue().compareTo(maxEntry.getValue()) > 0)
-            {
-                maxEntry = entry;
-            }
-        }
-
-        Emotion e = emotions.get(maxEntry.getKey());
-
-
-        ImageView emoticon = (ImageView) findViewById(R.id.emotion_image);
-        TextView emotion = (TextView) findViewById(R.id.emotion_name);
-        TextView statsmessage = (TextView) findViewById(R.id.emotion_statsmessage);
-
-        int resID = getResources().getIdentifier(e.getName().toLowerCase().trim() , "drawable", getPackageName());
-        emoticon.setImageResource(resID);
-        emotion.setText(e.getName());
-        statsmessage.setText(e.getStatsMessage());
+        updateContent();
     }
 
-    private void updateTimelineChart(ArrayList<Mood> moods){
+    @Override
+    protected void onResume() {
+        super.onResume();
+        updateContent();
+    }
+
+    private void updateContent(){
+        Mood9Application mAppllication = (Mood9Application) getApplication();
+        emotions = mAppllication.getEmotionModel().getEmotions();
+        List<Mood> moods = mAppllication.getMoodLinkedList();
+        HashMap<String, Float> emotionHistogram = new HashMap<String, Float>();
+        if(moods.size() > 0) {
+            for (Mood m : moods) {
+                Float i = emotionHistogram.get(m.getEmotionId());
+                if (i == null) {
+                    i = Float.valueOf(1);
+                } else {
+                    i = i + 1;
+                }
+                emotionHistogram.put(m.getEmotionId(), i);
+            }
+            updateEmotionChart(emotionHistogram);
+            updateTimelineChart(moods);
+
+            Emotion e = emotions.get(getHistogramMax(emotionHistogram).getKey());
+
+            ImageView emoticon = (ImageView) findViewById(R.id.emotion_image);
+            TextView emotion = (TextView) findViewById(R.id.emotion_name);
+            TextView statsmessage = (TextView) findViewById(R.id.emotion_statsmessage);
+
+            int resID = getResources().getIdentifier(e.getName().toLowerCase().trim(), "drawable", getPackageName());
+            emoticon.setImageResource(resID);
+            emotion.setText(e.getName());
+            statsmessage.setText(e.getStatsMessage());
+        }
+    }
+
+    private void updateTimelineChart(List<Mood> moods){
         String myFormat = "yyyy-MM-dd";
         SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.US);
 
         ScatterChart chart = (ScatterChart) findViewById(R.id.time_chart);
         List<String> yLabels = new ArrayList<>();
         List<Entry> entries = new ArrayList<>();
-        moods.sort(new MoodDateCompartor());
+        moods.sort(new MoodDateComparator());
         for(Mood mood: moods) {
             Entry e = new Entry();
             Date d = null;
@@ -143,7 +143,7 @@ public class StatsActivity extends AppCompatActivity {
         public int getDecimalDigits(){return 0;}
     }
 
-    public class MoodDateCompartor implements Comparator<Mood>{
+    public class MoodDateComparator implements Comparator<Mood>{
         public int compare(Mood m1, Mood m2){
             String myFormat = "yyyy-MM-dd";
             SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.US);
@@ -169,8 +169,8 @@ public class StatsActivity extends AppCompatActivity {
         List<PieEntry> entries = new ArrayList<>();
         List<Integer> colors = new ArrayList<>();
 
-        Mood9Application mAppllication = (Mood9Application) getApplication();
-        ConcurrentHashMap<String, Emotion> emotions = mAppllication.getEmotionModel().getEmotions();
+        Mood9Application mApplication = (Mood9Application) getApplication();
+        ConcurrentHashMap<String, Emotion> emotions = mApplication.getEmotionModel().getEmotions();
         Set<String> ekeys = emotions.keySet();
 
         float hl = getHistogramLength(emotionHistogram);
@@ -206,5 +206,20 @@ public class StatsActivity extends AppCompatActivity {
             sum = sum + i;
         }
         return sum;
+    }
+
+    private Map.Entry<String, Float> getHistogramMax(HashMap<String, Float> histogram){
+        // http://stackoverflow.com/questions/5911174/finding-key-associated-with-max-value-in-a-java-map
+        // Accessed 2017-03-29
+        Map.Entry<String, Float> maxEntry = null;
+        for (Map.Entry<String, Float> entry : histogram.entrySet())
+        {
+            if (maxEntry == null || entry.getValue().compareTo(maxEntry.getValue()) > 0)
+            {
+                maxEntry = entry;
+            }
+        }
+
+        return maxEntry;
     }
 }

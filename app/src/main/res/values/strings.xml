@@ -31,10 +31,14 @@
         MPAndroid Chart: Copyright 2016 Philipp Jahoda: Licensed under the Apache License, Version 2.0
     </string>
     <string name="about_apache2_button">Apache License</string>
-
+    <string name="max_emotion">You are mostly feeling:</string>
+    <string name="stats_default_message">
+        You have not selected any moods in the feed.
+        Navigate to the Personal feed and come back
+        to see the awesome charts.
+    </string>
     <string name="stored_name">username</string>
     <string name="stored_id">user_id</string>
-    <string name="max_emotion">You are mostly feeling:</string>
     <string name="Decline">Decline</string>
     <string name="Accept">Accept</string>
     <string name="Cancel">Cancel</string>
