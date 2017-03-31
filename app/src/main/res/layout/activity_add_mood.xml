@@ -75,12 +75,13 @@
         android:drawableRight="@android:drawable/ic_dialog_map"
         android:textColor="@color/colorWhite"
         android:background="@color/colorPrimary"
-        android:text="@string/add_location"
+        android:text="Current Location"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/button"
         android:layout_below="@+id/trigger_edittext"
-        android:layout_alignParentStart="true">
+        android:layout_alignParentStart="true"
+        android:layout_toStartOf="@+id/curDate">
         </Button>
 
     <Button
@@ -122,6 +123,17 @@
         android:layout_alignTop="@+id/trigger_edittext"
         android:layout_marginEnd="34dp"
         app:srcCompat="@android:drawable/ic_menu_report_image" />
+
+    <Button
+
+        android:textColor="@color/colorWhite"
+        android:background="@color/colorPrimary"
+        android:id="@+id/custom_location"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/trigger_edittext"
+        android:layout_toEndOf="@+id/trigger_edittext"
+        android:text="Custom Location" />
 
 
 </RelativeLayout>
