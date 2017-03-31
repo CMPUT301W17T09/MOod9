@@ -19,6 +19,15 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.Date;
 
+/**
+ * The main activity will check whether or not the user has a profile already, and if they don't
+ * prompt them to enter a new username. It will validate the username for uniqueness. If the user
+ * has already chosen a username, then it will not show them this activity and it will automatically
+ * load the universal feed activity.
+ * @author CMPUT301W17T09
+ */
+
+
 public class MainActivity extends AppCompatActivity {
 
     @Override
