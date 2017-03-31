@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -13,8 +12,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
-import android.util.Log;
-import android.widget.Toast;
+
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -49,7 +47,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private LocationRequest locationRequest;
     private FusedLocationProviderApi locationProvider = LocationServices.FusedLocationApi;
     private ArrayList<Marker> markers = new ArrayList<>();
-
+    private LatLng myCord = null;
 
 
     @Override
@@ -75,12 +73,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-
-        makeMarkers();
-
-        // Add a marker at tim hortons and move the camera
-        LatLng timmiesCord = new LatLng(53.526599, -113.524596);
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(timmiesCord, 10));
 
 
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
@@ -113,16 +105,43 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             if(!(tempMood.getLatitude() == null | tempMood.getLongitude() == null)) {
                 if (!(tempMood.getLatitude() == 0 & tempMood.getLongitude() == 0)) {
                     LatLng tempCord = new LatLng(tempMood.getLatitude(), tempMood.getLongitude());
-                    Mood9Application app = (Mood9Application) getApplication();
-                    EmotionModel em = app.getEmotionModel();
-                    Emotion emotion = em.getEmotion(tempMood.getEmotionId());
-                    String emotionName = emotion.getName();
-                    int iconNumber = getResources().getIdentifier(emotionName.toLowerCase().trim(), "drawable", getPackageName());
-                    Marker tempMarker = mMap.addMarker(new MarkerOptions().title(Integer.toString(i)).position(tempCord).icon(BitmapDescriptorFactory.fromBitmap(makeSmallerIcon(iconNumber))));
-                    markers.add(tempMarker);
+                    System.out.println(computeDistance(myCord, tempCord));
+                    if(computeDistance(myCord, tempCord) <= 5.0){
+                        Mood9Application app = (Mood9Application) getApplication();
+                        EmotionModel em = app.getEmotionModel();
+                        Emotion emotion = em.getEmotion(tempMood.getEmotionId());
+                        String emotionName = emotion.getName();
+                        int iconNumber = getResources().getIdentifier(emotionName.toLowerCase().trim(), "drawable", getPackageName());
+                        Marker tempMarker = mMap.addMarker(new MarkerOptions().title(Integer.toString(i)).position(tempCord).icon(BitmapDescriptorFactory.fromBitmap(makeSmallerIcon(iconNumber))));
+                        markers.add(tempMarker);
+                    }
                 }
             }
         }
+    }
+
+    //Three following functions found on http://www.geodatasource.com/developers/java
+    //March 30, 2017
+    private static double deg2rad(double deg) {
+        return (deg * Math.PI / 180.0);
+    }
+
+    private static double rad2deg(double rad) {
+        return (rad * 180 / Math.PI);
+    }
+
+    private static double computeDistance(LatLng myCord, LatLng theirCord) {
+        double lon1 = myCord.longitude;
+        double lon2 = theirCord.longitude;
+        double lat1 = myCord.latitude;
+        double lat2 = theirCord.latitude;
+
+        double theta = lon1 - lon2;
+        double dist = Math.sin(deg2rad(lat1)) * Math.sin(deg2rad(lat2)) + Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * Math.cos(deg2rad(theta));
+        dist = Math.acos(dist);
+        dist = rad2deg(dist);
+        dist = dist * 60 * 1.1515;
+        return (dist * 1.609344);
     }
 
 
@@ -170,13 +189,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
-        requestLocationUpdates();
+        locationRequest = new LocationRequest();
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) {
+            LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locationRequest, this);
+        }
 
     }
 
     private void requestLocationUpdates() {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) !=
+                PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
+                        != PackageManager.PERMISSION_GRANTED) {
             return;
         }
         LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locationRequest, this);
@@ -199,7 +225,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         Double myLat = location.getLatitude();
         LatLng newCord = new LatLng(myLat, myLong);
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(newCord, 10));
-
+        myCord = newCord;
+        makeMarkers();
+        System.out.println(myCord);
 
     }
 
