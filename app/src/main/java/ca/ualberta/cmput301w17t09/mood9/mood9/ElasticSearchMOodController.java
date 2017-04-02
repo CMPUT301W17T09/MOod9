@@ -30,7 +30,10 @@ import io.searchbox.indices.mapping.PutMapping;
 
 import static android.content.Context.MODE_PRIVATE;
 
-
+/**
+ * Provides the elastic search connectivity for the app.
+ * @author CMPUT301W17T09
+ */
 public class ElasticSearchMOodController {
     private static JestDroidClient client;
     private static String ElasticSearchServer = "http://cmput301.softwareprocess.es:8080";
@@ -39,6 +42,9 @@ public class ElasticSearchMOodController {
     private static String user_type = "user9";
 
 
+    /**
+     * Deletes and recreates indexes on elastic search.
+     */
     public static class ResetElasticSearch extends AsyncTask<String, Void, Void> {
 
         @Override
@@ -78,10 +84,13 @@ public class ElasticSearchMOodController {
         private ArrayList<Mood> Moods;
 
         public AddMoodsTask(ArrayList<Mood> moodList) {
-            Moods = new ArrayList<Mood>();
             Moods = moodList;
         }
 
+        /**
+         * Deletes a mood
+         * @param moods
+         */
         protected void DeleteMoods(ArrayList<Mood> moods) {
             verifySettings();
 
@@ -95,6 +104,11 @@ public class ElasticSearchMOodController {
             }
         }
 
+        /**
+         * Gets the mooods using the search parameters
+         * @param searchParameters
+         * @return
+         */
         protected ArrayList<Mood> GetMoods(String...searchParameters) {
             verifySettings();
 
@@ -131,6 +145,9 @@ public class ElasticSearchMOodController {
             return moods;
         }
 
+        /**
+         * Adds a new mood to elasticsearch
+         */
         protected void addNewMoods() {
             for (Mood mood: Moods) {
                 Index index = new Index.Builder(mood).index(index_name).type(mood_type).build();
@@ -167,6 +184,9 @@ public class ElasticSearchMOodController {
         }
     }
 
+    /**
+     * Deletes moods
+     */
     public static class DeleteMoodTask extends AsyncTask<Mood, Void, Void> {
         @Override
         protected Void doInBackground(Mood...deletedMoods) {
@@ -243,6 +263,9 @@ public class ElasticSearchMOodController {
         }
     }
 
+    /**
+     * Creates a JestDroid client if it has not been connected.
+     */
     public static void verifySettings() {
         if (client == null) {
             DroidClientConfig.Builder builder = new DroidClientConfig.Builder(ElasticSearchServer);
@@ -257,6 +280,9 @@ public class ElasticSearchMOodController {
         }
     }
 
+    /**
+     * Adds a followees to a user.
+     */
     public static class UpdateUsersTask extends AsyncTask<User, Void, Void> {
 
         @Override
@@ -285,6 +311,9 @@ public class ElasticSearchMOodController {
         }
     }
 
+    /**
+     * Deletes a user
+     */
     public static class DeleteUsersTask extends AsyncTask<User, Void, Void> {
         @Override
         protected Void doInBackground(User...users) {
@@ -303,6 +332,9 @@ public class ElasticSearchMOodController {
         }
     }
 
+    /**
+     * Gets the username of the user.
+     */
     public static class GetUsersTaskName extends AsyncTask<String, Void, ArrayList<User>> {
         @Override
         protected ArrayList<User> doInBackground(String...params) {
@@ -371,8 +403,10 @@ public class ElasticSearchMOodController {
         }
     }
 
+    /**
+     * Adds a user to elastic search
+     */
     public static class AddUsersTask extends AsyncTask<User, Void, String> {
-
         @Override
         protected String doInBackground(User...users) {
             verifySettings();
@@ -395,6 +429,9 @@ public class ElasticSearchMOodController {
         }
     }
 
+    /**
+     * Creates the user map from JSON
+     */
     private static void createUserMapping() {
         PutMapping putMapping = new PutMapping.Builder(
                 index_name,
@@ -418,6 +455,9 @@ public class ElasticSearchMOodController {
         }
     }
 
+    /**
+     * Creates the mood map from JSON.
+     */
     private static void createMOodMapping() {
         PutMapping putMapping = new PutMapping.Builder(
                 index_name,

@@ -10,7 +10,10 @@ import android.widget.TextView;
 
 import java.io.InputStream;
 
-
+/**
+ * AboutActivity Shows the copyright notices about the third party libraries used.
+ * @author CMPUT301W17T09
+ */
 public class AboutActivity extends AppCompatActivity {
 
     @Override
