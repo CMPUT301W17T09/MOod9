@@ -31,63 +31,88 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * This is the stats activity. This is what presents those awesome charts!
+ *
+ * @author CMPUT301W17T09
+ */
 public class StatsActivity extends AppCompatActivity {
-    ConcurrentHashMap<String, Emotion> emotions;
+    private ConcurrentHashMap<String, Emotion> emotions;
+    private List<Mood> moods;
+    private Mood9Application mAppllication;
+
+    /**
+     * Date Format used for parsing the dates stored in the moods.
+     */
+    private final String myFormat = "yyyy-MM-dd";
+    private final SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.US);
+
+    /**
+     * Initializes class instances of the emotions and mApplication
+     * Also gets the last viewed moods
+     * Then updates the charts
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_stats);
 
         getSupportActionBar().setTitle("My Stats");
-
-        Mood9Application mAppllication = (Mood9Application) getApplication();
+        mAppllication = (Mood9Application) getApplication();
+        moods = mAppllication.getMoodLinkedList();
         emotions = mAppllication.getEmotionModel().getEmotions();
-        ArrayList<Mood> moods = mAppllication.getMoodModel().getCurrentUserMoods();
-        HashMap<String, Float> emotionHistogram = new HashMap<String, Float>();
-        for(Mood m : moods){
-            Float i = emotionHistogram.get(m.getEmotionId());
-            if(i == null){
-                i = Float.valueOf(1);
-            } else {
-                i = i + 1;
-            }
-            emotionHistogram.put(m.getEmotionId(), i);
-        }
-        updateEmotionChart(emotionHistogram);
-        updateTimelineChart(moods);
 
-        // http://stackoverflow.com/questions/5911174/finding-key-associated-with-max-value-in-a-java-map
-        // Accessed 2017-03-29
-        Map.Entry<String, Float> maxEntry = null;
-        for (Map.Entry<String, Float> entry : emotionHistogram.entrySet())
-        {
-            if (maxEntry == null || entry.getValue().compareTo(maxEntry.getValue()) > 0)
-            {
-                maxEntry = entry;
-            }
-        }
-
-        Emotion e = emotions.get(maxEntry.getKey());
-
-
-        ImageView emoticon = (ImageView) findViewById(R.id.emotion_image);
-        TextView emotion = (TextView) findViewById(R.id.emotion_name);
-        TextView statsmessage = (TextView) findViewById(R.id.emotion_statsmessage);
-
-        int resID = getResources().getIdentifier(e.getName().toLowerCase().trim() , "drawable", getPackageName());
-        emoticon.setImageResource(resID);
-        emotion.setText(e.getName());
-        statsmessage.setText(e.getStatsMessage());
+        updateContent();
     }
 
-    private void updateTimelineChart(ArrayList<Mood> moods){
-        String myFormat = "yyyy-MM-dd";
-        SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.US);
+    /**
+     * Gets the last list of viewed moods.
+     * Then updates the chart.
+     */
+    @Override
+    protected void onResume() {
+        super.onResume();
+        moods = mAppllication.getMoodLinkedList();
+        updateContent();
+    }
 
+    /**
+     * Method that updates the charts.
+     */
+    private void updateContent(){
+        // If there are moods to chart
+        if(moods.size() > 0) {
+            // Update the charts
+            HashMap<String, Float> emotionHistogram = createEmotionHistogram(moods);
+            updateEmotionChart(emotionHistogram);
+            updateTimelineChart();
+
+            // Set the popular emotion to the emotion that is felt the most.
+            Emotion e = emotions.get(getHistogramMax(emotionHistogram).getKey());
+
+            ImageView emoticon = (ImageView) findViewById(R.id.emotion_image);
+            TextView emotion = (TextView) findViewById(R.id.emotion_name);
+            TextView statsmessage = (TextView) findViewById(R.id.emotion_statsmessage);
+
+            int resID = getResources().getIdentifier(e.getName().toLowerCase().trim(), "drawable", getPackageName());
+            emoticon.setImageResource(resID);
+            emotion.setText(e.getName());
+            statsmessage.setText(e.getStatsMessage());
+        }
+    }
+
+    /**
+     * Method that updates the updates the TimelineChart and makes it look good!
+     */
+    private void updateTimelineChart(){
         ScatterChart chart = (ScatterChart) findViewById(R.id.time_chart);
         List<String> yLabels = new ArrayList<>();
         List<Entry> entries = new ArrayList<>();
-        moods.sort(new MoodDateCompartor());
+
+        // Sorts the dates oldest first
+        moods.sort(new MoodDateComparator());
+        // Creates the entry for the scatter plot
         for(Mood mood: moods) {
             Entry e = new Entry();
             Date d = null;
@@ -100,30 +125,139 @@ public class StatsActivity extends AppCompatActivity {
             e.setY(Float.parseFloat(mood.getEmotionId()));
             entries.add(e);
         }
+
+        // Sets the dataset for the chart
         ScatterDataSet scatterDataSet = new ScatterDataSet(entries, "Moods");
         scatterDataSet.setDrawValues(false);
+        // Sets the dots in the chart to black
+        scatterDataSet.setColor(ColorTemplate.rgb("#000000")); // Black
+
+        // Sets the axises for the chart
         XAxis xAxis = chart.getXAxis();
         YAxis yAxis = chart.getAxisLeft();
         xAxis.setValueFormatter(new DateAxisValueFormatter());
         yAxis.setValueFormatter(new EmotionAxisFormatter());
         chart.getAxisRight().setDrawLabels(false);
 
-        scatterDataSet.setColor(ColorTemplate.rgb("#000000")); // Black
+        // Sets the data for the chart
         ScatterData scatterData = new ScatterData(scatterDataSet);
         chart.setData(scatterData);
+
+        // Update the label and view port of the chart
         chart.getDescription().setText("Emotion Timeline");
         chart.getDescription().setTextSize(9f);
         chart.setViewPortOffsets(-10f, 0f, -10f, 0f);
+
+        // Draw the new chart
         chart.notifyDataSetChanged();
         chart.invalidate();
 
     }
 
+    /**
+     * Method that updates the emotion pie chart, also making it pretty.
+     * @param emotionHistogram
+     */
+    private void updateEmotionChart(HashMap<String, Float> emotionHistogram){
+        PieChart chart = (PieChart) findViewById(R.id.emotion_chart);
+        List<PieEntry> entries = new ArrayList<>();
+        List<Integer> colors = new ArrayList<>();
+
+        Set<String> ekeys = emotions.keySet();
+
+        float hl = getHistogramLength(emotionHistogram);
+
+        // Create the pie entries and set the colors in the aproriate order.
+        for(String s: ekeys){
+            Float f = emotionHistogram.get(s);
+            if (f == null){
+                continue;
+            }
+            PieEntry pe = new PieEntry(f/hl);
+            pe.setLabel(emotions.get(s).getName());
+            entries.add(pe);
+
+            String cs = emotions.get(s).getColor();
+            colors.add(ColorTemplate.rgb(cs));
+        }
+        // Create the data set and style it
+        PieDataSet dataSet = new PieDataSet(entries, "Emotions");
+        dataSet.setSliceSpace(Float.valueOf(5));
+        dataSet.setColors(colors);
+        dataSet.setDrawValues(false);
+        PieData pieData = new PieData(dataSet);
+
+        // This is the only way I know to not draw the slice text
+        chart.setDrawSliceText(false);
+
+        // Set the data & labels for the chart
+        chart.setData(pieData);
+        chart.getDescription().setText("Emotion Circle");
+        chart.getDescription().setTextSize(9f);
+
+        // Update the chart
+        chart.notifyDataSetChanged();
+        chart.invalidate();
+    }
+
+    /**
+     * Gets the number of moods represented in the histogram
+     * @param histogram
+     * @return
+     */
+    private float getHistogramLength(HashMap<String, Float> histogram){
+        float sum = 0;
+        for(float i: histogram.values()){
+            sum = sum + i;
+        }
+        return sum;
+    }
+
+    /**
+     * Gets the histogram value with the highest entry
+     * @param histogram
+     * @return
+     */
+    private Map.Entry<String, Float> getHistogramMax(HashMap<String, Float> histogram){
+        // http://stackoverflow.com/questions/5911174/finding-key-associated-with-max-value-in-a-java-map
+        // Accessed 2017-03-29
+        Map.Entry<String, Float> maxEntry = null;
+        for (Map.Entry<String, Float> entry : histogram.entrySet())
+        {
+            if (maxEntry == null || entry.getValue().compareTo(maxEntry.getValue()) > 0)
+            {
+                maxEntry = entry;
+            }
+        }
+
+        return maxEntry;
+    }
+
+    /**
+     * Creates a histogram of mood counts with each entry being an emotion
+     * @param moods
+     * @return
+     */
+    private HashMap<String, Float> createEmotionHistogram(List<Mood> moods){
+        HashMap<String, Float> emotionHistogram = new HashMap<String, Float>();
+        for (Mood m : moods) {
+            Float i = emotionHistogram.get(m.getEmotionId());
+            if (i == null) {
+                i = Float.valueOf(1);
+            } else {
+                i = i + 1;
+            }
+            emotionHistogram.put(m.getEmotionId(), i);
+        }
+        return emotionHistogram;
+    }
+
+    /**
+     * Sets the axis to display the date
+     */
     public class DateAxisValueFormatter implements IAxisValueFormatter {
         @Override
         public String getFormattedValue(float value, AxisBase axis){
-            String myFormat = "yyyy-MM-dd";
-            SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.US);
             Date d = new Date((long) value);
             return sdf.format(d);
         }
@@ -131,6 +265,9 @@ public class StatsActivity extends AppCompatActivity {
         public int getDecimalDigits(){return 0;}
     }
 
+    /**
+     * Sets the axis to display the emotion name
+     */
     public class EmotionAxisFormatter implements IAxisValueFormatter {
 
         @Override
@@ -143,10 +280,11 @@ public class StatsActivity extends AppCompatActivity {
         public int getDecimalDigits(){return 0;}
     }
 
-    public class MoodDateCompartor implements Comparator<Mood>{
+    /**
+     * Comparator used to sort moods by date
+     */
+    public class MoodDateComparator implements Comparator<Mood>{
         public int compare(Mood m1, Mood m2){
-            String myFormat = "yyyy-MM-dd";
-            SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.US);
             Date d1 = null;
             Date d2 = null;
             try {
@@ -162,49 +300,5 @@ public class StatsActivity extends AppCompatActivity {
             }
             return 0;
         }
-    }
-
-    private void updateEmotionChart(HashMap<String, Float> emotionHistogram){
-        PieChart chart = (PieChart) findViewById(R.id.emotion_chart);
-        List<PieEntry> entries = new ArrayList<>();
-        List<Integer> colors = new ArrayList<>();
-
-        Mood9Application mAppllication = (Mood9Application) getApplication();
-        ConcurrentHashMap<String, Emotion> emotions = mAppllication.getEmotionModel().getEmotions();
-        Set<String> ekeys = emotions.keySet();
-
-        float hl = getHistogramLength(emotionHistogram);
-
-        for(String s: ekeys){
-            Float f = emotionHistogram.get(s);
-            if (f == null){
-                continue;
-            }
-            PieEntry pe = new PieEntry(f/hl);
-            pe.setLabel(emotions.get(s).getName());
-            entries.add(pe);
-
-            String cs = emotions.get(s).getColor();
-            colors.add(ColorTemplate.rgb(cs));
-        }
-        PieDataSet dataSet = new PieDataSet(entries, "Emotions");
-        dataSet.setSliceSpace(Float.valueOf(5));
-        dataSet.setColors(colors);
-        dataSet.setDrawValues(false);
-        PieData pieData = new PieData(dataSet);
-        chart.setDrawSliceText(false);
-        chart.setData(pieData);
-        chart.getDescription().setText("Emotion Circle");
-        chart.getDescription().setTextSize(9f);
-        chart.notifyDataSetChanged();
-        chart.invalidate();
-    }
-
-    private float getHistogramLength(HashMap<String, Float> histogram){
-        float sum = 0;
-        for(float i: histogram.values()){
-            sum = sum + i;
-        }
-        return sum;
     }
 }

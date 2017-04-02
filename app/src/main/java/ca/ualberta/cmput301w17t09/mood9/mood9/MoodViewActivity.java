@@ -21,6 +21,10 @@ import android.widget.Toast;
 
 import org.w3c.dom.Text;
 
+/**
+ * View showing you the details of a mood
+ * @author CMPUT301W17T09
+ */
 public class MoodViewActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,7 +63,9 @@ public class MoodViewActivity extends AppCompatActivity {
         String user_id = sharedPreferences.getString("user_id", "TESTER IN MAIN");
         User current = UserModel.getUserProfile(mood.getUser_id());
         User k_user = UserModel.getUserProfile(user_id);
+
         if (mood.getUser_id().equals(user_id)) {
+            // If the mood is a mood of the users show the edit button
             follow.setVisibility(View.GONE);
             edit.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -72,6 +78,7 @@ public class MoodViewActivity extends AppCompatActivity {
                 }
             });
         } else {
+            // If the mood is not of the users then show the follow button
             edit.setVisibility(View.INVISIBLE);
             follow.setOnClickListener(new View.OnClickListener() {
                 @Override
