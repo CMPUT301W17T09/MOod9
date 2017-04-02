@@ -1,35 +1,25 @@
 package ca.ualberta.cmput301w17t09.mood9.mood9;
 
-import android.Manifest;
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
 
-import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.provider.Settings;
-
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.widget.Toast;
 /**
+ * Location Service class for getting the current location
+ * <p>
  * Created by cdkushni on 3/13/17.
  * code referenced from http://clover.studio/2016/08/09/getting-current-location-in-android-using-location-manager/
+ * </p>
  */
 
 public class LocationService implements LocationListener {
     private final Context mContext;
 
-    boolean checkGPS = false;
-
-    boolean checkNetwork = false;
-
-    boolean canGetLocation = false;
+    private boolean canGetLocation = false;
 
     private Location loc;
     private double latitude;
@@ -39,25 +29,29 @@ public class LocationService implements LocationListener {
     private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 10;
 
 
-    private static final long MIN_TIME_BW_UPDATES = 1000 * 60 * 1;
-    protected LocationManager locationManager;
+    private static final long MIN_TIME_BW_UPDATES = 1000 * 60;
+    private LocationManager locationManager;
 
-    public LocationService(Context mContext) {
+    LocationService(Context mContext) {
         this.mContext = mContext;
         getLocation();
     }
 
+    /**
+     * Verifies permissions and gets location by either network or gps depending on availability
+     * @return found location
+     */
     private Location getLocation() {
         try {
             locationManager = (LocationManager) mContext
                     .getSystemService(Context.LOCATION_SERVICE);
 
             // getting GPS status
-            checkGPS = locationManager
+            boolean checkGPS = locationManager
                     .isProviderEnabled(LocationManager.GPS_PROVIDER);
 
             // getting network status
-            checkNetwork = locationManager
+            boolean checkNetwork = locationManager
                     .isProviderEnabled(LocationManager.NETWORK_PROVIDER);
 
             if (!checkGPS && !checkNetwork) {
@@ -86,7 +80,7 @@ public class LocationService implements LocationListener {
                         }
                     }
                     catch(SecurityException e){
-
+                        return loc;
                     }
                 }
             }
@@ -121,57 +115,22 @@ public class LocationService implements LocationListener {
         return loc;
     }
 
-    public double getLongitude() {
+    double getLongitude() {
         if (loc != null) {
             longitude = loc.getLongitude();
         }
         return longitude;
     }
 
-    public double getLatitude() {
+    double getLatitude() {
         if (loc != null) {
             latitude = loc.getLatitude();
         }
         return latitude;
     }
 
-    public boolean canGetLocation() {
+    boolean canGetLocation() {
         return this.canGetLocation;
-    }
-
-    public void showSettingsAlert() {
-        AlertDialog.Builder alertDialog = new AlertDialog.Builder(mContext);
-
-
-        alertDialog.setTitle("GPS Not Enabled");
-
-        alertDialog.setMessage("Do you wants to turn On GPS");
-
-
-        alertDialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-                Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                mContext.startActivity(intent);
-            }
-        });
-
-
-        alertDialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.cancel();
-            }
-        });
-
-
-        alertDialog.show();
-    }
-
-
-    public void stopUsingGPS() {
-        if (locationManager != null) {
-
-            locationManager.removeUpdates(LocationService.this);
-        }
     }
 
     @Override

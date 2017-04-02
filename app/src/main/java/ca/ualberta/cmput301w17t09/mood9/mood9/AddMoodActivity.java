@@ -40,6 +40,8 @@ import static java.lang.Math.ceil;
 import static java.lang.Math.sqrt;
 
 /**
+ * Deals with I/O and saving of new/edited moods
+ * <p>
  * Originally created by Fady
  * Save returns data through intent extras implemented by cdkushni 3/5/17
  * Changed to implement AdapterView.OnItemSelectedListener by cdkushni on 3/8/17
@@ -51,6 +53,18 @@ import static java.lang.Math.sqrt;
  * Modified by cdkushni on 3/20/17 gps location grabbing is now working, network location
  * grabbing is still not working for whatever reason.
  * Encapsulated some parts from the on create function to make it a bit cleaner
+ * Modified by cdkushni on 4/2/17
+ * Fixed lack of OO practices and removed unnecessary setter variables and instead just set returnMood
+ * when setting values. Also removed unnecessary global variables.
+ * </p>
+ *
+ * @author fady
+ * @author cdkushni
+ * @version 1.7
+ * @see FeedActivity
+ * @see Mood9Application
+ * @see LocationService
+ * @since 1.0
  */
 public class AddMoodActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener{
 
@@ -58,14 +72,18 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
     private static Mood returnMood;
 
     private ImageView cameraImage;
-    private Bitmap imageBitmap = null;
 
     private int oldMoodIndex = 0;
-
 
     private static final int REQUEST_PERMISSION_FINE = 0;
     private LocationService locationService;
 
+    /**
+     * OnCreate method, handles Initialization of activity, including:
+     * deciding if we are editing an old mood or creating a new mood
+     * Initializing click listeners and view objects
+     * @param savedInstanceState : instance bundle
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -81,6 +99,10 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
         String userName = sharedPreferences.getString("username", "test");
         String userId = UserModel.getUserID(userName);
 
+        /**
+         * If this is an edit then get the index of the old mood and set to the edit layout
+         * If this is a new mood then create a new mood and set to the add layout
+         */
         if (editCheck == 1) {
             setContentView(R.layout.activity_edit_mood);
             oldMoodIndex = editCheckB.getInt("moodIndex");
@@ -91,6 +113,9 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
                     "0", "0", "N/A", "2017-04-01", userId, null);
         }
 
+        /**
+         * Initialize all needed view objects
+         */
         Button customLocation = (Button) findViewById(R.id.custom_location);
         cameraImage  = (ImageView) findViewById(R.id.cameraImage);
         ImageButton cameraButton = (ImageButton) findViewById(R.id.cameraButton);
@@ -102,8 +127,14 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
         Button calendar = (Button) findViewById(R.id.calendar);
         final TextView txtDate = (TextView) findViewById(R.id.curDate);
 
+        /**
+         * Initialize the fields with their values varied if they are an old mood vs a new mood
+         */
         spinnerDateInit(editCheck, trigger, txtDate, emotionsSpinner, socialSpinner);
 
+        /**
+         * Sets getting a custom location listener
+         */
         customLocation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -113,6 +144,9 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
             }
         });
 
+        /**
+         * sets adding the current location listener
+         */
         addLocation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -124,6 +158,9 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
             }
         });
 
+        /**
+         * sets opening the date picker listener
+         */
         calendar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -132,6 +169,9 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
             }
         });
 
+        /**
+         * sets the delete button listener if we know this is an old mood
+         */
         if (editCheck == 1) {
             Button delete = (Button) findViewById(R.id.delete_button);
             delete.setOnClickListener(new View.OnClickListener() {
@@ -144,6 +184,9 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
             });
         }
 
+        /**
+         * sets the camera button listener
+         */
         cameraButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -152,7 +195,12 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
             }
         });
 
-
+        /**
+         * sets the save button listener
+         * If the trigger entered is not the correct format, don't save and make a toast to prompt
+         * if the trigger is valid then saves the trigger to the return mood and updates elasticsearch
+         * and local with the new/edited mood
+         */
         save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -182,8 +230,10 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
         });
     }
 
-    // https://developer.android.com/guide/topics/ui/controls/pickers.html
-    // Accessed 2017-01-29
+    /**
+     * https://developer.android.com/guide/topics/ui/controls/pickers.html
+     * Accessed 2017-03-30
+     */
     public static class DatePickerFragment extends DialogFragment
             implements DatePickerDialog.OnDateSetListener {
 
@@ -218,6 +268,11 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
         dateEditText.setText(text);
     }
 
+    /**
+     * Verifies trigger length when saving
+     * @param triggerText : the current trigger text
+     * @return boolean whether it is a valid trigger or not
+     */
     private int triggerVerify(String triggerText) {
         if (triggerText.length() > 20) {
             return 0;
@@ -228,12 +283,18 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
         return 1;
     }
 
+    /**
+     * Sets image when picture is taken
+     * @param requestCode : request code request
+     * @param resultCode : resulting code request
+     * @param data : intent data
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if(resultCode == Activity.RESULT_OK) {
             if (requestCode == 0) {
-                imageBitmap = (Bitmap) data.getExtras().get("data");
+                Bitmap imageBitmap = (Bitmap) data.getExtras().get("data");
                 cameraImage.setImageBitmap(imageBitmap);
 
                 ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
@@ -266,6 +327,14 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
     }
 
     //Performing action onItemSelected and onNothing selected
+
+    /**
+     * When a spinner item is selected, set the return mood parameter to it
+     * @param arg0 : argument
+     * @param arg1 : argument
+     * @param position : position of selection
+     * @param id : id
+     */
     @Override
     public void onItemSelected(AdapterView<?> arg0, View arg1, int position, long id) {
         Spinner spinner = (Spinner) arg0;
@@ -281,6 +350,9 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
         // TODO Auto-generated method stub
     }
 
+    /**
+     * check location permission for location getting
+     */
     private void checkLocationPermissions() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission
                 .ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -297,6 +369,14 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
         }
     }
 
+    /**
+     * Initiates spinners with Emotion and SocialSituation model data
+     * @param editCheck : edit check for spinnerInit data checking
+     * @param trigger : trigger data for spinnerInit data init
+     * @param txtDate : Date text for spinnerInit data init
+     * @param emotionsSpinner : emotionsSpinner to be init
+     * @param socialSpinner : socialSpinner to be init
+     */
     private void spinnerDateInit(int editCheck, EditText trigger, TextView txtDate,
                                  Spinner emotionsSpinner, Spinner socialSpinner) {
         int[] emoticons = new int[mApplication.getEmotionModel().getEmotions().size()];
@@ -320,6 +400,17 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
                 , emoticons, emotions, socials);
     }
 
+    /**
+     * Initialization of all views with either default values or parameters if this is an old mood
+     * @param editCheck : old mood check
+     * @param trigger : trigger value
+     * @param txtDate : Date Value
+     * @param emotionsSpinner : Emotions spinner
+     * @param socialSpinner : Social Situation spinner
+     * @param emoticons : emoticons for init
+     * @param emotions : emotions for init
+     * @param socials : socials for init
+     */
     private void spinnerInit(int editCheck, EditText trigger, TextView txtDate,
                              Spinner emotionsSpinner, Spinner socialSpinner,
                              int[] emoticons, String[] emotions, String[] socials) {

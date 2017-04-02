@@ -39,16 +39,40 @@ import java.util.LinkedList;
 import java.util.Map;
 
 /**
+ * The main feed activity controller for I/O control on anything to do with the feed views.
+ * Maintains the mood list that is used to contain what will be displayed in the fields.
+ * <p>
  * Originally created by :
- * Modified by cdkushni on 3/5/17 and 3/8/17 to implement MoodListAdapter and data bundle receipt from addMood. Also made to inflate layout to a listview in the feed.
- * Modified by cdkushni on 3/10/17 to access the global application for global Models, changed over to using resource files for emotions and social situations,
+ * Modified by cdkushni on 3/5/17 and 3/8/17 to implement MoodListAdapter and data bundle receipt
+ * from addMood. Also made to inflate layout to a listview in the feed.
+ * Modified by cdkushni on 3/10/17 to access the global application for global Models, changed
+ * over to using resource files for emotions and social situations,
  * started updating MoodModel along with linkedList of moods
- * Modified by cdkushni on 3/18/17 to incorporate a expandable search action bar item to search queries in elastic search
- * Modified by cdkushni on 3/20/17 to return search queries to main feed and load it into the display adapter, also encapsulated default mood load for easy reloads
- * Also, kept using moodLinkedList so that we can use the linkedList as a displayer that can be cleared when searching without affecting the moodModel which holds the default moods
+ * Modified by cdkushni on 3/18/17 to incorporate a expandable search action bar item to search
+ * queries in elastic search
+ * Modified by cdkushni on 3/20/17 to return search queries to main feed and load it into the
+ * display adapter, also encapsulated default mood load for easy reloads
+ * Also, kept using moodLinkedList so that we can use the linkedList as a displayer that can be
+ * cleared when searching without affecting the moodModel which holds the default moods
  * Fixed some bugs with shared preferences that came up upon new accounts after a clear data
- * Disabled editing mood events while searching. Instead clicking on a mood will bring up a dialog window with username, trigger and social description.
- * Modified by cdkushni on 3/20/17 to start a new function that will take input queries and convert it to usable id queries
+ * Disabled editing mood events while searching. Instead clicking on a mood will bring up a dialog
+ * window with username, trigger and social description.
+ * Modified by cdkushni on 3/20/17 to start a new function that will take input queries and convert
+ * it to usable id queries
+ * Modified by cdkushni on 3/25/17 to work with each individual feed (Universal, personal and
+ * followed)
+ * Modified by cdkushni on 3/30/17 to be able to search/sort/filter all feeds
+ * </p>
+ *
+ * @author cdkushni
+ * @version 1.6, 4/2/17
+ * @see AddMoodActivity
+ * @see MoodViewActivity
+ * @see MoodListAdapter
+ * @see LocationService
+ * @see Mood9Application
+ * @see UpdatedMoodModel
+ * @since 1.0
  */
 public class FeedActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -59,6 +83,10 @@ public class FeedActivity extends AppCompatActivity
     private LinkedList<Mood> preSortList;
 
 
+    /**
+     * The onCreate method, sets up the feed with default settings and initializes adapter
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -101,8 +129,10 @@ public class FeedActivity extends AppCompatActivity
         populateFromMoodLoad(mApplication.getMoodModel().getUniversalUserMoods(null));
         //sortDisplayByDate();
 
-
-
+        /**
+         * Click listener for checking if a mood in the list was clicked and if so then to
+         * start the viewing activity for it.
+         */
         moodListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -113,7 +143,6 @@ public class FeedActivity extends AppCompatActivity
             }
         });
     }
-
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -124,6 +153,12 @@ public class FeedActivity extends AppCompatActivity
         }
     }
 
+    /**
+     * Search action bar menu handler.
+     * Handles submission of a new search query and closing the search
+     * @param menu : the new menu to inflate
+     * @return boolean
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -140,15 +175,23 @@ public class FeedActivity extends AppCompatActivity
                 // this is your adapter that will be filtered
                 return true;
             }
+
+            /**
+             * Submits the text to the query converter function which will search
+             * for and return the moods found.
+             * It then populates the feed with the newly found moods while saving the default
+             * moods of the current feed in the preSortList before updating the adapter.
+             * @param query : The query to search for
+             * @return boolean
+             */
             public boolean onQueryTextSubmit(String query) {
-                Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-                ArrayList<Mood> reloadedMoods = new ArrayList<>();/*
+                /*
                 if (toolbar.getTitle().toString().compareTo("Universal Feed") == 0) {
                     reloadedMoods = queryConverter(query);
                 } else { // Personal or Follower feed so all should be loaded
                     reloadedMoods = queryConverter(query);
                 }*/
-                reloadedMoods = queryConverter(query);
+                ArrayList<Mood> reloadedMoods = queryConverter(query);
                 populateFromMoodLoad(reloadedMoods);
                 preSortList.clear();
                 preSortList.addAll(moodLinkedList);
@@ -158,6 +201,10 @@ public class FeedActivity extends AppCompatActivity
         };
         searchView.setOnQueryTextListener(queryTextListener);
 
+        /**
+         * On close search listener. Closes the search and reloads the feed to it's default
+         * Moods based on what feed it is currently on.
+         */
         searchView.setOnCloseListener(new SearchView.OnCloseListener() {
             @Override
             public boolean onClose() {
@@ -180,6 +227,11 @@ public class FeedActivity extends AppCompatActivity
         return super.onCreateOptionsMenu(menu);
     }
 
+    /**
+     * Handles I/O for either sorting or filtering the feed
+     * @param item : The item selected in the filter/sort drop down list
+     * @return result
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
@@ -213,30 +265,35 @@ public class FeedActivity extends AppCompatActivity
 
         return super.onOptionsItemSelected(item);
     }
+
+    /**
+     * Searches the current feed's moods for the string query and returns the moods found
+     * @param query : the query to search for
+     * @return reloadedMoods : the moodlist appended to
+     */
     private ArrayList<Mood> currentFeedQuery(String query) {
-        String returnConversion = query;
         ArrayList<Mood> reloadedMoods = new ArrayList<>();
-        if (returnConversion.substring(0, returnConversion.indexOf(':')).compareTo("emotionId") == 0) {
+        if (query.substring(0, query.indexOf(':')).compareTo("emotionId") == 0) {
             for (Mood mood : moodLinkedList) {
-                if (mood.getEmotionId().compareTo(returnConversion.substring(returnConversion.indexOf(':')+1)) == 0) {
+                if (mood.getEmotionId().compareTo(query.substring(query.indexOf(':')+1)) == 0) {
                     reloadedMoods.add(mood);
                 }
             }
-        } else if (returnConversion.substring(0, returnConversion.indexOf(':')).compareTo("socialSituationId") == 0) {
+        } else if (query.substring(0, query.indexOf(':')).compareTo("socialSituationId") == 0) {
             for (Mood mood : moodLinkedList) {
-                if (mood.getSocialSituationId().compareTo(returnConversion.substring(returnConversion.indexOf(':') + 1)) == 0) {
+                if (mood.getSocialSituationId().compareTo(query.substring(query.indexOf(':') + 1)) == 0) {
                     reloadedMoods.add(mood);
                 }
             }
-        } else if (returnConversion.substring(0, returnConversion.indexOf(':')).compareTo("user_id") == 0) {
+        } else if (query.substring(0, query.indexOf(':')).compareTo("user_id") == 0) {
             for (Mood mood : moodLinkedList) {
-                if (mood.getUser_id().compareTo(returnConversion.substring(returnConversion.indexOf(':') + 1)) == 0) {
+                if (mood.getUser_id().compareTo(query.substring(query.indexOf(':') + 1)) == 0) {
                     reloadedMoods.add(mood);
                 }
             }
-        } else if (returnConversion.substring(0, returnConversion.indexOf(':')).compareTo("trigger") == 0) {
+        } else if (query.substring(0, query.indexOf(':')).compareTo("trigger") == 0) {
             for (Mood mood : moodLinkedList) {
-                if (mood.getTrigger().compareTo(returnConversion.substring(returnConversion.indexOf(':') + 1)) == 0) {
+                if (mood.getTrigger().compareTo(query.substring(query.indexOf(':') + 1)) == 0) {
                     reloadedMoods.add(mood);
                 }
             }
@@ -244,9 +301,15 @@ public class FeedActivity extends AppCompatActivity
         return reloadedMoods;
     }
 
+    /**
+     * Handles I/O and filtering of the feed depending on said I/O
+     * Gets what items were clicked and then based upon the feed filters the current feed based
+     * upon whatever the selection was.
+     * @param filterType : the type of filter selected
+     */
     private void openFilterDialog(String filterType) {
         final String[] items = checkBoxDateInit(filterType);
-        final ArrayList<String> selectedItems = new ArrayList();
+        final ArrayList<String> selectedItems = new ArrayList<>();
         AlertDialog dialog = new AlertDialog.Builder(this)
                 .setTitle("Select Filter Parameters")
                 .setMultiChoiceItems(items, null, new DialogInterface.OnMultiChoiceClickListener() {
@@ -262,7 +325,7 @@ public class FeedActivity extends AppCompatActivity
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         // SAVE SELECTED ITEMS AND QUERY HERE
-                        ArrayList<Mood> reloadedMoods = new ArrayList<Mood>();
+                        ArrayList<Mood> reloadedMoods = new ArrayList<>();
                         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
                         if (toolbar.getTitle().toString().compareTo("Universal Feed") == 0) {
                             if (preSortList.size() == 0) {
@@ -307,6 +370,11 @@ public class FeedActivity extends AppCompatActivity
         dialog.show();
     }
 
+    /**
+     * Initiates the filter checkBoxes based upon what the filter type selection was
+     * @param dateType : the selection made for what to filter
+     * @return checkBoxItems : the list of items to be used as check box items
+     */
     private String[] checkBoxDateInit(String dateType) {
         String[] checkBoxItems = new String[0];
         if (dateType.compareTo("emotions") == 0) {
@@ -326,7 +394,11 @@ public class FeedActivity extends AppCompatActivity
         return checkBoxItems;
     }
 
-
+    /**
+     * I/O controller for switching between different views based around the main feed view
+     * @param item : the item selected to switch to
+     * @return true
+     */
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
@@ -368,17 +440,25 @@ public class FeedActivity extends AppCompatActivity
         return true;
     }
 
+    /**
+     * sets the Toolbar's name to the new feed name
+     * @param newName : the new name to set the feed to
+     */
     private void setFeedName(String newName) {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        if (newName == "universal")
+        if (newName.compareTo("universal") == 0)
             toolbar.setTitle(R.string.universal_feed);
-        else if (newName == "personal")
+        else if (newName.compareTo("personal") == 0)
             toolbar.setTitle(R.string.personal_feed);
-        else if (newName == "followed")
+        else if (newName.compareTo("followed") == 0)
             toolbar.setTitle(R.string.followed_feed);
-        return;
     }
 
+    /**
+     * Updates the view from the presort list or a default feed list for a full reset
+     * If the preSortList is not empty then we know that it has been previously filled with
+     * items that were saved there before a search or a filter and we now want to reload it.
+     */
     private void updateFromPreSortList() {
         moodLinkedList.clear();
         if (preSortList.size() > 0) { // this string of conditions sets it up so that the original list of moods is reloaded for resorting
@@ -395,21 +475,28 @@ public class FeedActivity extends AppCompatActivity
             }
         }
     }
+
+    /**
+     * Updates the moodlist to original list for a new sort
+     * Sorts the list by chronological order
+     * Then filters the display to only show moods based upon the date range inputted
+     * @param range : the date range to show
+     */
     private void setMoodsByDate(String range) {
         updateFromPreSortList();
         sortDisplayByDate();
         Date target = new Date();
         Calendar cal = Calendar.getInstance();
-        if (range == "day") {
+        if (range.compareTo("day") == 0) {
             cal.add(Calendar.DATE, -1);
             target = cal.getTime();
-        } else if (range == "week") {
+        } else if (range.compareTo("week") == 0) {
             cal.add(Calendar.DATE, -7);
             target = cal.getTime();
-        } else if (range == "month") {
+        } else if (range.compareTo("month") == 0) {
             cal.add(Calendar.MONTH, -1);
             target = cal.getTime();
-        } else if (range == "year") {
+        } else if (range.compareTo("year") == 0) {
             cal.add(Calendar.YEAR, -1);
             target = cal.getTime();
         }
@@ -429,6 +516,9 @@ public class FeedActivity extends AppCompatActivity
         moodListAdapter.notifyDataSetChanged();
     }
 
+    /**
+     * Sorts the current Moods on display into ascending chronological order
+     */
     private void sortDisplayByDate() {
         Collections.sort(moodLinkedList, new Comparator<Mood>(){
             DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
@@ -445,12 +535,19 @@ public class FeedActivity extends AppCompatActivity
         moodListAdapter.notifyDataSetChanged();
     }
 
+    /**
+     * Calls the addition of a new mood and switches activities
+     */
     private void addMood() {
         Intent addMoodIntent = new Intent(this, AddMoodActivity.class);
         addMoodIntent.putExtra("editCheck", 0);
         startActivityForResult(addMoodIntent, 0);
     }
 
+    /**
+     * Populates the Feed with the passed in list of moods
+     * @param newMoods : the moods to populate the feed with
+     */
     private void populateFromMoodLoad(ArrayList<Mood> newMoods) {
         moodLinkedList.clear();
         //LOADING FROM ELASTIC SEARCH
@@ -459,13 +556,19 @@ public class FeedActivity extends AppCompatActivity
         }
         moodListAdapter.notifyDataSetChanged();
     }
+
+    /**
+     * Converts user queries into usable Id search queries then queries for them based upon
+     * which feed is currently active and appends them to the list of moods found
+     * @param query : the inputted query to convert and search for
+     * @return reloadedMoods : the moods found by the query
+     */
     private ArrayList<Mood> queryConverter(String query) {
         // Convert user queries into usable id search queries
-        String queryConverted = query;
+        String queryConverted;
         ArrayList<Mood> reloadedMoods = new ArrayList<>();
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        ArrayList<String> names = new ArrayList<String>();
-        names = UserModel.getAllUsers();
+        ArrayList<String> names = UserModel.getAllUsers();
 
         for (Map.Entry<String, SocialSituation> entry : mApplication.getSocialSituationModel()
                 .getSocialSituations().entrySet()) {
@@ -514,6 +617,11 @@ public class FeedActivity extends AppCompatActivity
         return reloadedMoods;
     }
 
+    /**
+     * Removes and duplicate moods found in a list of moods
+     * @param moodList : the list of moods to check for duplicates
+     * @return tempList : the list of moods with duplicates removed
+     */
     private ArrayList<Mood> removeDuplicateMoods(ArrayList<Mood> moodList) {
         ArrayList<Mood> tempList = new ArrayList<>();
         for (Mood mood : moodList) {
@@ -536,6 +644,11 @@ public class FeedActivity extends AppCompatActivity
         return tempList;
     }
 
+    /**
+     * Gets moods by searching elastic search for universal moods with a converted query
+     * @param queryConverted : the converted query to search elastic search for
+     * @return the found moods
+     */
     private ArrayList<Mood> universalElasticQuery(String queryConverted) {
         HashMap<String, String> queryHash = new HashMap<>();
         queryHash.put(queryConverted.substring(0,queryConverted.indexOf(':')),
@@ -544,6 +657,10 @@ public class FeedActivity extends AppCompatActivity
         return mApplication.getMoodModel().getUniversalUserMoods(queryHash);
     }
 
+    /**
+     * Gets all moods from the current user's followed list
+     * @return FollowerMoods : all moods found
+     */
     private ArrayList<Mood> getFollowerMoods() {
         ArrayList<Mood> FollowerMoods = new ArrayList<>();
         HashMap<String, String> queryHash = new HashMap<>();
@@ -553,6 +670,11 @@ public class FeedActivity extends AppCompatActivity
         }
         return FollowerMoods;
     }
+
+    /**
+     * Uses shared preferences on the phone to get the current user profile
+     * @return userProfile: the user profile to be returned
+     */
     private User getCurrentUser() {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         String userName = sharedPreferences.getString("username", "test");
@@ -560,6 +682,10 @@ public class FeedActivity extends AppCompatActivity
         return userProfile;
     }
 
+    /**
+     * Recieves return data after either having added a new mood or edited an old one
+     * Uses the return data to update the feed with the new mood or changed mood.
+     */
     // Code Documentation found here: https://developer.android.com/reference/android/app/Activity.html
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         // requestcode 0 is from adding a new mood
