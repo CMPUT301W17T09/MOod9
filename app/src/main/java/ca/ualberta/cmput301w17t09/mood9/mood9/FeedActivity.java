@@ -37,8 +37,11 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Originally created by :
@@ -101,6 +104,7 @@ public class FeedActivity extends AppCompatActivity
         moodListAdapter = new MoodListAdapter(this, moodLinkedList, mApplication);
         moodListView.setAdapter(moodListAdapter);
         populateFromMoodLoad(mApplication.getMoodModel().getUniversalUserMoods(null));
+        sortDisplayByDate();
 
 
         moodListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -142,12 +146,13 @@ public class FeedActivity extends AppCompatActivity
             }
             public boolean onQueryTextSubmit(String query) {
                 Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-                ArrayList<Mood> reloadedMoods = new ArrayList<>();
+                ArrayList<Mood> reloadedMoods = new ArrayList<>();/*
                 if (toolbar.getTitle().toString().compareTo("Universal Feed") == 0) {
-                    reloadedMoods = universalQuery(query);
+                    reloadedMoods = queryConverter(query);
                 } else { // Personal or Follower feed so all should be loaded
-                    reloadedMoods = currentFeedQuery(query);
-                }
+                    reloadedMoods = queryConverter(query);
+                }*/
+                reloadedMoods = queryConverter(query);
                 populateFromMoodLoad(reloadedMoods);
                 preSortList.clear();
                 preSortList.addAll(moodLinkedList);
@@ -165,7 +170,7 @@ public class FeedActivity extends AppCompatActivity
                 ArrayList<Mood> reloadedMoods;
                 if (toolbar.getTitle().toString().compareTo("Personal Feed") == 0)
                     reloadedMoods = mApplication.getMoodModel().getCurrentUserMoods();
-                else if (toolbar.getTitle().toString().compareTo("Follower Feed") == 0)
+                else if (toolbar.getTitle().toString().compareTo("Followed Feed") == 0)
                     reloadedMoods = getFollowerMoods();
                 else
                     reloadedMoods = mApplication.getMoodModel().getUniversalUserMoods(null);
@@ -213,7 +218,7 @@ public class FeedActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
     private ArrayList<Mood> currentFeedQuery(String query) {
-        String returnConversion = queryConverter(query);
+        String returnConversion = query;
         ArrayList<Mood> reloadedMoods = new ArrayList<>();
         if (returnConversion.substring(0, returnConversion.indexOf(':')).compareTo("emotionId") == 0) {
             for (Mood mood : moodLinkedList) {
@@ -240,20 +245,6 @@ public class FeedActivity extends AppCompatActivity
                 }
             }
         }
-        return reloadedMoods;
-    }
-
-    private ArrayList<Mood> universalQuery(String query) {
-        String returnConversion = queryConverter(query);
-        // TODO: move this call to the queryConverter so that you
-        // TODO: can grab multiple possible queries in one search,
-        // TODO: so query every time something is found and add to list
-        HashMap<String, String> queryHash = new HashMap<>();
-        queryHash.put(returnConversion.substring(0,returnConversion.indexOf(':')),
-                returnConversion.substring(returnConversion.indexOf(':')+1));
-        moodLinkedList.clear();
-        ArrayList<Mood> reloadedMoods = mApplication.getMoodModel()
-                .getUniversalUserMoods(queryHash);
         return reloadedMoods;
     }
 
@@ -286,7 +277,7 @@ public class FeedActivity extends AppCompatActivity
                                 moodLinkedList.clear();
                                 moodLinkedList.addAll(preSortList);
                             }
-                        } else if (toolbar.getTitle().toString().compareTo("Follower Feed") == 0) {
+                        } else if (toolbar.getTitle().toString().compareTo("Followed Feed") == 0) {
                             if (preSortList.size() == 0) {
                                 moodLinkedList.clear();
                                 moodLinkedList.addAll(getFollowerMoods());
@@ -351,13 +342,16 @@ public class FeedActivity extends AppCompatActivity
             setFeedName("personal");
             ArrayList<Mood> temp = mApplication.getMoodModel().getCurrentUserMoods();
             populateFromMoodLoad(temp);
+            sortDisplayByDate();
         } else if (id == R.id.followed) {
             setFeedName("followed");
             populateFromMoodLoad(getFollowerMoods());
+            sortDisplayByDate();
         } else if (id == R.id.universal) {
             setFeedName("universal");
             ArrayList<Mood> temp = mApplication.getMoodModel().getUniversalUserMoods(null);
             populateFromMoodLoad(temp);
+            sortDisplayByDate();
         } else if (id == R.id.near_me) {
             Intent mapIntent = new Intent(this, MapsActivity.class);
             mapIntent.putExtra("moodList", moodLinkedList);
@@ -400,7 +394,7 @@ public class FeedActivity extends AppCompatActivity
                 moodLinkedList.addAll(mApplication.getMoodModel().getUniversalUserMoods(null));
             } else if (title.compareTo("Personal Feed") == 0) {
                 moodLinkedList.addAll(mApplication.getMoodModel().getCurrentUserMoods());
-            } else if (title.compareTo("Follower Feed") == 0) {
+            } else if (title.compareTo("Followed Feed") == 0) {
                 moodLinkedList.addAll(getFollowerMoods());
             }
         }
@@ -469,10 +463,11 @@ public class FeedActivity extends AppCompatActivity
         }
         moodListAdapter.notifyDataSetChanged();
     }
-    private String queryConverter(String query) {
+    private ArrayList<Mood> queryConverter(String query) {
         // Convert user queries into usable id search queries
         String queryConverted = query;
-        ArrayList<Mood> universalMoods = mApplication.getMoodModel().getUniversalUserMoods(null);
+        ArrayList<Mood> reloadedMoods = new ArrayList<>();
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         ArrayList<String> names = new ArrayList<String>();
         names = UserModel.getAllUsers();
 
@@ -482,7 +477,10 @@ public class FeedActivity extends AppCompatActivity
                     .contains(query.toLowerCase()) || entry.getValue().getDescription()
                     .toLowerCase().contains(query.toLowerCase())) {
                 queryConverted = "socialSituationId:"+entry.getValue().getId();
-                return queryConverted;
+                if (toolbar.getTitle().toString().compareTo("Universal Feed") == 0)
+                    reloadedMoods.addAll(universalElasticQuery(queryConverted));
+                else
+                    reloadedMoods.addAll(currentFeedQuery(queryConverted));
             }
         }
         for (Map.Entry<String, Emotion> entry: mApplication.getEmotionModel()
@@ -491,19 +489,60 @@ public class FeedActivity extends AppCompatActivity
                     .contains(query.toLowerCase()) || entry.getValue().getDescription()
                     .toLowerCase().contains(query.toLowerCase())) {
                 queryConverted = "emotionId:"+entry.getValue().getId();
-                return queryConverted;
+                if (toolbar.getTitle().toString().compareTo("Universal Feed") == 0)
+                    reloadedMoods.addAll(universalElasticQuery(queryConverted));
+                else
+                    reloadedMoods.addAll(currentFeedQuery(queryConverted));
             }
         }
         for (String name : names) {
             if (name.toLowerCase().contains(query.toLowerCase())) {
                 queryConverted = "user_id:"+UserModel.getUserID(name);
-                return queryConverted;
+                if (toolbar.getTitle().toString().compareTo("Universal Feed") == 0)
+                    reloadedMoods.addAll(universalElasticQuery(queryConverted));
+                else
+                    reloadedMoods.addAll(currentFeedQuery(queryConverted));
             }
         }
-        queryConverted = "trigger:"+query;
+        //queryConverted = "trigger:"+query;
+        // TODO: set up new trigger query
 
-        return queryConverted;
+        // Remove duplicates
+        reloadedMoods = removeDuplicateMoods(reloadedMoods);
+
+        return reloadedMoods;
     }
+
+    private ArrayList<Mood> removeDuplicateMoods(ArrayList<Mood> moodList) {
+        ArrayList<Mood> tempList = new ArrayList<>();
+        for (Mood mood : moodList) {
+            int FoundMood = 0;
+            for (Mood mood2 : tempList) {
+                try {
+                    if (mood.getId().compareTo(mood2.getId()) == 0) {
+                        FoundMood = 1;
+                    }
+                } catch (Exception e) {
+                    if (mood == mood2) {
+                        FoundMood = 1;
+                    }
+                }
+            }
+            if (FoundMood == 0) {
+                tempList.add(mood);
+            }
+        }
+        return tempList;
+    }
+
+    private ArrayList<Mood> universalElasticQuery(String queryConverted) {
+        HashMap<String, String> queryHash = new HashMap<>();
+        queryHash.put(queryConverted.substring(0,queryConverted.indexOf(':')),
+                queryConverted.substring(queryConverted.indexOf(':')+1));
+        moodLinkedList.clear();
+        return mApplication.getMoodModel().getUniversalUserMoods(queryHash);
+    }
+
     private ArrayList<Mood> getFollowerMoods() {
         ArrayList<Mood> FollowerMoods = new ArrayList<>();
         HashMap<String, String> queryHash = new HashMap<>();
@@ -513,7 +552,6 @@ public class FeedActivity extends AppCompatActivity
         }
         return FollowerMoods;
     }
-
     private User getCurrentUser() {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         String userName = sharedPreferences.getString("username", "test");
@@ -533,10 +571,12 @@ public class FeedActivity extends AppCompatActivity
             TextView username = (TextView)view.findViewById(R.id.username);
             username.setTypeface(null, Typeface.BOLD);
             moodListAdapter.notifyDataSetChanged();
+            sortDisplayByDate();
 
         } else {
             if (requestCode == 1) {
                 moodListAdapter.notifyDataSetChanged();
+                sortDisplayByDate();
             }
         }
     }

@@ -1,6 +1,7 @@
 package ca.ualberta.cmput301w17t09.mood9.mood9;
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.content.Context;
@@ -87,6 +88,7 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
     String selectedSocial = "N/A";
     Bundle editCheckB;
 
+
     private static final int REQUEST_PERMISSION_FINE = 0;
     private LocationService locationService;
 
@@ -96,6 +98,7 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
 
         checkLocationPermissions();
 
+
         mApplication = (Mood9Application)getApplicationContext();
         Intent thisIntent = getIntent();
         editCheckB = thisIntent.getExtras();
@@ -103,6 +106,8 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
         if (editCheck == 1) {
             setContentView(R.layout.activity_edit_mood);
             oldMoodIndex = editCheckB.getInt("moodIndex");
+
+
         }
         else {
             setContentView(R.layout.activity_add_mood);
@@ -112,6 +117,7 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
         String userName = sharedPreferences.getString("username", "test");
         userId = UserModel.getUserID(userName);
 
+        Button customLocation = (Button) findViewById(R.id.custom_location);
         cameraImage  = (ImageView) findViewById(R.id.cameraImage);
         ImageButton cameraButton = (ImageButton) findViewById(R.id.cameraButton);
         Spinner emotionsSpinner = (Spinner) findViewById(R.id.emotions_spinner);
@@ -124,6 +130,14 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
 
         spinnerDateInit();
         spinnerInit(editCheck, trigger, txtDate, emotionsSpinner, socialSpinner);
+
+        customLocation.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent customLocationIntent = new Intent(AddMoodActivity.this, CustomLocation.class);
+                startActivityForResult(customLocationIntent, 1);
+            }
+        });
 
         addLocation.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -192,6 +206,7 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
                         }
                     } else {
                         // added emoticon parameter to Mood class to store the r.drawable of the selected emotion
+                        System.out.println(latitude);
                         if (imageString == null) {
                             returnMood = new Mood(latitude, longitude, trigger.getText().toString(),
                                     String.valueOf(emotionId), String.valueOf(socialId),
@@ -264,29 +279,36 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        imageBitmap = (Bitmap)data.getExtras().get("data");
-        cameraImage.setImageBitmap(imageBitmap);
+        if(resultCode == Activity.RESULT_OK) {
+            if (requestCode == 0) {
+                imageBitmap = (Bitmap) data.getExtras().get("data");
+                cameraImage.setImageBitmap(imageBitmap);
 
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        imageBitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
-        byte[] byteArray = byteArrayOutputStream.toByteArray();
+                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                imageBitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
+                byte[] byteArray = byteArrayOutputStream.toByteArray();
 
-        Bitmap compressedImage = null;
-        int maxImageSize = 65536;
-        int bitmapByteCount = BitmapCompat.getAllocationByteCount(imageBitmap);
+                Bitmap compressedImage = null;
+                int maxImageSize = 65536;
+                int bitmapByteCount = BitmapCompat.getAllocationByteCount(imageBitmap);
 
-        if(bitmapByteCount > maxImageSize){
-            final BitmapFactory.Options options = new BitmapFactory.Options();
-            double compressionRatio = ((double)bitmapByteCount / (double)maxImageSize);
-            double compressionSize = sqrt(compressionRatio);
-            options.inSampleSize = (int) ceil(compressionSize);
-            compressedImage = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.length, options);
+                if (bitmapByteCount > maxImageSize) {
+                    final BitmapFactory.Options options = new BitmapFactory.Options();
+                    double compressionRatio = ((double) bitmapByteCount / (double) maxImageSize);
+                    double compressionSize = sqrt(compressionRatio);
+                    options.inSampleSize = (int) ceil(compressionSize);
+                    compressedImage = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.length, options);
+                }
+
+                compressedImage.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
+
+                imageString = Base64.encodeToString(byteArray, Base64.DEFAULT);
+            }
+            if (requestCode == 1) {
+                longitude = (double) data.getExtras().get("lon");
+                latitude = (double) data.getExtras().get("lat");
+            }
         }
-
-        compressedImage.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
-
-        System.out.println(compressedImage.getAllocationByteCount());
-        imageString = Base64.encodeToString(byteArray, Base64.DEFAULT);
     }
 
     //Performing action onItemSelected and onNothing selected
