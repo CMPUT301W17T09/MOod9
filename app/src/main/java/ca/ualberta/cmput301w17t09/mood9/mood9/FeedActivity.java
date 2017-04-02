@@ -85,7 +85,7 @@ public class FeedActivity extends AppCompatActivity
 
     /**
      * The onCreate method, sets up the feed with default settings and initializes adapter
-     * @param savedInstanceState
+     * @param savedInstanceState : saved Instance State
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
