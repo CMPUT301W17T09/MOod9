@@ -104,7 +104,8 @@ public class FeedActivity extends AppCompatActivity
         moodListAdapter = new MoodListAdapter(this, moodLinkedList, mApplication);
         moodListView.setAdapter(moodListAdapter);
         populateFromMoodLoad(mApplication.getMoodModel().getUniversalUserMoods(null));
-        sortDisplayByDate();
+        //sortDisplayByDate();
+
 
 
         moodListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
