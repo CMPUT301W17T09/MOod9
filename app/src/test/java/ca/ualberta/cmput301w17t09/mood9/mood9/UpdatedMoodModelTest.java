@@ -14,6 +14,9 @@ import java.util.Date;
 
 public class UpdatedMoodModelTest {
 
+    // Put this in tomorrow Monday:
+    // http://stackoverflow.com/questions/28960898/getting-context-in-androidtestcase-or-instrumentationtestcase-in-android-studio
+    
     private ArrayList<Mood> testMoods;
     private File testFile = new File("test_moods.sav");
     private UpdatedMoodModel moodModel;
