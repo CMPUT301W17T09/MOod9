@@ -25,17 +25,15 @@ import android.widget.Toast;
 public class LocationService implements LocationListener {
     private final Context mContext;
 
-
     boolean checkGPS = false;
-
 
     boolean checkNetwork = false;
 
     boolean canGetLocation = false;
 
-    Location loc;
-    double latitude;
-    double longitude;
+    private Location loc;
+    private double latitude;
+    private double longitude;
 
 
     private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 10;

@@ -4,7 +4,6 @@ import android.Manifest;
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -14,14 +13,11 @@ import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.BitmapCompat;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Base64;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -36,17 +32,10 @@ import android.widget.Toast;
 
 import java.text.DateFormat;
 import java.io.ByteArrayOutputStream;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
-import java.util.Locale;
 import java.util.Map;
-import java.util.TimeZone;
 
-import static android.R.attr.bitmap;
-import static android.R.attr.datePickerDialogTheme;
-import static android.R.attr.targetActivity;
 import static java.lang.Math.ceil;
 import static java.lang.Math.sqrt;
 
@@ -54,39 +43,24 @@ import static java.lang.Math.sqrt;
  * Originally created by Fady
  * Save returns data through intent extras implemented by cdkushni 3/5/17
  * Changed to implement AdapterView.OnItemSelectedListener by cdkushni on 3/8/17
- * Fixed to use mood model, grabbing emotion model and socialmodel data for spinners and reloading other edit details from passed in mood by cdkushni on 3/10/17
- * Modified by cdkushni on 3/20/17, fixed some bugs with shared preferences that came up whenever a new account was made and implemented a new version of the location
+ * Fixed to use mood model, grabbing emotion model and socialmodel data for spinners
+ * and reloading other edit details from passed in mood by cdkushni on 3/10/17
+ * Modified by cdkushni on 3/20/17, fixed some bugs with shared preferences that came
+ * up whenever a new account was made and implemented a new version of the location
  * service, not tested yet.
- * Modified by cdkushni on 3/20/17 gps location grabbing is now working, network location grabbing is still not working for whatever reason.
+ * Modified by cdkushni on 3/20/17 gps location grabbing is now working, network location
+ * grabbing is still not working for whatever reason.
  * Encapsulated some parts from the on create function to make it a bit cleaner
  */
 public class AddMoodActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener{
 
     private Mood9Application mApplication;
-    String[] emotions;
-    String[] socials;
+    private static Mood returnMood;
 
-    Mood returnMood;
-    // replace these with just setting the return mood values as we go along
-    int[] emoticons;
-    int emotionId = 0;
-    int socialId = 0;
-    double latitude = 0.0;
-    double longitude = 0.0;
-    static Date curDate = new Date();
-    String imageTriggerId = "N/A";
-    String selectedEmotion = "Anger";
-    String userId = "newUser";
+    private ImageView cameraImage;
+    private Bitmap imageBitmap = null;
 
-    ImageView cameraImage;
-    Bitmap imageBitmap = null;
-    String imageString;
-
-    int oldMoodIndex = 0;
-
-    int selectedEmote = R.drawable.anger;
-    String selectedSocial = "N/A";
-    Bundle editCheckB;
+    private int oldMoodIndex = 0;
 
 
     private static final int REQUEST_PERMISSION_FINE = 0;
@@ -98,24 +72,24 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
 
         checkLocationPermissions();
 
-
         mApplication = (Mood9Application)getApplicationContext();
         Intent thisIntent = getIntent();
-        editCheckB = thisIntent.getExtras();
+        Bundle editCheckB = thisIntent.getExtras();
         int editCheck = editCheckB.getInt("editCheck", 0);
+
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        String userName = sharedPreferences.getString("username", "test");
+        String userId = UserModel.getUserID(userName);
+
         if (editCheck == 1) {
             setContentView(R.layout.activity_edit_mood);
             oldMoodIndex = editCheckB.getInt("moodIndex");
 
-
-        }
-        else {
+        } else {
             setContentView(R.layout.activity_add_mood);
+            returnMood = new Mood(53.5, 113.5, "",
+                    "0", "0", "N/A", "2017-04-01", userId, null);
         }
-
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        String userName = sharedPreferences.getString("username", "test");
-        userId = UserModel.getUserID(userName);
 
         Button customLocation = (Button) findViewById(R.id.custom_location);
         cameraImage  = (ImageView) findViewById(R.id.cameraImage);
@@ -128,13 +102,13 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
         Button calendar = (Button) findViewById(R.id.calendar);
         final TextView txtDate = (TextView) findViewById(R.id.curDate);
 
-        spinnerDateInit();
-        spinnerInit(editCheck, trigger, txtDate, emotionsSpinner, socialSpinner);
+        spinnerDateInit(editCheck, trigger, txtDate, emotionsSpinner, socialSpinner);
 
         customLocation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent customLocationIntent = new Intent(AddMoodActivity.this, CustomLocation.class);
+                Intent customLocationIntent = new Intent(AddMoodActivity.this
+                        , CustomLocation.class);
                 startActivityForResult(customLocationIntent, 1);
             }
         });
@@ -144,8 +118,8 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
             public void onClick(View v) {
                 locationService = new LocationService(AddMoodActivity.this);
                 if (locationService.canGetLocation()) {
-                    longitude = locationService.getLongitude();
-                    latitude = locationService.getLatitude();
+                    returnMood.setLongitude(locationService.getLongitude());
+                    returnMood.setLatitude(locationService.getLatitude());
                 }
             }
         });
@@ -182,22 +156,11 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
         save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-                String newDate = dateFormat.format(curDate);
                 if (triggerVerify(trigger.getText().toString()) == 1) {
                     if (editCheckB.getInt("editCheck", -1) == 1) {
                         try {
-                            returnMood.setDate(newDate);
-                            returnMood.setEmotionId(String.valueOf(emotionId));
-                            returnMood.setSocialSituationId(String.valueOf(socialId));
                             returnMood.setTrigger(trigger.getText().toString());
-                            returnMood.setLatitude(latitude);
-                            returnMood.setLongitude(longitude);
-                            if (imageString != null) {
-                                returnMood.setImage(imageString);
-                            }
                             mApplication.getMoodLinkedList().set(oldMoodIndex, returnMood);
-
                             mApplication.getMoodModel().updateMood(returnMood);
                             finish();
                         } catch (Exception e) {
@@ -205,20 +168,7 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
                             finish();
                         }
                     } else {
-                        // added emoticon parameter to Mood class to store the r.drawable of the selected emotion
-                        System.out.println(latitude);
-                        if (imageString == null) {
-                            returnMood = new Mood(latitude, longitude, trigger.getText().toString(),
-                                    String.valueOf(emotionId), String.valueOf(socialId),
-                                    imageTriggerId, newDate, userId, null);
-                        } else {
-                            returnMood = new Mood(latitude, longitude, trigger.getText().toString(),
-                                    String.valueOf(emotionId), String.valueOf(socialId),
-                                    imageTriggerId, newDate, userId, imageString);
-                        }
-                        returnMood.setEmotionId(String.valueOf(emotionId));
-                        returnMood.setSocialSituationId(String.valueOf(socialId));
-
+                        returnMood.setTrigger(trigger.getText().toString());
                         mApplication.getMoodLinkedList().add(returnMood);
                         mApplication.getMoodModel().addMood(returnMood);
                         finish();
@@ -255,8 +205,10 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
         public void onDateSet(DatePicker view, int year, int month, int day) {
             Calendar c = Calendar.getInstance();
             c.set(year, month, day);
-            curDate = c.getTime();
             AddMoodActivity thisActivity = (AddMoodActivity) getActivity();
+            DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+            String newDate = dateFormat.format(c.getTime());
+            returnMood.setDate(newDate);
             thisActivity.setDateText(String.format("%1$tY-%1$tm-%1$td", c));
         }
     }
@@ -297,16 +249,18 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
                     double compressionRatio = ((double) bitmapByteCount / (double) maxImageSize);
                     double compressionSize = sqrt(compressionRatio);
                     options.inSampleSize = (int) ceil(compressionSize);
-                    compressedImage = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.length, options);
+                    compressedImage = BitmapFactory.decodeByteArray(byteArray, 0
+                            , byteArray.length, options);
                 }
 
                 compressedImage.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
 
-                imageString = Base64.encodeToString(byteArray, Base64.DEFAULT);
+                //imageString = Base64.encodeToString(byteArray, Base64.DEFAULT);
+                returnMood.setImage(Base64.encodeToString(byteArray, Base64.DEFAULT));
             }
             if (requestCode == 1) {
-                longitude = (double) data.getExtras().get("lon");
-                latitude = (double) data.getExtras().get("lat");
+                returnMood.setLongitude((double) data.getExtras().get("lon"));
+                returnMood.setLatitude((double) data.getExtras().get("lat"));
             }
         }
     }
@@ -316,15 +270,10 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
     public void onItemSelected(AdapterView<?> arg0, View arg1, int position, long id) {
         Spinner spinner = (Spinner) arg0;
         if (spinner.getId() == R.id.emotions_spinner) {
-            //Toast.makeText(getApplicationContext(), emotions[position], Toast.LENGTH_SHORT).show();
-            emotionId = position;
-            selectedEmotion = emotions[position];
-            selectedEmote = emoticons[position];
+            returnMood.setEmotionId(String.valueOf(position));
         }
         else if (spinner.getId() == R.id.social_spinner) {
-            //Toast.makeText(getApplicationContext(), socials[position], Toast.LENGTH_SHORT).show();
-            socialId = position;
-            selectedSocial = socials[position];
+            returnMood.setSocialSituationId(String.valueOf(position));
         }
     }
     @Override
@@ -348,29 +297,32 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
         }
     }
 
-    private void spinnerDateInit() {
-        emoticons = new int[mApplication.getEmotionModel().getEmotions().size()];
-        emotions = new String[mApplication.getEmotionModel().getEmotions().size()];
+    private void spinnerDateInit(int editCheck, EditText trigger, TextView txtDate,
+                                 Spinner emotionsSpinner, Spinner socialSpinner) {
+        int[] emoticons = new int[mApplication.getEmotionModel().getEmotions().size()];
+        String[] emotions = new String[mApplication.getEmotionModel().getEmotions().size()];
         for (Map.Entry<String, Emotion> entry : mApplication.getEmotionModel()
                 .getEmotions().entrySet()) {
-            //String imgNameBuilder = entry.getValue().getName().toLowerCase() + ".png";
             String imgNameBuilder = entry.getValue().getImageName();
             emoticons[Integer.parseInt(entry.getKey())] = getResources()
                     .getIdentifier(imgNameBuilder.substring(0,
                             imgNameBuilder.lastIndexOf(".")), "drawable", getPackageName());
             emotions[Integer.parseInt(entry.getKey())] = entry.getValue().getName();
         }
-        socials = new String[mApplication.getSocialSituationModel().getSocialSituations()
+        String[] socials = new String[mApplication.getSocialSituationModel().getSocialSituations()
                 .entrySet().size()];
 
         for (Map.Entry<String, SocialSituation> entry : mApplication.getSocialSituationModel()
                 .getSocialSituations().entrySet()) {
             socials[Integer.parseInt(entry.getKey())] = entry.getValue().getName();
         }
+        spinnerInit(editCheck, trigger, txtDate, emotionsSpinner, socialSpinner
+                , emoticons, emotions, socials);
     }
 
     private void spinnerInit(int editCheck, EditText trigger, TextView txtDate,
-                             Spinner emotionsSpinner, Spinner socialSpinner) {
+                             Spinner emotionsSpinner, Spinner socialSpinner,
+                             int[] emoticons, String[] emotions, String[] socials) {
         EmotionsSpinnerAdapter emotionsSpinnerAdapter = new EmotionsSpinnerAdapter
                 (getApplicationContext(), emoticons, emotions);
 
@@ -400,14 +352,6 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
             socialSpinner.setSelection(position);
             trigger.setText(returnMood.getTrigger());
 
-            String myFormat = "yyyy-MM-dd";
-            SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.US);
-            try {
-                curDate = sdf.parse(returnMood.getDate());
-            } catch (Exception e) {
-                // FAILED TO GET OLD DATE
-                curDate = new Date();
-            }
             txtDate.setText(returnMood.getDate().split("T")[0]);
         }
         else {
@@ -418,15 +362,12 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
         socialSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                //Toast.makeText(getApplicationContext(), socials[position], Toast.LENGTH_SHORT).show();
-                socialId = position;
-                selectedSocial = socials[position];
+                returnMood.setSocialSituationId(String.valueOf(position));
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-                socialId = 0;
-                selectedSocial = socials[0];
+                returnMood.setSocialSituationId("0");
             }
         });
     }

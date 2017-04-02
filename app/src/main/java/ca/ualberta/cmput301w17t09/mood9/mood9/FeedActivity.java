@@ -26,8 +26,6 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import org.apache.commons.lang3.ObjectUtils;
-
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -37,11 +35,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Originally created by :
@@ -505,8 +500,13 @@ public class FeedActivity extends AppCompatActivity
                     reloadedMoods.addAll(currentFeedQuery(queryConverted));
             }
         }
-        //queryConverted = "trigger:"+query;
-        // TODO: set up new trigger query
+        if (reloadedMoods.size() == 0) {
+            queryConverted = "trigger:"+query;
+            if (toolbar.getTitle().toString().compareTo("Universal Feed") == 0)
+                reloadedMoods.addAll(universalElasticQuery(queryConverted));
+            else
+                reloadedMoods.addAll(currentFeedQuery(queryConverted));
+        }
 
         // Remove duplicates
         reloadedMoods = removeDuplicateMoods(reloadedMoods);
