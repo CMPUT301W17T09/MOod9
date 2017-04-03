@@ -110,7 +110,7 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
         } else {
             setContentView(R.layout.activity_add_mood);
             returnMood = new Mood(53.5, 113.5, "",
-                    "0", "0", "N/A", "2017-04-01", userId, null);
+                    "0", "0", "N/A", "2017-04-01T00:00:00", userId, null);
         }
 
         /**

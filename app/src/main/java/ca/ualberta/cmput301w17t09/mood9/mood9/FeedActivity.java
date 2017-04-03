@@ -259,6 +259,7 @@ public class FeedActivity extends AppCompatActivity
         } else if (id == R.id.filter_socials) {
             openFilterDialog("socials");
         } else if (id == R.id.filter_clear) {
+            preSortList.clear();
             updateFromPreSortList();
             moodListAdapter.notifyDataSetChanged();
         }
@@ -356,9 +357,11 @@ public class FeedActivity extends AppCompatActivity
                             }
                         }
                         for (int i = 0; i < selectedItems.size(); i++) {
-                            reloadedMoods.addAll(currentFeedQuery(selectedItems.get(i))); // check this over, may need to fix reloading of prefilter personal list
+                            reloadedMoods.addAll(queryConverter(selectedItems.get(i))); // check this over, may need to fix reloading of prefilter personal list
                         }
                         populateFromMoodLoad(reloadedMoods);
+                        preSortList.clear();
+                        preSortList.addAll(moodLinkedList);
                         moodListAdapter.notifyDataSetChanged();
                     }
                 }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -650,11 +653,15 @@ public class FeedActivity extends AppCompatActivity
      * @return the found moods
      */
     private ArrayList<Mood> universalElasticQuery(String queryConverted) {
-        HashMap<String, String> queryHash = new HashMap<>();
-        queryHash.put(queryConverted.substring(0,queryConverted.indexOf(':')),
-                queryConverted.substring(queryConverted.indexOf(':')+1));
-        moodLinkedList.clear();
-        return mApplication.getMoodModel().getUniversalUserMoods(queryHash);
+        if (preSortList.size() == 0) {
+            HashMap<String, String> queryHash = new HashMap<>();
+            queryHash.put(queryConverted.substring(0, queryConverted.indexOf(':')),
+                    queryConverted.substring(queryConverted.indexOf(':') + 1));
+            moodLinkedList.clear();
+            return mApplication.getMoodModel().getUniversalUserMoods(queryHash);
+        } else {
+            return currentFeedQuery(queryConverted);
+        }
     }
 
     /**
@@ -697,8 +704,12 @@ public class FeedActivity extends AppCompatActivity
 
             TextView username = (TextView)view.findViewById(R.id.username);
             username.setTypeface(null, Typeface.BOLD);
-            moodListAdapter.notifyDataSetChanged();
+            setFeedName("personal");
+            ArrayList<Mood> temp = mApplication.getMoodModel().getCurrentUserMoods();
+            populateFromMoodLoad(temp);
             sortDisplayByDate();
+            NavigationView navView = (NavigationView) findViewById(R.id.nav_view);
+            navView.getMenu().getItem(0).setChecked(true);
 
         } else {
             if (requestCode == 1) {
