@@ -29,9 +29,11 @@ import io.searchbox.indices.DeleteIndex;
 import io.searchbox.indices.mapping.PutMapping;
 
 import static android.content.Context.MODE_PRIVATE;
+import static ca.ualberta.cmput301w17t09.mood9.mood9.GetMoodsTask.verifySettings;
 
 /**
  * Provides the elastic search connectivity for the app.
+ *
  * @author CMPUT301W17T09
  */
 public class ElasticSearchMOodController {
@@ -79,17 +81,26 @@ public class ElasticSearchMOodController {
         }
     }
 
+    /***
+     * Add an array of Moods to Elastic Search asynchronously
+     */
     public static class AddMoodsTask extends AsyncTask<Void, Void, Void> {
 
         private ArrayList<Mood> Moods;
 
+        /**
+         * Instantiates a new Add moods task.
+         *
+         * @param moodList the mood list
+         */
         public AddMoodsTask(ArrayList<Mood> moodList) {
             Moods = moodList;
         }
 
         /**
          * Deletes a mood
-         * @param moods
+         *
+         * @param moods the moods
          */
         protected void DeleteMoods(ArrayList<Mood> moods) {
             verifySettings();
@@ -106,8 +117,9 @@ public class ElasticSearchMOodController {
 
         /**
          * Gets the mooods using the search parameters
-         * @param searchParameters
-         * @return
+         *
+         * @param searchParameters the search parameters
+         * @return array list
          */
         protected ArrayList<Mood> GetMoods(String...searchParameters) {
             verifySettings();
@@ -205,12 +217,17 @@ public class ElasticSearchMOodController {
     }
 
     /**
-     * This only filters by user_id
+     * This only filters by the specified fields and values
      */
     public static class GetMoodsTask extends AsyncTask<Void, Void, ArrayList<Mood>> {
 
         private HashMap<String, String> query_params;
 
+        /**
+         * Instantiates a new Get moods task.
+         *
+         * @param qp the qp
+         */
         public GetMoodsTask(HashMap<String, String> qp) {
             query_params = qp;
         }
@@ -380,6 +397,9 @@ public class ElasticSearchMOodController {
         }
     }
 
+    /***
+     * Get a User object, given the ID
+     */
     public static class GetUsersTaskID extends AsyncTask<String, Void, User> {
         @Override
         protected User doInBackground(String...params) {

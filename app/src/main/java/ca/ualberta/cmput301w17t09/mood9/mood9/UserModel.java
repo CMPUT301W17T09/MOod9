@@ -10,7 +10,7 @@ public class UserModel {
     /***
      * Checks if a username already existed, by querying ElasticSearch
      * @param username the username
-     * @return null  if username already existed User object with the new username, as well as push the new User object to ElasticSearch
+     * @return null if username already existed User object with the new username, as well as push the new User object to ElasticSearch
      */
     public static String getUser(String username){
 
@@ -40,6 +40,12 @@ public class UserModel {
         }
     }
 
+    /**
+     * Get User object, given user id
+     *
+     * @param userId the user id
+     * @return User Object, NUll if not exist
+     */
     public  static User getUserProfile(String userId) {
         ElasticSearchMOodController.GetUsersTaskID getUsersTask = new ElasticSearchMOodController.GetUsersTaskID();
         getUsersTask.execute(userId);
@@ -55,11 +61,19 @@ public class UserModel {
         return user;
     }
 
+    /***
+     * Update the user, upload to ElasticSearch
+     * @param user the user
+     */
     public static void updateUser(User user) {
         ElasticSearchMOodController.AddUsersTask addUsersTask = new ElasticSearchMOodController.AddUsersTask();
         addUsersTask.execute(user);
     }
 
+    /***
+     * Get all Users of the app
+     * @return  : ArrayList<String> of all Usernames
+     */
     public static ArrayList<String> getAllUsers() {
         ElasticSearchMOodController.GetUsersTaskName getUsersTaskName = new ElasticSearchMOodController.GetUsersTaskName();
         getUsersTaskName.execute("");
@@ -79,6 +93,11 @@ public class UserModel {
         return user_names;
     }
 
+    /***
+     * Get userID give username
+     * @param username the username
+     * @return String userID
+     */
     public static String getUserID(String username) {
         ElasticSearchMOodController.GetUsersTaskName getUsersTaskName = new ElasticSearchMOodController.GetUsersTaskName();
         getUsersTaskName.execute(username);

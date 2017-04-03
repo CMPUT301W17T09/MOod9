@@ -11,21 +11,21 @@ import java.util.concurrent.ConcurrentMap;
 
 public class UserModelTest {
     
-    private userID;
+    private String userID;
     String newUserName = "test_user";
     
     @Test
-    public testAddUser() {     
+    public void testAddUser() {
         String newUserID = UserModel.getUser(newUserName);
         assertTrue(newUserID != null);
         userID = newUserID;
         
         String existedUserID = UserModel.getUser(newUserName);
-        assertTrue(existeduserID == null);
+        assertTrue(existedUserID == null);
     }
     
     @Test
-    public testGetUser() {
+    public void testGetUser() {
         User existedUser = UserModel.getUserProfile(userID);
         assertTrue(existedUser.getName().equals(newUserName));
         
@@ -34,7 +34,7 @@ public class UserModelTest {
     }
     
     @Test
-    public testUpdateUser() {
+    public void testUpdateUser() {
         User existedUser = UserModel.getUserProfile(userID);
         existedUser.addToRequests("This is Request 1");
         
@@ -46,7 +46,8 @@ public class UserModelTest {
         assertTrue(existedUser.getRequests().size() == 1);
     }
 
-    @Test testGetUserID() {
+    @Test
+    public void testGetUserID() {
         String ID = UserModel.getUserID(newUserName);
         assertTrue(ID.equals(userID));
     }

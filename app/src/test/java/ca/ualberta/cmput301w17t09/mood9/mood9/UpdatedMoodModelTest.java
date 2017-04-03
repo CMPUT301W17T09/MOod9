@@ -6,8 +6,14 @@ import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
+
+import android.content.Context;
+import android.test.InstrumentationTestCase;
+import android.test.mock.MockContext;
+
 /**
  * Created by ddao on 3/21/17.
  */
@@ -16,37 +22,25 @@ public class UpdatedMoodModelTest {
 
     // Put this in tomorrow Monday:
     // http://stackoverflow.com/questions/28960898/getting-context-in-androidtestcase-or-instrumentationtestcase-in-android-studio
-    
-    private ArrayList<Mood> testMoods;
+    private Context context = new MockContext();
     private File testFile = new File("test_moods.sav");
-    private UpdatedMoodModel moodModel;
-    
-    private setUp() {
-        testMoods = new ArrayList<Mood>();
-        moodModel = new UpdatedMoodModel(this, testFile);
-        
-        Mood m1 = new Mood(12.22,13.22,"Trigger","1","Fun","22",new Date(),"1");
-        Mood m2 = new Mood(12.22,13.22,"Trigger","2","Fun","22",new Date(),"2");
-        Mood m3 = new Mood(12.22,13.22,"Trigger","3","asodjf","powooidi",new Date(),"3");
-        
-        testMoods.add(m1);
-        testMoods.add(m2);
-        testMoods.add(m3):
-    }
+    private UpdatedMoodModel moodModel = new UpdatedMoodModel(context, testFile);
+
+    Mood m1 = new Mood(12.22,13.22,"Trigger","1","Fun","22", "2015-02-01 00:00:00","1", "asf");
+    Mood m2 = new Mood(12.22,13.22,"Trigger","2","Fun","22", "2015-02-01 00:00:00","2", "sfas");
+    Mood m3 = new Mood(12.22,13.22,"Trigger","3","asodjf","powooidi", "2015-02-01 00:00:00","3", "asdds");
     
     @Test
     public void testAdd(){
-        setUp();
-        
-        for (Mood m : testMoods) 
-            moodModel.addMood(m);
+
+        moodModel.addMood(m1);
 
         assertTrue(moodModel.getCurrentUserMoods().size() == 3);
     }
     
     @Test
     public void testDelete() {
-        moodModel.deleteMood(testMoods.get(2));
+        moodModel.deleteMood(m2);
         assertTrue(moodModel.getCurrentUserMoods().size() == 2);
     }
     
@@ -65,7 +59,7 @@ public class UpdatedMoodModelTest {
     
     @Test
     public void testReset() {
-        UpdatedMoodModel newModel = new UpdatedMoodModel();
+        UpdatedMoodModel newModel = new UpdatedMoodModel(context, testFile);
         assertTrue(newModel.getCurrentUserMoods().size() == 2);
     }
 }
