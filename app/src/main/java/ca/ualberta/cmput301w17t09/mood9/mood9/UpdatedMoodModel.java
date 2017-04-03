@@ -3,6 +3,7 @@ package ca.ualberta.cmput301w17t09.mood9.mood9;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.test.InstrumentationTestCase;
 import android.util.Log;
 
 import com.google.gson.Gson;
@@ -28,12 +29,20 @@ import java.util.HashMap;
 /**
  * Created by ddao on 3/21/17.
  */
+public class UpdatedMoodModel extends InstrumentationTestCase {
 
-public class UpdatedMoodModel {
-
+    /**
+     * The constant FILENAME.
+     */
     public static String FILENAME = "personal_moods.sav";
     private ArrayList<Mood> moodList;
+    /**
+     * The Currentmoods.
+     */
     File CURRENTMOODS = new File("personal_moods.sav");
+    /**
+     * The M context.
+     */
     Context mContext;
 
     /***
@@ -49,6 +58,11 @@ public class UpdatedMoodModel {
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 
+    /***
+     * Initialization for MoodModel
+     * @param context : current activity context
+     * @param file : Filename to save offline
+     */
     public UpdatedMoodModel(Context context, File file) {
         this.mContext = context;
         this.CURRENTMOODS = file;
@@ -56,18 +70,33 @@ public class UpdatedMoodModel {
         loadFromFile();
     }
 
+    /***
+     * Add a mood to offline storage, then synchronize to Elastic Search
+     * if possible
+     * @param mood the mood
+     */
     public void addMood(Mood mood) {
         moodList.add(mood);
         saveInFile();
         synchronize();
     }
 
+    /***
+     * Delete a mood from offline storage,
+     * then synchronize to Elastic Search
+     * @param mood the mood
+     */
     public void deleteMood(Mood mood) {
         moodList.remove(mood);
         saveInFile();
         synchronize();
     }
 
+    /***
+     * Update a mood in offline storage,
+     * then synchronize to Elastic Search
+     * @param mood the mood
+     */
     public void updateMood(Mood mood) {
         for (Mood m : moodList) {
             if (m.getId() == null) {
@@ -88,6 +117,10 @@ public class UpdatedMoodModel {
         synchronize();
     }
 
+    /***
+     * Check if Internet connection is available,
+     * then synchronize to Elastic Search
+     */
     private void synchronize() {
         if (isNetworkAvailable()) {
             ElasticSearchMOodController.AddMoodsTask addMoodsTask = new ElasticSearchMOodController.AddMoodsTask(moodList);
@@ -95,10 +128,20 @@ public class UpdatedMoodModel {
         }
     }
 
+    /***
+     * Get all current User moods
+     * @return current user moods
+     */
     public ArrayList<Mood> getCurrentUserMoods() {
         return moodList;
     }
 
+    /**
+     * Gets universal user moods.
+     *
+     * @param search_param the search param
+     * @return the universal user moods
+     */
     public ArrayList<Mood> getUniversalUserMoods(HashMap<String, String> search_param) {
         ArrayList<Mood> moods = new ArrayList<Mood>();
         // Elastic Search Stuff, do later
@@ -119,6 +162,9 @@ public class UpdatedMoodModel {
         return moods;
     }
 
+    /**
+     * Load current user moods from offline storage
+     */
     private void loadFromFile() {
 
         try {
@@ -139,6 +185,9 @@ public class UpdatedMoodModel {
         }
     }
 
+    /**
+     * Save all current user moods in offline storage
+     */
     private void saveInFile() {
         try {
             new PrintWriter(CURRENTMOODS).close();

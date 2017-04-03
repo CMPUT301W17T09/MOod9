@@ -1,0 +1,70 @@
+Everyone is present.
+
+1. Code quality, (100 character limits, line breaks, inconsistent variable names, access modifiers [private])
+2. Test cases (UI Test case, use case, backend, label)
+3. Fix map thing
+4. Social status list (duplicates) => Fixed
+5. Presentation (Cable VGA, built and ready to go)
+	+ Promoting the app
+	+ Narrate while going through app
+	+ Wao feature
+	+ DO NOT SWING IT
+	+ Everyone MUST contribute (10 minutes / team)
+	+ Pretend like presenting to clients
+	+ Answer questions (Design pattern, workflow, features, etc)
+6. Better documentation (compiled JavaDoc, comment description at the start of every file)
+7. Build and run properly
+8. Requirement updated with the WAO factor, make sure every requirements are covered
+	+ Specify which ones are done
+9. UML, MVC design pattern
+10. Code reference, dates
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
