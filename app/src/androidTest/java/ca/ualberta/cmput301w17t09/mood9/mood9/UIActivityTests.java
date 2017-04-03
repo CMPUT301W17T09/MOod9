@@ -25,10 +25,6 @@ public class UIActivityTests extends ActivityInstrumentationTestCase2<FeedActivi
         solo = new Solo(getInstrumentation(), getActivity());
     }
 
-    public void testStart() throws Exception {
-        Activity activity = getActivity();
-    }
-
     @Test
     public void testNavBar(){
 
@@ -67,10 +63,6 @@ public class UIActivityTests extends ActivityInstrumentationTestCase2<FeedActivi
         solo.assertCurrentActivity("Wrong Activity", FeedActivity.class);
     }
 
-    @Override
-    public void tearDown() throws Exception{
-        solo.finishOpenedActivities();
-    }
     @Test
     public void testAdd(){
         solo.assertCurrentActivity("Wrong Activity", FeedActivity.class);
@@ -94,7 +86,6 @@ public class UIActivityTests extends ActivityInstrumentationTestCase2<FeedActivi
     }
     @Test
     public void testEdit(){
-        FeedActivity activityFeed = (FeedActivity) solo.getCurrentActivity();
 
         solo.clickOnImageButton(0);
         solo.clickOnMenuItem("Personal");
@@ -107,6 +98,7 @@ public class UIActivityTests extends ActivityInstrumentationTestCase2<FeedActivi
         solo.clickOnButton(0);
         solo.assertCurrentActivity("Wrong Activity", AddMoodActivity.class);
 
+        solo.clearEditText((EditText) solo.getView(R.id.trigger_edittext));
         solo.enterText((EditText) solo.getView(R.id.trigger_edittext), "THIS IS SPARTA!");
         View view1 = solo.getView(Spinner.class, 0);
         View view2 = solo.getView(Spinner.class, 1);
@@ -146,5 +138,11 @@ public class UIActivityTests extends ActivityInstrumentationTestCase2<FeedActivi
         solo.clickOnText("Delete");
         solo.sleep(1000);
         solo.assertCurrentActivity("Wrong Activity", FeedActivity.class);
+    }
+
+
+    @Override
+    public void tearDown() throws Exception{
+        solo.finishOpenedActivities();
     }
 }
