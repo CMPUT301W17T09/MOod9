@@ -29,7 +29,6 @@ import io.searchbox.indices.DeleteIndex;
 import io.searchbox.indices.mapping.PutMapping;
 
 import static android.content.Context.MODE_PRIVATE;
-import static ca.ualberta.cmput301w17t09.mood9.mood9.GetMoodsTask.verifySettings;
 
 /**
  * Provides the elastic search connectivity for the app.
