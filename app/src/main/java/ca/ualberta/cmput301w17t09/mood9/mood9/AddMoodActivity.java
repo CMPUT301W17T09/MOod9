@@ -34,6 +34,7 @@ import java.text.DateFormat;
 import java.io.ByteArrayOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Map;
 
 import static java.lang.Math.ceil;
@@ -116,9 +117,11 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
             oldMoodIndex = editCheckB.getInt("moodIndex");
 
         } else {
+            DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+            String newDate = dateFormat.format(new Date());
             setContentView(R.layout.activity_add_mood);
             returnMood = new Mood(53.5, 113.5, "",
-                    "0", "0", "N/A", "2017-04-01T00:00:00", userId, null);
+                    "0", "0", "N/A", newDate, userId, null);
         }
 
         /**

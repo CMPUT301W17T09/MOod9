@@ -270,25 +270,25 @@ public class FeedActivity extends AppCompatActivity
         ArrayList<Mood> reloadedMoods = new ArrayList<>();
         if (query.substring(0, query.indexOf(':')).compareTo("emotionId") == 0) {
             for (Mood mood : moodLinkedList) {
-                if (mood.getEmotionId().compareTo(query.substring(query.indexOf(':')+1)) == 0) {
+                if (mood.getEmotionId().contains(query.substring(query.indexOf(':')+1))) {
                     reloadedMoods.add(mood);
                 }
             }
         } else if (query.substring(0, query.indexOf(':')).compareTo("socialSituationId") == 0) {
             for (Mood mood : moodLinkedList) {
-                if (mood.getSocialSituationId().compareTo(query.substring(query.indexOf(':') + 1)) == 0) {
+                if (mood.getSocialSituationId().contains(query.substring(query.indexOf(':') + 1))) {
                     reloadedMoods.add(mood);
                 }
             }
         } else if (query.substring(0, query.indexOf(':')).compareTo("user_id") == 0) {
             for (Mood mood : moodLinkedList) {
-                if (mood.getUser_id().compareTo(query.substring(query.indexOf(':') + 1)) == 0) {
+                if (mood.getUser_id().contains(query.substring(query.indexOf(':') + 1))) {
                     reloadedMoods.add(mood);
                 }
             }
         } else if (query.substring(0, query.indexOf(':')).compareTo("trigger") == 0) {
             for (Mood mood : moodLinkedList) {
-                if (mood.getTrigger().compareTo(query.substring(query.indexOf(':') + 1)) == 0) {
+                if (mood.getTrigger().contains(query.substring(query.indexOf(':') + 1))) {
                     reloadedMoods.add(mood);
                 }
             }
