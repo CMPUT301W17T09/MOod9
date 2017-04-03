@@ -2,8 +2,10 @@ package ca.ualberta.cmput301w17t09.mood9.mood9;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -87,7 +89,12 @@ public class MoodListAdapter extends BaseAdapter{
         holder.timetv=(TextView) rowView.findViewById(R.id.time);
         holder.img=(ImageView) rowView.findViewById(R.id.imageView);
 
-        holder.idtv.setText(UserModel.getUserProfile(moodList.get(position).getUser_id()).getName());
+        String username = UserModel.getUserProfile(moodList.get(position).getUser_id()).getName();
+        if (username.compareTo("") == 0) {
+            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+            username = sharedPreferences.getString("username", "test");
+        }
+        holder.idtv.setText(username);
         holder.timetv.setText(moodList.get(position).getDate());
         String imgNameBuilder = mApplication.getEmotionModel().getEmotion(moodList.get(position).getEmotionId()).getName().toLowerCase() + ".png";
         holder.img.setImageResource(context.getResources().getIdentifier(imgNameBuilder.substring(0, imgNameBuilder.lastIndexOf(".")), "drawable", context.getPackageName()));

@@ -185,12 +185,6 @@ public class FeedActivity extends AppCompatActivity
              * @return boolean
              */
             public boolean onQueryTextSubmit(String query) {
-                /*
-                if (toolbar.getTitle().toString().compareTo("Universal Feed") == 0) {
-                    reloadedMoods = queryConverter(query);
-                } else { // Personal or Follower feed so all should be loaded
-                    reloadedMoods = queryConverter(query);
-                }*/
                 ArrayList<Mood> reloadedMoods = queryConverter(query);
                 populateFromMoodLoad(reloadedMoods);
                 preSortList.clear();
@@ -671,9 +665,13 @@ public class FeedActivity extends AppCompatActivity
     private ArrayList<Mood> getFollowerMoods() {
         ArrayList<Mood> FollowerMoods = new ArrayList<>();
         HashMap<String, String> queryHash = new HashMap<>();
-        for (String Followee : getCurrentUser().getFollowees()) {
-            queryHash.put("user_id", Followee);
-            FollowerMoods.addAll(mApplication.getMoodModel().getUniversalUserMoods(queryHash));
+        try {
+            for (String Followee : getCurrentUser().getFollowees()) {
+                queryHash.put("user_id", Followee);
+                FollowerMoods.addAll(mApplication.getMoodModel().getUniversalUserMoods(queryHash));
+            }
+        } catch (Exception e) {
+            return new ArrayList<>();
         }
         return FollowerMoods;
     }

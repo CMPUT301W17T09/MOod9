@@ -11,6 +11,8 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="ca.ualberta.cmput301w17t09.mood9.mood9.AddMoodActivity">
 <RelativeLayout
+    android:focusable="true"
+    android:focusableInTouchMode="true"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
     <TextView

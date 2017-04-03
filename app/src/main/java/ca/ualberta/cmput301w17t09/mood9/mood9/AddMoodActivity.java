@@ -97,7 +97,15 @@ public class AddMoodActivity extends AppCompatActivity implements AdapterView.On
 
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         String userName = sharedPreferences.getString("username", "test");
-        String userId = UserModel.getUserID(userName);
+        String userId;
+        try {
+            userId = UserModel.getUserID(userName);
+        } catch (Exception e) {
+            userId = sharedPreferences.getString("userId", "idNotFoundDefaulter");
+            if (mApplication.getMoodModel().getCurrentUserMoods().size() > 0) {
+                userId = mApplication.getMoodModel().getCurrentUserMoods().get(0).getUser_id();
+            }
+        }
 
         /**
          * If this is an edit then get the index of the old mood and set to the edit layout
