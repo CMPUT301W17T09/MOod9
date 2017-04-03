@@ -121,7 +121,7 @@ public class UpdatedMoodModel extends InstrumentationTestCase {
      * Check if Internet connection is available,
      * then synchronize to Elastic Search
      */
-    private void synchronize() {
+    public void synchronize() {
         if (isNetworkAvailable()) {
             ElasticSearchMOodController.AddMoodsTask addMoodsTask = new ElasticSearchMOodController.AddMoodsTask(moodList);
             addMoodsTask.execute();

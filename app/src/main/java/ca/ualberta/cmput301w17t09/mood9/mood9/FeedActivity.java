@@ -414,6 +414,7 @@ public class FeedActivity extends AppCompatActivity
             sortDisplayByDate();
         } else if (id == R.id.universal) {
             setFeedName("universal");
+            mApplication.getMoodModel().synchronize();
             ArrayList<Mood> temp = mApplication.getMoodModel().getUniversalUserMoods(null);
             populateFromMoodLoad(temp);
             sortDisplayByDate();
