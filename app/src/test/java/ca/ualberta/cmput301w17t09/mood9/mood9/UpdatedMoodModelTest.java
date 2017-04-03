@@ -11,20 +11,27 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import android.content.Context;
+import android.test.ActivityInstrumentationTestCase2;
 import android.test.InstrumentationTestCase;
 import android.test.mock.MockContext;
+
+import android.app.Activity;
+import android.widget.EditText;
+
+import com.robotium.solo.Solo;
 
 /**
  * Created by ddao on 3/21/17.
  */
 
-public class UpdatedMoodModelTest {
+public class UpdatedMoodModelTest extends ActivityInstrumentationTestCase2<MainActivity> {
 
-    // Put this in tomorrow Monday:
-    // http://stackoverflow.com/questions/28960898/getting-context-in-androidtestcase-or-instrumentationtestcase-in-android-studio
-    private Context context = new MockContext();
+    public UpdatedMoodModelTest() {
+        super(MainActivity.class);
+    }
+
     private File testFile = new File("test_moods.sav");
-    private UpdatedMoodModel moodModel = new UpdatedMoodModel(context, testFile);
+    private UpdatedMoodModel moodModel = new UpdatedMoodModel(getActivity(), testFile);
 
     Mood m1 = new Mood(12.22,13.22,"Trigger","1","Fun","22", "2015-02-01 00:00:00","1", "asf");
     Mood m2 = new Mood(12.22,13.22,"Trigger","2","Fun","22", "2015-02-01 00:00:00","2", "sfas");
@@ -32,9 +39,9 @@ public class UpdatedMoodModelTest {
     
     @Test
     public void testAdd(){
-
         moodModel.addMood(m1);
-
+        moodModel.addMood(m2);
+        moodModel.addMood(m3);
         assertTrue(moodModel.getCurrentUserMoods().size() == 3);
     }
     
@@ -59,7 +66,7 @@ public class UpdatedMoodModelTest {
     
     @Test
     public void testReset() {
-        UpdatedMoodModel newModel = new UpdatedMoodModel(context, testFile);
+        UpdatedMoodModel newModel = new UpdatedMoodModel(getActivity(), testFile);
         assertTrue(newModel.getCurrentUserMoods().size() == 2);
     }
 }

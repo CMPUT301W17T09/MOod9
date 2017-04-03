@@ -26,18 +26,20 @@ public class UserModel {
         }
 
         // If user already exists, return null
-        if (users.size() != 0)
-            return null;
-        else {
+        if (users == null) {
             User user = new User(username);
             ElasticSearchMOodController.AddUsersTask addUsersTask = new ElasticSearchMOodController.AddUsersTask();
             String id = null;
             try {
                 id = addUsersTask.execute(user).get();
-            } catch (Exception e){ return null;}
+            } catch (Exception e){
+                String err = e.getMessage();
+                return null;
+            }
 
             return id;
-        }
+        } else
+            return null;
     }
 
     /**
