@@ -9,4 +9,4 @@ Teammembers:
 * dannick - Dannick Pomerleau
 * cdkushni - Colin Kushniruk
 * ddao - Dai Dao
-* fmachaal - Fady Machalani
+* fmachaal - Fady Machaalani
