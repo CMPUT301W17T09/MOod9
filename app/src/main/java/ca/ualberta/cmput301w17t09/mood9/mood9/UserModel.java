@@ -26,7 +26,7 @@ public class UserModel {
         }
 
         // If user already exists, return null
-        if (users == null) {
+        if (users.size() == 0) {
             User user = new User(username);
             ElasticSearchMOodController.AddUsersTask addUsersTask = new ElasticSearchMOodController.AddUsersTask();
             String id = null;
